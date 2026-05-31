@@ -6,7 +6,7 @@ name: deploy
 # Benötigte Repo-Secrets (Settings -> Secrets and variables -> Actions):
 #   SSH_HOST  – Server-IP/Host (z. B. 49.12.10.11)
 #   SSH_USER  – SSH-Benutzer (z. B. root)
-#   SSH_KEY   – privater SSH-Deploy-Key (gesamter Inhalt, inkl. BEGIN/END-Zeilen)
+#   FHZ       – privater SSH-Deploy-Key (gesamter Inhalt, inkl. BEGIN/END-Zeilen)
 #   SSH_PORT  – optional, Standard 22
 
 on:
@@ -22,7 +22,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.FHZ }}
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
