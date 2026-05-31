@@ -158,19 +158,35 @@ mv .next.new .next
 rm -rf .next.old
 echo ">>> [swap] erledigt"
 
-# --- Schritt 6: PM2 neu starten ----------------------------------------------
-# ACHTUNG: Dies killt den App-Prozess, der dieses Update angestoßen hat. Da das
-# Skript detached läuft, läuft es weiter; die App kommt danach zurück.
-CURRENT_STEP="restart"
-write_status "running" "$CURRENT_STEP" "Starte Anwendung neu (pm2 restart $PM2_APP)" "$NEW_SHA"
-echo ">>> [pm2] restart $PM2_APP --update-env"
-pm2 restart "$PM2_APP" --update-env
-
-# --- Schritt 7: Erfolg -------------------------------------------------------
+# --- Schritt 6: Erfolg markieren (Build ist eingespielt) ---------------------
+# WICHTIG: 'success' wird JETZT geschrieben — VOR dem Neustart. Grund:
+# `pm2 restart` killt den kompletten Prozessbaum von fhz-test (PM2 treekill).
+# Dieses Skript ist zu dem Zeitpunkt noch ein Nachfahre von fhz-test und würde
+# beim Neustart mitgekillt, BEVOR es 'success' schreiben könnte → die UI hinge
+# dann dauerhaft auf Schritt 'restart'. Der Build+Swap ist bereits erfolgt, also
+# ist das Update inhaltlich an dieser Stelle fertig.
+# Ab hier KEIN ERR-Trap/`set -e` mehr: der (entkoppelte) Neustart darf 'success'
+# nicht nachträglich zu 'error' umschreiben.
+set +e
+trap - ERR
 CURRENT_STEP="done"
-write_status "success" "$CURRENT_STEP" "Update erfolgreich abgeschlossen" "$NEW_SHA"
+write_status "success" "$CURRENT_STEP" "Update erfolgreich abgeschlossen – Anwendung wird neu gestartet" "$NEW_SHA"
 echo "=================================================="
-echo "Self-Update ERFOLGREICH: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Self-Update ERFOLGREICH (Build eingespielt): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "Neuer Commit: $NEW_SHA"
 echo "=================================================="
+
+# --- Schritt 7: PM2-Neustart vom Skript-Prozessbaum entkoppeln ---------------
+# Den Neustart in eine NEUE Session (setsid) auslagern, damit PM2s treekill den
+# Neustarter nicht erwischt. `sleep 1` gibt diesem Skript Zeit, sich zu beenden,
+# wodurch der Neustarter auf init umgehängt wird und kein fhz-test-Nachfahre
+# mehr ist → er überlebt den Neustart und führt ihn zuverlässig aus.
+echo ">>> [pm2] restart $PM2_APP --update-env (entkoppelt via setsid)"
+if command -v setsid >/dev/null 2>&1; then
+  setsid --fork bash -c "sleep 1; pm2 restart '$PM2_APP' --update-env >> '$UPDATE_DIR/update.log' 2>&1" < /dev/null > /dev/null 2>&1 || true
+else
+  # Fallback ohne setsid: direkter Neustart (Skript wird ggf. mitgekillt, aber
+  # 'success' steht bereits → UI bleibt korrekt).
+  pm2 restart "$PM2_APP" --update-env >> "$UPDATE_DIR/update.log" 2>&1 || true
+fi
 exit 0
