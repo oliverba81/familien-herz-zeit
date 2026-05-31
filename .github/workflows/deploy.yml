@@ -1,7 +1,11 @@
 name: deploy
 
-# Deployt automatisch auf den Hetzner-Server, sobald ein GitHub-Release
-# veröffentlicht wird (durch Merge des release-please-PR).
+# Deployt auf den Hetzner-Server. Wird vom release-please-Workflow per
+# workflow_call aufgerufen (wenn ein Release erstellt wurde) und kann
+# zusätzlich manuell ausgelöst werden (Actions -> deploy -> Run workflow).
+#
+# Hinweis: Ein direkter `release: published`-Trigger funktioniert NICHT, weil
+# von GITHUB_TOKEN erzeugte Releases keine weiteren Workflows auslösen.
 #
 # Benötigte Repo-Secrets (Settings -> Secrets and variables -> Actions):
 #   SSH_HOST  – Server-IP/Host (z. B. 49.12.10.11)
@@ -10,8 +14,8 @@ name: deploy
 #   SSH_PORT  – optional, Standard 22
 
 on:
-  release:
-    types: [published]
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   deploy:
