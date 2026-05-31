@@ -6,15 +6,23 @@
 #   bash /root/srv/cursor-projects/familien-herz-zeit/scripts/deploy-on-server.sh
 set -e
 cd "$(dirname "$0")/.."
+export GIT_TERMINAL_PROMPT=0
 echo "=== Deploy auf Server ==="
-echo "0. Git-Tags aktualisieren (fuer Versionsanzeige)..."
-git fetch --tags --force || echo "  (git fetch fehlgeschlagen – fahre fort)"
-echo "1. Alten Build entfernen..."
+echo "0. Neuesten Code + Tags von GitHub holen..."
+git fetch origin --tags --prune --force
+echo "   -> Setze Server exakt auf origin/main (verwirft lokale Aenderungen an versionierten Dateien)..."
+git reset --hard origin/main
+echo "1. Abhaengigkeiten installieren..."
+npm install
+echo "2. Prisma-Client generieren + Schema synchronisieren..."
+npx prisma generate
+npx prisma db push
+echo "3. Alten Build entfernen..."
 rm -rf .next
-echo "2. Neu bauen..."
+echo "4. Neu bauen..."
 npm run build
-echo "3. PM2-App neu starten..."
-pm2 restart fhz-test
+echo "5. PM2-App neu starten..."
+pm2 restart fhz-test --update-env
 echo ""
 echo "=== Deploy fertig ==="
 echo "  • Test-URL: https://test.familien-herz-zeit.de"

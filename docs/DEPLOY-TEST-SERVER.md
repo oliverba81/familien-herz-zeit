@@ -1,3 +1,61 @@
+# Deploy-Flow (Test-Server)
+
+Der Server läuft als **Git-Checkout** von `origin/main` unter
+`/root/srv/cursor-projects/familien-herz-zeit` (PM2-Prozess `fhz-test`). Es gibt
+zwei Wege, einen neuen Stand auszuspielen:
+
+1. **Admin-Oberfläche → System → Updates** (empfohlen): „Auf Updates prüfen“ und
+   „Update starten“. Läuft `git reset --hard origin/main` + install + Prisma +
+   Zero-Downtime-Build (`.next.new` + Swap) + `pm2 restart` automatisch im
+   Hintergrund.
+2. **Per SSH:** `bash scripts/deploy-on-server.sh` – macht dasselbe (ohne
+   Zero-Downtime-Swap).
+
+## Einmaliges Server-Setup (Git-Checkout einrichten)
+
+War der Server-Ordner bisher **kein** Git-Checkout (Deploy per scp/rsync), einmalig
+in einen Klon von `origin/main` umwandeln – **ohne** `.env`, Uploads, `node_modules`
+zu verlieren (`git reset --hard` fasst nur **versionierte** Dateien an, untracked
+bleibt unberührt):
+
+```bash
+cd /root/srv/cursor-projects/familien-herz-zeit
+
+# 1) Git initialisieren und Remote setzen (privates Repo → Token oder Deploy-Key, s.u.)
+git init
+git remote add origin https://github.com/oliverba81/familien-herz-zeit.git
+git fetch origin
+
+# 2) Arbeitskopie exakt auf main setzen (überschreibt nur versionierte Dateien)
+git reset --hard origin/main
+git branch -M main
+git branch --set-upstream-to=origin/main main
+
+# 3) Build + Start
+npm install && npx prisma generate && npx prisma db push
+rm -rf .next && npm run build && pm2 restart fhz-test --update-env
+```
+
+### Nicht-interaktiver Git-Zugang (Pflicht für „Update starten“)
+
+Das private Repo braucht Auth ohne Passwort-Prompt. Eine der beiden Varianten:
+
+- **Personal Access Token (fine-grained, nur „Contents: Read“):**
+  ```bash
+  git config --global credential.helper store
+  # Beim ersten fetch Token als Passwort eingeben; danach gespeichert. Test:
+  GIT_TERMINAL_PROMPT=0 git fetch origin   # muss ohne Eingabe durchlaufen
+  ```
+  Alternativ Token direkt in die Remote-URL:
+  `git remote set-url origin https://<TOKEN>@github.com/oliverba81/familien-herz-zeit.git`
+- **SSH Deploy-Key:** öffentlichen Key als Deploy-Key (read-only) im GitHub-Repo
+  hinterlegen und `git remote set-url origin git@github.com:oliverba81/familien-herz-zeit.git`.
+
+Erst wenn `GIT_TERMINAL_PROMPT=0 git fetch origin` ohne Eingabe durchläuft,
+funktioniert das Self-Update zuverlässig.
+
+---
+
 # Test-Server: 500 bei CSS/JS-Chunks
 
 ## Symptom
