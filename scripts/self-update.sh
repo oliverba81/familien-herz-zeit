@@ -110,10 +110,15 @@ NEW_SHA="$(git rev-parse HEAD)"
 echo ">>> Neuer Commit: $NEW_SHA"
 
 # --- Schritt 3: Dependencies installieren ------------------------------------
+# WICHTIG: --include=dev erzwingen. Der Self-Update-Prozess wird vom PM2-App-
+# Prozess gespawnt und erbt dessen NODE_ENV=production → sonst überspringt
+# `npm install` die devDependencies. Der Build braucht aber Build-Tools, die
+# als devDependencies geführt werden (z.B. @tailwindcss/postcss, tailwindcss,
+# postcss, typescript) → ohne sie schlägt `next build` fehl.
 CURRENT_STEP="install"
-write_status "running" "$CURRENT_STEP" "Installiere Abhängigkeiten (npm install)" "$NEW_SHA"
-echo ">>> [npm] install"
-npm install
+write_status "running" "$CURRENT_STEP" "Installiere Abhängigkeiten (npm install --include=dev)" "$NEW_SHA"
+echo ">>> [npm] install --include=dev"
+npm install --include=dev
 
 # --- Schritt 4: Prisma -------------------------------------------------------
 # `prisma generate` ist ZWINGEND: /src/generated/prisma ist gitignored und es
