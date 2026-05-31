@@ -24,3 +24,66 @@ body {
   }
 }
 
+/* Vorschau wie TinyMCE-Editor – gleiche Darstellung wie im Editor (Schrift, Tabellen, Überschriften) */
+.tinymce-preview-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Tabellen – nur Layout/Abstand, keine erzwungenen Rahmen (HTML border="0" / border-style: none bleibt sichtbar) */
+.tinymce-preview-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75em 0;
+}
+
+.tinymce-preview-content td,
+.tinymce-preview-content th {
+  padding: 0.4em 0.6em;
+  vertical-align: top;
+}
+
+.tinymce-preview-content th {
+  font-weight: bold;
+  background: #f5f5f5;
+}
+
+/* Überschriften wie im Editor */
+.tinymce-preview-content h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
+.tinymce-preview-content h2 { font-size: 1.5em; font-weight: bold; margin: 0.75em 0; }
+.tinymce-preview-content h3 { font-size: 1.25em; font-weight: bold; margin: 0.83em 0; }
+
+/* Absätze/Listen – Abstände wie im Editor, Prose nicht überschreiben lassen */
+.tinymce-preview-content p { margin: 0.5em 0; }
+.tinymce-preview-content p:first-child { margin-top: 0; }
+.tinymce-preview-content p:last-child { margin-bottom: 0; }
+.tinymce-preview-content ul,
+.tinymce-preview-content ol { padding-left: 1.5em; margin: 0.5em 0; }
+
+/* Links in der Vorschau (wie auf der Seite) */
+.tinymce-preview-content a { color: #e11d48; text-decoration: underline; }
+.tinymce-preview-content a:hover { color: #be123c; }
+
+/* Hover-Effekte für Tabellen-Zellen mit Gradient-Rahmen */
+td.table-cell-gradient:hover,
+figure.table-cell-gradient:hover {
+  background: linear-gradient(white, white) padding-box, 
+              linear-gradient(135deg, #f093fb 0%, #f5576c 30%, #4facfe 70%, #00f2fe 100%) border-box !important;
+}
+
+/* Rahmen-Styles für Bilder in Tabellenzellen - erhöhte Spezifität */
+td figure.bg-white\/70,
+td figure.border-2,
+td figure.border,
+td figure.bg-gray-50,
+td figure.shadow-xl,
+td figure.shadow-lg,
+td figure.shadow-md,
+td figure.shadow-sm,
+td figure.shadow-2xl {
+  /* Stelle sicher, dass die Styles angewendet werden */
+  position: relative !important;
+  z-index: 10 !important;
+}
+

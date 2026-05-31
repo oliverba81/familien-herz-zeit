@@ -29,4 +29,3 @@ export const sessionCallback = async ({
   return session;
 };
 
-

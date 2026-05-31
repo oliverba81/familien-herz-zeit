@@ -5,7 +5,17 @@
       "Bash(gh auth *)",
       "Bash(gh repo *)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(echo \"Exit-Code: $?  \\(1 = nichts gefunden = gut\\)\")",
+      "Bash(xargs grep -l \"Abmelden\")",
+      "Bash(xargs grep -l \"dark:bg\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\olive\\\\Documents\\\\Cursor-Projekte\\\\Familien-Herz-Zeit_v1\" -Force)",
+      "Bash(Select-Object Name, FullName)",
+      "Bash(findstr -v \"node_modules\")",
+      "Bash(ls -la \"C:\\\\Users\\\\olive\\\\Documents\\\\Cursor-Projekte\\\\Familien-Herz-Zeit_v1\\\\\" | head -30)",
+      "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")",
+      "Bash(xargs grep -l \"github\\\\|github.com\")",
+      "Bash(xargs grep -l \"footer\\\\|Footer\\\\|copyright\")"
     ]
   }
 }

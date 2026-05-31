@@ -46,11 +46,31 @@ export default function ContentRenderer({ contentJson }: ContentRendererProps) {
             );
 
           case "text":
+            const text = block.text || block.data?.text || "";
+            const hasHtml = /<[^>]+>/.test(text);
+            
+            if (hasHtml) {
+              // Importiere cleanAndConvertHtml
+              const cleanedHtml = text
+                .replace(
+                  /href=["']https?:\/\/(www\.)?familien-herz-zeit\.de([^"']*)["']/gi,
+                  (match: string, www: string | undefined, path: string | undefined) => `href="${path || "/"}"`
+                );
+              
+              return (
+                <div 
+                  key={index} 
+                  className="prose max-w-none prose-a:text-rose-600 prose-a:hover:text-rose-700 prose-a:underline"
+                  dangerouslySetInnerHTML={{ __html: cleanedHtml }}
+                />
+              );
+            }
+            
             return (
               <div key={index} className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {block.text || ""}
-                </p>
+                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {text}
+                </div>
               </div>
             );
 
@@ -76,5 +96,4 @@ export default function ContentRenderer({ contentJson }: ContentRendererProps) {
     </div>
   );
 }
-
 

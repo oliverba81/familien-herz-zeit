@@ -15,23 +15,39 @@ interface BlockListProps {
 const blockIcons: Record<BlockType, string> = {
   hero: "🎯",
   text: "📝",
+  richText: "📄",
   image: "🖼️",
   video: "🎥",
   features: "⭐",
   testimonials: "💬",
   cta: "🚀",
   spacer: "↕️",
+  table: "📊",
+  section: "📦",
+  reusable: "♻️",
+  courses: "📚",
+  "current-appointments": "📅",
+  "herzzeit-story": "📖",
+  contactForm: "📧",
 };
 
 const blockLabels: Record<BlockType, string> = {
   hero: "Hero",
   text: "Text",
+  richText: "Formatierter Text",
   image: "Bild",
   video: "Video",
   features: "Features",
   testimonials: "Testimonials",
   cta: "Call to Action",
   spacer: "Abstand",
+  table: "Tabelle",
+  section: "Sektion",
+  reusable: "Wiederverwendbar",
+  courses: "Kurse",
+  "current-appointments": "Aktuelle Termine",
+  "herzzeit-story": "HerzZeit-Geschichte",
+  contactForm: "Kontaktformular",
 };
 
 export default function BlockList({
@@ -66,6 +82,7 @@ export default function BlockList({
         return (
           <div
             key={block.id}
+            data-block-id={block.id}
             className={`p-3 border rounded-lg cursor-pointer transition-colors ${
               isSelected
                 ? "border-rose-500 bg-rose-50"
@@ -80,6 +97,7 @@ export default function BlockList({
               </div>
               <div className="flex items-center gap-1">
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onMoveUp(index);
@@ -91,6 +109,7 @@ export default function BlockList({
                   ↑
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onMoveDown(index);
@@ -102,6 +121,7 @@ export default function BlockList({
                   ↓
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDuplicate(block);
@@ -112,6 +132,7 @@ export default function BlockList({
                   📋
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     if (confirm("Block wirklich löschen?")) {
@@ -132,5 +153,4 @@ export default function BlockList({
     </div>
   );
 }
-
 

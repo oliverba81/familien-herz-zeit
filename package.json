@@ -5,21 +5,52 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:clean": "rm -rf .next && next build",
+    "deploy:build": "bash scripts/deploy-build.sh",
+    "deploy": "bash scripts/deploy-on-server.sh",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "backup:db": "bash scripts/backup-database.sh",
+    "backup:full": "bash scripts/full-backup.sh",
+    "restore:db": "bash scripts/restore-database.sh"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/react": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.19",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
+    "@tinymce/tinymce-react": "^6.3.0",
+    "@tiptap/extension-color": "^3.13.0",
+    "@tiptap/extension-font-family": "^3.13.0",
+    "@tiptap/extension-link": "^3.13.0",
+    "@tiptap/extension-text-align": "^3.13.0",
+    "@tiptap/extension-text-style": "^3.13.0",
+    "@tiptap/extension-underline": "^3.13.0",
+    "@tiptap/react": "^3.13.0",
+    "@tiptap/starter-kit": "^3.13.0",
+    "@types/pdfkit": "^0.17.4",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.561.0",
+    "luxon": "^3.7.2",
     "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.11",
+    "pdfkit": "^0.17.2",
     "pg": "^8.16.3",
+    "react-google-recaptcha-v3": "^1.11.0",
     "react-hook-form": "^7.68.0",
+    "sharp": "^0.34.5",
+    "stripe": "^20.1.0",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.1.13"
+    "zod": "4.1.13"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -27,7 +58,9 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/bcryptjs": "^2.4.6",
+    "@types/luxon": "^3.7.1",
     "@types/node": "^25.0.2",
+    "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.16.0",
     "autoprefixer": "^10.4.22",
     "next": "^16.0.10",
@@ -39,4 +72,3 @@
     "ts-node": "^10.9.2"
   }
 }
-

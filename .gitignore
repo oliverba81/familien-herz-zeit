@@ -20,15 +20,6 @@
 .DS_Store
 *.pem
 
-# secrets / ssh keys (NIEMALS committen)
-.ssh/
-*.ppk
-*.pub
-familienherzzeit
-familienherzzeit.ppk
-familienherzzeit.pub
-_oli.txt
-
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -54,3 +45,18 @@ next-env.d.ts
 
 /src/generated/prisma
 
+# backups
+/backups
+
+# secrets & ssh keys (niemals committen!)
+.ssh/
+familienherzzeit
+familienherzzeit.ppk
+familienherzzeit.pub
+*.ppk
+*.key
+_oli.txt
+
+# leere junk-dateien
+/next
+/familien-herz-zeit@0.1.0

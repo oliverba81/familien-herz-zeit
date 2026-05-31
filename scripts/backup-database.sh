@@ -1,6 +1,6 @@
-﻿#!/bin/bash
+#!/bin/bash
 
-# Backup-Script für PostgreSQL Datenbank mit Fortschrittsanzeige
+# Backup-Script für PostgreSQL Datenbank
 # Verwendung: ./scripts/backup-database.sh
 # Oder: npm run backup:db
 
@@ -21,6 +21,7 @@ if [ -z "$DATABASE_URL" ]; then
 fi
 
 # Bereinige DATABASE_URL - entferne Query-Parameter die pg_dump nicht unterstützt
+# pg_dump unterstützt keine Parameter wie ?schema=public
 CLEAN_DATABASE_URL=$(echo "$DATABASE_URL" | sed 's/?.*$//')
 
 # Erstelle Backup-Verzeichnis
@@ -30,79 +31,39 @@ mkdir -p "$BACKUP_DIR"
 # Erstelle Dateiname mit Timestamp
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_FILE="$BACKUP_DIR/db_backup_$TIMESTAMP.sql"
-BACKUP_FILE_GZ="${BACKUP_FILE}.gz"
 
-echo "═══════════════════════════════════════════════════════════"
 echo "🔄 Erstelle Datenbank-Backup..."
 echo "📁 Ziel: $BACKUP_FILE"
-echo "═══════════════════════════════════════════════════════════"
-echo ""
 
-# Funktion für Fortschrittsanzeige
-show_progress() {
-    local pid=$1
-    local message=$2
-    local spinner="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
-    local i=0
-    
-    while kill -0 $pid 2>/dev/null; do
-        i=$(( (i+1) % 10 ))
-        printf "\r${message} ${spinner:$i:1} "
-        sleep 0.1
-    done
-    printf "\r${message} ✅\n"
-}
+# Führe pg_dump aus
+pg_dump "$CLEAN_DATABASE_URL" > "$BACKUP_FILE"
 
-# Starte pg_dump im Hintergrund mit verbose Ausgabe
-echo "📊 Starte Datenbank-Dump..."
-pg_dump --verbose "$CLEAN_DATABASE_URL" > "$BACKUP_FILE" 2>&1 &
-DUMP_PID=$!
-
-# Zeige Fortschritt während des Dumps
-show_progress $DUMP_PID "🔄 Dump läuft"
-
-# Warte auf Abschluss
-wait $DUMP_PID
-DUMP_EXIT_CODE=$?
-
-if [ $DUMP_EXIT_CODE -eq 0 ]; then
+if [ $? -eq 0 ]; then
     # Prüfe Dateigröße
-    FILE_SIZE=$(du -h "$BACKUP_FILE" 2>/dev/null | cut -f1 || echo "0")
+    FILE_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
     echo "✅ Backup erfolgreich erstellt: $BACKUP_FILE ($FILE_SIZE)"
-    echo ""
     
-    # Komprimiere Backup mit Fortschrittsanzeige
+    # Komprimiere Backup
     echo "📦 Komprimiere Backup..."
-    gzip "$BACKUP_FILE" &
-    GZIP_PID=$!
-    show_progress $GZIP_PID "🔄 Komprimierung läuft"
-    wait $GZIP_PID
+    gzip "$BACKUP_FILE"
+    BACKUP_FILE="${BACKUP_FILE}.gz"
+    COMPRESSED_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+    echo "✅ Komprimiert: $BACKUP_FILE ($COMPRESSED_SIZE)"
     
-    if [ -f "$BACKUP_FILE_GZ" ]; then
-        COMPRESSED_SIZE=$(du -h "$BACKUP_FILE_GZ" 2>/dev/null | cut -f1 || echo "0")
-        echo "✅ Komprimiert: $BACKUP_FILE_GZ ($COMPRESSED_SIZE)"
-        echo ""
-        
-        # Lösche Backups älter als 30 Tage
-        echo "🧹 Lösche alte Backups (>30 Tage)..."
-        DELETED=$(find "$BACKUP_DIR" -name "db_backup_*.sql.gz" -mtime +30 -delete -print 2>/dev/null | wc -l)
-        if [ "$DELETED" -gt 0 ]; then
-            echo "✅ $DELETED alte Backups gelöscht"
-        else
-            echo "ℹ️  Keine alten Backups zum Löschen gefunden"
-        fi
-        
-        echo ""
-        echo "═══════════════════════════════════════════════════════════"
-        echo "✅ Datenbank-Backup abgeschlossen!"
-        echo "📁 Backup-Datei: $BACKUP_FILE_GZ"
-        echo "📊 Größe: $COMPRESSED_SIZE"
-        echo "═══════════════════════════════════════════════════════════"
+    # Lösche Backups älter als 30 Tage
+    echo "🧹 Lösche alte Backups (>30 Tage)..."
+    DELETED=$(find "$BACKUP_DIR" -name "db_backup_*.sql.gz" -mtime +30 -delete -print | wc -l)
+    if [ "$DELETED" -gt 0 ]; then
+        echo "✅ $DELETED alte Backups gelöscht"
     else
-        echo "❌ Fehler: Komprimierte Datei nicht gefunden"
-        exit 1
+        echo "ℹ️  Keine alten Backups zum Löschen gefunden"
     fi
+    
+    echo ""
+    echo "✅ Datenbank-Backup abgeschlossen!"
+    echo "📁 Backup-Datei: $BACKUP_FILE"
 else
-    echo "❌ Fehler beim Erstellen des Backups (Exit Code: $DUMP_EXIT_CODE)"
+    echo "❌ Fehler beim Erstellen des Backups"
     exit 1
 fi
+

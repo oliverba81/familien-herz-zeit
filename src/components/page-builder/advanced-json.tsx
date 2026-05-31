@@ -53,12 +53,14 @@ export default function AdvancedJSON({
         <h3 className="text-lg font-semibold text-gray-900">Advanced JSON Editor</h3>
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={handleExport}
             className="px-3 py-1 bg-gray-200 text-gray-800 text-sm rounded-lg hover:bg-gray-300"
           >
             Export
           </button>
           <button
+            type="button"
             onClick={handleImport}
             className="px-3 py-1 bg-rose-500 text-white text-sm rounded-lg hover:bg-rose-600"
           >
@@ -84,5 +86,4 @@ export default function AdvancedJSON({
     </div>
   );
 }
-
 

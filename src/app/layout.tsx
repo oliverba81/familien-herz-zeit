@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import NavigationLoader from "@/components/navigation/navigation-loader";
+import FooterLoader from "@/components/navigation/footer-loader";
+import { generateMetadata } from "@/components/layout/metadata-loader";
+import AnalyticsGate from "@/components/analytics/analytics-gate";
+import CookieBanner from "@/components/consent/cookie-banner";
 
-export const metadata: Metadata = {
-  title: "Familien Herz Zeit",
-  description: "Familien Herz Zeit - Ihre Familienwebsite",
-};
+export { generateMetadata };
 
 export default function RootLayout({
   children,
@@ -14,8 +15,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de">
-      <body>
-        <Providers>{children}</Providers>
+      <head>
+        <meta charSet="utf-8" />
+      </head>
+      <body className="flex flex-col min-h-screen">
+        <link rel="stylesheet" href="/page-builder-v2-presets.css" />
+        <Providers>
+          <AnalyticsGate />
+          <NavigationLoader />
+          <main className="flex-1">{children}</main>
+          <FooterLoader />
+          <CookieBanner />
+        </Providers>
       </body>
     </html>
   );

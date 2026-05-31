@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import * as React from "react";
 import { PageContent, Block } from "@/lib/page-builder/types";
-import { createBlock, generateBlockId } from "@/lib/page-builder/templates";
+import { createBlock, generateBlockId, normalizeContent } from "@/lib/page-builder/templates";
 import BlockList from "./block-list";
 import BlockEditor from "./block-editor";
 import AddBlockMenu from "./add-block-menu";
@@ -143,6 +143,7 @@ export default function Builder({ value, onChange }: BuilderProps) {
       {/* Tab Switcher */}
       <div className="flex border-b border-gray-200">
         <button
+          type="button"
           onClick={() => setViewMode("builder")}
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             viewMode === "builder"
@@ -153,6 +154,7 @@ export default function Builder({ value, onChange }: BuilderProps) {
           Builder
         </button>
         <button
+          type="button"
           onClick={() => setViewMode("json")}
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             viewMode === "json"
@@ -189,11 +191,13 @@ export default function Builder({ value, onChange }: BuilderProps) {
           </div>
 
           {/* Right: Live Preview */}
-          <div className="lg:sticky lg:top-4 h-fit">
+          <div className="lg:sticky lg:top-4 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-4">Live Preview</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 sticky top-0 bg-white z-10 pb-2">
+                Live Preview
+              </h3>
               <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <PageRenderer content={value} />
+                <PageRenderer content={normalizeContent(value)} />
               </div>
             </div>
           </div>

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth/require-role";
 import { pageUpsertSchema } from "@/lib/validations/pages";
 import { db } from "@/lib/db";
+import { logger } from "@/lib/logging/logger";
+import { logAudit, getActorFromSession, getChangedFields } from "@/lib/audit/log";
+import { AuditAction } from "@prisma/client";
+import { revalidateTag } from "next/cache";
+import { tagPage, tagPages } from "@/lib/seo/tags";
+import { parsePageContent, pageContentSchemaV1, isPageContentV2, pageContentSchemaV2 } from "@/lib/page-builder/schema";
 
 // GET /api/pages/:id - Einzelne Seite abrufen
 export async function GET(
@@ -47,6 +53,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let body: any = null;
   try {
     const session = await requireRole(["ADMIN", "EDITOR"], {
       throwError: true,
@@ -57,63 +64,241 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const body = await request.json();
+    
+    // Versuche Request-Body zu parsen
+    try {
+      body = await request.json();
+    } catch (parseError: any) {
+      console.error("❌ Failed to parse request body:", parseError.message);
+      return NextResponse.json(
+        { 
+          error: "Ungültiger Request-Body", 
+          message: "Der Request-Body konnte nicht als JSON geparst werden. Möglicherweise ist er leer oder beschädigt.",
+          details: parseError.message 
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Log nur in Development und nur einen Ausschnitt
+    if (process.env.NODE_ENV === "development") {
+      const bodyPreview = {
+        title: body.title,
+        slug: body.slug,
+        published: body.published,
+        hasDraftContent: !!body.draftContentJson,
+        hasContent: !!body.contentJson,
+      };
+      console.log("📥 Received body for update:", JSON.stringify(bodyPreview, null, 2));
+    }
 
     // Setze published default auf false falls nicht vorhanden
     if (body.published === undefined) {
       body.published = false;
     }
 
+    // Setze showTitle default auf true falls nicht vorhanden oder null
+    if (body.showTitle === undefined || body.showTitle === null) {
+      body.showTitle = true;
+    }
+    
+    // Stelle sicher, dass showTitle ein Boolean ist
+    body.showTitle = Boolean(body.showTitle);
+
+    // Setze containerWidth default auf "medium" falls nicht vorhanden
+    if (!body.containerWidth) {
+      body.containerWidth = "medium";
+    }
+
     // Validierung
     const validatedData = pageUpsertSchema.parse(body);
 
-    // Prüfe ob Seite existiert
+    // Prüfe ob Seite existiert und ob Slug-Änderung nötig ist
     const existingPage = await db.page.findUnique({
       where: { id },
+      select: {
+        id: true,
+        published: true,
+        slug: true,
+      },
     });
 
     if (!existingPage) {
       return NextResponse.json({ error: "Seite nicht gefunden" }, { status: 404 });
     }
 
-    // Prüfe ob Slug bereits von anderer Seite verwendet wird
-    const slugConflict = await db.page.findFirst({
-      where: {
-        slug: validatedData.slug,
-        id: { not: id },
-      },
-    });
+    // Prüfe Slug-Konflikt nur wenn sich der Slug geändert hat
+    if (existingPage.slug !== validatedData.slug) {
+      const slugConflict = await db.page.findFirst({
+        where: {
+          slug: validatedData.slug,
+          id: { not: id },
+        },
+        select: { id: true },
+      });
 
-    if (slugConflict) {
-      return NextResponse.json(
-        { error: "Eine andere Seite mit diesem Slug existiert bereits" },
-        { status: 409 }
-      );
+      if (slugConflict) {
+        return NextResponse.json(
+          { error: "Eine andere Seite mit diesem Slug existiert bereits" },
+          { status: 409 }
+        );
+      }
     }
 
-    // Parse contentJson falls String
-    let contentJson = validatedData.contentJson;
-    if (typeof contentJson === "string") {
+    // Parse draftContentJson (oder contentJson für Backward Compatibility)
+    let draftContentJson = body.draftContentJson ?? body.contentJson;
+    
+    // Prüfe ob mindestens eines der Content-Felder vorhanden ist
+    if (draftContentJson === undefined || draftContentJson === null) {
+      return NextResponse.json(
+        { error: "Entweder contentJson oder draftContentJson muss vorhanden sein" },
+        { status: 400 }
+      );
+    }
+    
+    if (typeof draftContentJson === "string") {
       try {
-        contentJson = JSON.parse(contentJson);
+        draftContentJson = JSON.parse(draftContentJson);
       } catch (e) {
         return NextResponse.json(
-          { error: "Ungültiges JSON in contentJson" },
+          { error: "Ungültiges JSON in draftContentJson" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validiere Page Content Schema (V1 oder V2)
+    if (isPageContentV2(draftContentJson)) {
+      try {
+        pageContentSchemaV2.parse(draftContentJson);
+        // V2: unverändert speichern
+      } catch (e: any) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("V2 Content validation error:", e?.message || e);
+        }
+        if (e?.name === "ZodError") {
+          const issues = e.issues || [];
+          const errorMessages = issues
+            .map((issue: any) => {
+              const path = issue.path?.length ? issue.path.join(".") : "root";
+              return `${path}: ${issue.message}`;
+            })
+            .join(", ");
+          return NextResponse.json(
+            {
+              error: "Ungültiges V2 Content-Format",
+              message: errorMessages,
+              details: issues,
+            },
+            { status: 400 }
+          );
+        }
+        return NextResponse.json(
+          { error: "Ungültiges V2 Content-Format", message: e?.message },
+          { status: 400 }
+        );
+      }
+    } else {
+      try {
+        const parsedContent = parsePageContent(draftContentJson);
+        draftContentJson = parsedContent;
+      } catch (e: any) {
+      // Log nur in Development
+      if (process.env.NODE_ENV === "development") {
+        console.error("Content validation error:", e?.message || e);
+        if (e?.issues) {
+          console.error("Validation issues:", e.issues);
+        }
+      }
+      
+      // Wenn es ein ZodError ist, gebe detaillierte Fehler zurück
+      if (e?.name === "ZodError") {
+        const issues = e.issues || [];
+        const errorMessages = issues.map((issue: any) => {
+          const path = issue.path && issue.path.length > 0 ? issue.path.join(".") : "root";
+          return `${path}: ${issue.message}`;
+        }).join(", ");
+        
+        return NextResponse.json(
+          { 
+            error: "Ungültiges Content-Format", 
+            message: errorMessages || e.message || "Content-Validierung fehlgeschlagen",
+            details: issues.length > 0 ? issues : e.message 
+          },
+          { status: 400 }
+        );
+      }
+      
+      return NextResponse.json(
+          { 
+            error: "Ungültiges Content-Format", 
+            message: e?.message || "Content-Validierung fehlgeschlagen",
+            details: e?.message 
+          },
           { status: 400 }
         );
       }
     }
 
     // Aktualisiere Seite
-    const page = await db.page.update({
-      where: { id },
-      data: {
+    // Wenn die Seite veröffentlicht ist (oder gerade veröffentlicht wird), 
+    // aktualisiere auch publishedContentJson, damit die Änderungen sofort im Frontend sichtbar sind
+    const updateData: any = {
+      title: validatedData.title,
+      slug: validatedData.slug,
+      published: validatedData.published ?? false,
+      showTitle: validatedData.showTitle ?? true,
+      containerWidth: validatedData.containerWidth ?? "medium",
+      customCss: validatedData.customCss || null,
+      metaDescription: validatedData.metaDescription ?? null,
+      metaKeywords: validatedData.metaKeywords ?? null,
+      ogImageUrl: validatedData.ogImageUrl ?? null,
+      draftContentJson: draftContentJson,
+      // Legacy: contentJson auch setzen für Backward Compatibility
+      contentJson: draftContentJson,
+    };
+
+    // Wenn Seite veröffentlicht ist (oder gerade veröffentlicht wird), setze publishedContentJson
+    const isPublishing = validatedData.published === true;
+    if (isPublishing) {
+      updateData.publishedContentJson = draftContentJson;
+      // Setze publishedAt nur wenn die Seite vorher nicht veröffentlicht war
+      if (!existingPage.published) {
+        updateData.publishedAt = new Date();
+      }
+    }
+
+    // Log nur in Development
+    if (process.env.NODE_ENV === "development") {
+      console.log("📝 Updating page:", {
+        id,
         title: validatedData.title,
         slug: validatedData.slug,
         published: validatedData.published,
-        contentJson: contentJson,
-      },
+      });
+    }
+    
+    const page = await db.page.update({
+      where: { id },
+      data: updateData,
     });
+
+    await logger.success("ADMIN", "PAGE_UPDATED", `Page updated: ${page.title}`, {
+      pageId: page.id,
+      slug: page.slug,
+      published: page.published,
+    });
+
+    // Cache invalidierten, wenn Seite veröffentlicht ist
+    if (page.published === true) {
+      // #region agent log
+      fetch("http://localhost:7243/ingest/1d60de62-6032-4976-9878-2ebaff9d4a67", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "debug-session", runId: "page-update", hypothesisId: "H3", location: "src/app/api/pages/[id]/route.ts:revalidate", message: "Revalidate tags after page update", data: { slug: page.slug, published: page.published }, timestamp: Date.now() }) }).catch(() => {});
+      // #endregion
+      // @ts-ignore - TypeScript type issue with revalidateTag
+      revalidateTag(tagPage(page.slug));
+      // @ts-ignore - TypeScript type issue with revalidateTag
+      revalidateTag(tagPages());
+    }
 
     return NextResponse.json(page);
   } catch (error: any) {
@@ -124,14 +309,44 @@ export async function PUT(
       );
     }
     if (error.name === "ZodError") {
+      const errorDetails = error.errors || [];
+      console.error("Zod validation error:", JSON.stringify(errorDetails, null, 2));
+      console.error("Zod error issues:", JSON.stringify(error.issues, null, 2));
+      if (body) {
+        console.error("Request body:", JSON.stringify(body, null, 2));
+      } else {
+        console.error("Request body: nicht verfügbar (Fehler beim Parsen)");
+      }
+      
+      // Wenn keine Fehler im errors-Array sind, aber es ein ZodError ist, 
+      // könnte es ein refine-Fehler sein - verwende issues stattdessen
+      const issues = error.issues || errorDetails;
+      const errorMessages = issues.map((e: any) => {
+        const path = e.path && e.path.length > 0 ? e.path.join(".") : e.path || "root";
+        return `${path}: ${e.message}`;
+      }).join(", ");
+      
       return NextResponse.json(
-        { error: "Validierungsfehler", details: error.errors },
+        { 
+          error: "Validierungsfehler", 
+          message: errorMessages || error.message || "Ungültige Daten",
+          details: issues.length > 0 ? issues : errorDetails 
+        },
         { status: 400 }
       );
     }
-    console.error("Error updating page:", error);
+    console.error("❌ Error updating page:", error);
+    console.error("❌ Error name:", error.name);
+    console.error("❌ Error message:", error.message);
+    console.error("❌ Error stack:", error.stack);
+    console.error("❌ Full error:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: "Internal server error", 
+        message: error.message,
+        name: error.name,
+        details: process.env.NODE_ENV === "development" ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
@@ -163,9 +378,42 @@ export async function DELETE(
     }
 
     // Lösche Seite
+    const pageTitle = existingPage.title;
+    const pageSlug = existingPage.slug;
     await db.page.delete({
       where: { id },
     });
+
+    await logger.warning(
+      "ADMIN",
+      "PAGE_DELETED",
+      `Page deleted: ${pageTitle}`,
+      undefined,
+      undefined,
+      {
+        pageId: id,
+        slug: pageSlug,
+      }
+    );
+
+    // Audit Log
+    const actor = await getActorFromSession();
+    await logAudit({
+      actor,
+      entity: {
+        type: "Page",
+        id: existingPage.id,
+        label: existingPage.slug,
+      },
+      action: AuditAction.DELETE,
+      message: `Seite "${pageTitle}" gelöscht`,
+    });
+
+    // Revalidate Cache
+    // @ts-ignore - TypeScript type issue with revalidateTag
+    revalidateTag(tagPage(existingPage.slug));
+    // @ts-ignore - TypeScript type issue with revalidateTag
+    revalidateTag(tagPages());
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

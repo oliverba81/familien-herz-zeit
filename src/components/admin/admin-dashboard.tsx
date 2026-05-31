@@ -17,6 +17,42 @@ export default function AdminDashboard() {
               Erstellen, bearbeiten und löschen Sie Seiten
             </p>
           </Link>
+          <Link
+            href="/admin/media"
+            className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
+          >
+            <h3 className="font-semibold text-gray-900 mb-1">Medien verwalten</h3>
+            <p className="text-sm text-gray-600">
+              Verwalten Sie Ihre hochgeladenen Bilder und Videos
+            </p>
+          </Link>
+          <Link
+            href="/admin/video-courses"
+            className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
+          >
+            <h3 className="font-semibold text-gray-900 mb-1">Videokurse verwalten</h3>
+            <p className="text-sm text-gray-600">
+              Erstellen, bearbeiten und löschen Sie Videokurse
+            </p>
+          </Link>
+          <Link
+            href="/admin/courses"
+            className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
+          >
+            <h3 className="font-semibold text-gray-900 mb-1">Live-Kurse verwalten</h3>
+            <p className="text-sm text-gray-600">
+              Erstellen, bearbeiten und löschen Sie Live-Kurse
+            </p>
+          </Link>
+          <Link
+            href="/admin/bookings"
+            className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
+          >
+            <h3 className="font-semibold text-gray-900 mb-1">Buchungen verwalten</h3>
+            <p className="text-sm text-gray-600">
+              Verwalten Sie alle Buchungen und ändern Sie den Status
+            </p>
+          </Link>
         </div>
       </div>
 

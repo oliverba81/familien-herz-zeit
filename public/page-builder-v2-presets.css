@@ -1,0 +1,88 @@
+/**
+ * Stylevorlagen für Pagebuilder V2 (WYSIWYG).
+ * Wird im TinyMCE-Editor (content_css) und im Frontend (layout) geladen.
+ */
+
+/* Rahmen */
+.fhz-frame-solid {
+  border: 2px solid #d1d5db;
+}
+.fhz-frame-double {
+  border: 4px double #d1d5db;
+}
+.fhz-frame-shadow {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+/* Karten */
+.fhz-shadow-card {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.fhz-shadow-card-strong {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Abstände */
+.fhz-padding-sm {
+  padding: 0.5rem;
+}
+.fhz-padding-md {
+  padding: 1rem;
+}
+.fhz-padding-lg {
+  padding: 1.5rem;
+}
+
+/* Hintergrund */
+.fhz-bg-highlight {
+  background-color: #fef3c7;
+}
+.fhz-bg-muted {
+  background-color: #f3f4f6;
+}
+
+/* Callout / Hinweis-Boxen */
+.fhz-callout-info {
+  background-color: #dbeafe;
+  border-left: 4px solid #2563eb;
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+.fhz-callout-warn {
+  background-color: #fef3c7;
+  border-left: 4px solid #d97706;
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+/* Bilder */
+.fhz-img-rounded {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.fhz-img-rounded img {
+  border-radius: 0.5rem;
+}
+.fhz-img-polaroid {
+  padding: 0.5rem;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  border: 1px solid #e5e7eb;
+}
+.fhz-img-polaroid img {
+  display: block;
+}
+
+/* Tabellen */
+.fhz-table-zebra tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+.fhz-table-compact td,
+.fhz-table-compact th {
+  padding: 0.25rem 0.5rem;
+}

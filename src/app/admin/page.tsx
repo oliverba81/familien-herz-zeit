@@ -17,7 +17,9 @@ export default async function AdminPage() {
     <AdminContainer>
       <AdminHeader />
       <UserInfo email={session.user?.email || ""} role={session.user?.role || ""} />
-      <AdminDashboard />
+      <div className="mt-6">
+        <AdminDashboard />
+      </div>
     </AdminContainer>
   );
 }

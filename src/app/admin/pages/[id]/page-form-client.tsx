@@ -10,7 +10,12 @@ interface PageFormClientProps {
     title: string;
     slug: string;
     published: boolean;
+    showTitle?: boolean;
+    containerWidth?: string;
+    customCss?: string | null;
     contentJson: any;
+    draftContentJson?: any;
+    previewToken?: string | null;
   };
 }
 
@@ -63,5 +68,4 @@ export default function PageFormClient({ initialData }: PageFormClientProps) {
     </div>
   );
 }
-
 

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,25 +6,512 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
-  ADMIN
-  EDITOR
-}
-
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String          @id @default(cuid())
+  email        String          @unique
   passwordHash String
-  role         UserRole @default(ADMIN)
-  createdAt    DateTime @default(now())
+  role         UserRole        @default(ADMIN)
+  isActive     Boolean         @default(true)
+  name         String?
+  firstName    String?
+  lastName     String?
+  address      String?
+  city         String?
+  zip          String?
+  country      String?
+  createdAt    DateTime        @default(now())
+  purchases    VideoPurchase[]
+  invoices     Invoice[]
+  logs         SystemLog[]
+  auditLogs    AuditLog[]      @relation("AuditLogActor")
+
+  @@index([isActive])
+  @@index([role])
 }
 
 model Page {
-  id         String   @id @default(cuid())
-  slug       String   @unique
-  title      String
-  contentJson Json
-  published  Boolean  @default(false)
-  updatedAt  DateTime @updatedAt
-  createdAt  DateTime @default(now())
+  id                   String    @id @default(cuid())
+  slug                 String    @unique
+  title                String
+  contentJson          Json // Legacy - wird für Backward Compatibility behalten
+  draftContentJson     Json? // Entwurf (wird im Builder bearbeitet)
+  publishedContentJson Json? // Veröffentlichte Version (nur wenn published=true)
+  published            Boolean   @default(false)
+  publishedAt          DateTime? // Wann wurde veröffentlicht
+  previewToken         String?   @unique // Token für Preview-Link
+  previewTokenExpires  DateTime? // Optional: Token Ablaufdatum
+  showTitle            Boolean   @default(true)
+  containerWidth       String?   @default("medium")
+  customCss            String? // Custom CSS für diese Seite
+  metaDescription      String? // Kurzbeschreibung für Snippets/KI (ca. 120–158 Zeichen)
+  metaKeywords         String? // Komma-getrennte Stichwörter (optional)
+  ogImageUrl           String? // Relativer Pfad oder URL für OG/Social (z. B. 1200×630 px)
+  updatedAt            DateTime  @updatedAt
+  createdAt            DateTime  @default(now())
+}
+
+model ReusableBlock {
+  id          String   @id @default(cuid())
+  name        String
+  contentJson Json // PageContentV1 oder einzelner Block
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  type      MediaType
+  title     String?
+  fileName  String
+  mimeType  String
+  size      Int
+  url       String    @unique
+  createdAt DateTime  @default(now())
+}
+
+model VideoCourse {
+  id              String             @id @default(cuid())
+  slug            String             @unique
+  title           String
+  description     String
+  priceCents      Int
+  currency        String             @default("EUR")
+  durationSeconds Int?
+  videoUrl        String
+  thumbnailUrl    String?
+  status          VideoCourseStatus  @default(DRAFT)
+  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime           @default(now())
+  accessTokens    VideoAccessToken[]
+  purchases       VideoPurchase[]
+  discountCodes   DiscountCode[]
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  CUSTOMER
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum NavigationLocation {
+  HEADER
+  FOOTER
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum CourseCategory {
+  AUTO
+  COURSE
+  TOPIC
+}
+
+enum RecurrenceFrequency {
+  WEEKLY
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum VideoCourseStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+}
+
+enum PurchaseStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model NavigationItem {
+  id        String             @id @default(cuid())
+  location  NavigationLocation
+  label     String
+  href      String?
+  order     Int                @default(0)
+  parentId  String?
+  parent    NavigationItem?    @relation("NavigationItemChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children  NavigationItem[]   @relation("NavigationItemChildren")
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model SiteSettings {
+  key       String   @id
+  value     String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  type        String   @unique // z.B. "booking_user", "booking_confirmed", "booking_admin"
+  name        String // Anzeigename z.B. "Buchungsanfrage an Teilnehmer"
+  description String? // Beschreibung des Templates
+  subject     String // Betreff der E-Mail
+  textBody    String // Text-Version (Plain Text)
+  htmlBody    String // HTML-Version
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+}
+
+model CourseSeries {
+  id              String              @id @default(cuid())
+  title           String
+  description     String
+  durationMinutes Int
+  priceCents      Int                 @default(0)
+  maxParticipants Int                 @default(10)
+  location        String?
+  status          CourseStatus        @default(DRAFT)
+  timezone        String              @default("Europe/Berlin")
+  frequency       RecurrenceFrequency @default(WEEKLY)
+  intervalWeeks   Int                 @default(1) // 1 = jede Woche, 2 = jede 2. Woche
+  weekdays        Json // z.B. [1,3,5] für Mo/Mi/Fr (Luxon: 1=Mo..7=So)
+  startDate       DateTime // Datum (00:00), Zone Berlin
+  endDate         DateTime // Datum (00:00), Zone Berlin
+  startTime       String // "HH:mm" (z.B. "10:30")
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  courses         Course[]
+
+  @@index([status])
+}
+
+model Course {
+  id                String          @id @default(cuid())
+  title             String
+  description       String
+  priceCents        Int // Preis für den gesamten Kurs (alle Termine)
+  maxParticipants   Int
+  location          String?
+  acceptsAokVoucher Boolean         @default(false) // AOK-Gutscheine akzeptieren?
+  status            CourseStatus    @default(DRAFT)
+  category          CourseCategory  @default(AUTO) // Kategorie für Anzeige im Terminblock
+  plannedMonth      Int? // Optional: Geplanter Monat (1-12) wenn noch kein genaues Datum
+  plannedYear       Int? // Optional: Geplantes Jahr wenn noch kein genaues Datum
+  seriesId          String?
+  series            CourseSeries?   @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  sessions          CourseSession[]
+  bookings          Booking[]
+  waitlistEntries   WaitlistEntry[]
+
+  @@index([seriesId])
+}
+
+model CourseSession {
+  id              String    @id @default(cuid())
+  courseId        String
+  course          Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  startAt         DateTime // Datum & Uhrzeit des Termins
+  durationMinutes Int // Dauer des Termins in Minuten
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+
+  @@unique([courseId, startAt])
+  @@index([courseId])
+  @@index([startAt])
+}
+
+model Booking {
+  id              String         @id @default(cuid())
+  courseId        String
+  course          Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sessionId       String? // Optional: Spezifischer Termin, falls nur für einen Termin gebucht
+  session         CourseSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  // Elternteil-Informationen
+  firstName       String
+  lastName        String
+  street          String
+  zipCode         String
+  city            String
+  email           String
+  phone           String
+  hasAokVoucher   Boolean        @default(false) // AOK-Gutschein vorhanden?
+  // Kind-Informationen
+  childFirstName  String
+  childLastName   String
+  childBirthDate  DateTime
+  childNotes      String? // Besonderheiten
+  // Weitere Informationen
+  howDidYouHear   String? // Wie aufmerksam geworden
+  privacyAccepted Boolean        @default(false)
+  termsAccepted   Boolean        @default(false)
+  // Legacy-Felder (für Backward Compatibility)
+  parentName      String? // Wird aus firstName + lastName zusammengesetzt
+  childName       String? // Wird aus childFirstName + childLastName zusammengesetzt
+  childAgeMonths  Int?
+  status          BookingStatus  @default(PENDING)
+  // Zahlungsinformationen
+  paymentProvider String? // "STRIPE" oder "PAYPAL"
+  paymentStatus   String? // "PENDING", "COMPLETED", "FAILED", "CANCELLED"
+  stripeSessionId String?        @unique
+  paypalOrderId   String?        @unique
+  amountPaidCents Int? // Betrag in Cent, der tatsächlich bezahlt wurde
+  createdAt       DateTime       @default(now())
+
+  @@index([courseId])
+  @@index([sessionId])
+}
+
+model WaitlistEntry {
+  id             String   @id @default(cuid())
+  courseId       String?
+  course         Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  // Kontakt
+  firstName      String
+  lastName       String
+  email          String
+  phone          String?
+  // Kind-Informationen (optional)
+  childFirstName String?
+  childLastName  String?
+  childBirthDate DateTime?
+  childNotes     String?
+  // Interesse
+  interestLabel  String?
+  notes          String?
+  createdAt      DateTime @default(now())
+
+  @@index([courseId])
+  @@index([createdAt])
+}
+
+model VideoAccessToken {
+  id            String      @id @default(cuid())
+  token         String      @unique
+  videoCourseId String
+  videoCourse   VideoCourse @relation(fields: [videoCourseId], references: [id], onDelete: Cascade)
+  email         String
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime    @default(now())
+}
+
+model VideoPurchase {
+  id                    String          @id @default(cuid())
+  provider              PaymentProvider @default(STRIPE)
+  status                PurchaseStatus  @default(PENDING)
+  videoCourseId         String
+  videoCourse           VideoCourse     @relation(fields: [videoCourseId], references: [id], onDelete: Cascade)
+  userId                String?
+  user                  User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email                 String
+  amountCents           Int
+  currency              String          @default("eur")
+  appliedDiscountCode   String?
+  stripeSessionId       String?         @unique
+  stripePaymentIntentId String?
+  paypalOrderId         String?         @unique
+  paypalCaptureId       String?
+  paidAt                DateTime?
+  createdAt             DateTime        @default(now())
+  invoice               Invoice?
+
+  @@index([videoCourseId])
+  @@index([email])
+  @@index([userId])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  purchaseId    String        @unique
+  purchase      VideoPurchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  pdfUrl        String
+  createdAt     DateTime      @default(now())
+
+  @@index([userId])
+  @@index([invoiceNumber])
+}
+
+model InvoiceSettings {
+  id                  String   @id @default(cuid())
+  companyName         String
+  companyAddress      String
+  companyCity         String
+  companyZip          String
+  companyCountry      String   @default("Deutschland")
+  companyTaxId        String?
+  companyVatId        String?
+  taxRate             Float    @default(19.0) // MwSt in Prozent
+  invoiceNumberPrefix String? // Optionales Prefix für Rechnungsnummern (z.B. "RE")
+  invoiceNumberSuffix String? // Optionales Suffix für Rechnungsnummern
+  invoiceNumberStart  Int      @default(1) // Startnummer für Rechnungen
+  isSmallBusiness     Boolean  @default(false) // Kleinunternehmerregelung nach § 19 UStG
+  updatedAt           DateTime @updatedAt
+  createdAt           DateTime @default(now())
+}
+
+enum LogLevel {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum LogCategory {
+  AUTH
+  PAYMENT
+  ADMIN
+  VIDEO
+  USER
+  ERROR
+  SYSTEM
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  STATUS_CHANGE
+  SYNC
+  BATCH_UPDATE
+  LOGIN
+  OTHER
+}
+
+enum DiscountProvider {
+  STRIPE
+  LOCAL
+}
+
+enum DiscountType {
+  PERCENT
+  AMOUNT
+}
+
+enum SignStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model SystemLog {
+  id            String      @id @default(cuid())
+  level         LogLevel
+  category      LogCategory
+  action        String // z.B. "LOGIN_SUCCESS", "PAGE_CREATED", "PAYMENT_RECEIVED"
+  message       String
+  details       Json? // Zusätzliche Details als JSON
+  userId        String? // Wer hat die Aktion ausgeführt
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ipAddress     String?
+  userAgent     String?
+  requestPath   String? // API-Route oder Seite
+  requestMethod String? // GET, POST, PUT, DELETE
+  errorStack    String? // Stack-Trace bei Fehlern
+  metadata      Json? // Weitere Metadaten (z.B. purchaseId, courseId, etc.)
+  createdAt     DateTime    @default(now())
+
+  @@index([level])
+  @@index([category])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  actorUserId String?
+  actorEmail  String?
+  actor       User?       @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  entityType  String // z.B. "Page", "Course", "Booking", "Media", "User", "VideoCourse", "CourseSeries"
+  entityId    String?
+  entityLabel String? // z.B. Page.slug oder Course.title (snapshot)
+  action      AuditAction
+  message     String?
+  meta        Json? // kleine Zusatzinfos: changedFields[], oldStatus/newStatus, etc.
+
+  @@index([createdAt])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([actorUserId])
+}
+
+model DiscountCode {
+  id                      String           @id @default(cuid())
+  provider                DiscountProvider
+  code                    String           @unique
+  type                    DiscountType
+  percentOff              Int?
+  amountOffCents          Int?
+  currency                String           @default("eur")
+  isActive                Boolean          @default(true)
+  startsAt                DateTime?
+  endsAt                  DateTime?
+  maxRedemptions          Int?
+  timesRedeemed           Int              @default(0)
+  restrictToVideoCourseId String?
+  videoCourse             VideoCourse?     @relation(fields: [restrictToVideoCourseId], references: [id], onDelete: SetNull)
+  stripeCouponId          String?          @unique
+  stripePromotionCodeId   String?          @unique
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+
+  @@index([provider])
+  @@index([isActive])
+}
+
+model Sign {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  description String
+  howTo       String?
+  tips        String?
+  videoUrl    String?
+  imageUrl    String?
+  status      SignStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  tags        SignTag[]
+
+  @@index([title])
+  @@index([status])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  signs     SignTag[]
+}
+
+model SignTag {
+  signId    String
+  sign      Sign     @relation(fields: [signId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([signId, tagId])
+  @@index([tagId])
 }

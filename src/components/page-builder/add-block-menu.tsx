@@ -10,12 +10,17 @@ interface AddBlockMenuProps {
 const blockTypes: { type: BlockType; label: string; icon: string }[] = [
   { type: "hero", label: "Hero", icon: "🎯" },
   { type: "text", label: "Text", icon: "📝" },
+  { type: "richText", label: "Formatierter Text", icon: "✏️" },
   { type: "image", label: "Bild", icon: "🖼️" },
   { type: "video", label: "Video", icon: "🎥" },
   { type: "features", label: "Features", icon: "⭐" },
   { type: "testimonials", label: "Testimonials", icon: "💬" },
   { type: "cta", label: "Call to Action", icon: "🚀" },
   { type: "spacer", label: "Abstand", icon: "↕️" },
+  { type: "table", label: "Tabelle", icon: "📊" },
+  { type: "courses", label: "Kurse & Termine", icon: "📅" },
+  { type: "current-appointments", label: "Aktuelle Termine", icon: "🗓️" },
+  { type: "herzzeit-story", label: "HerzZeit-Geschichten", icon: "📖" },
 ];
 
 export default function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
@@ -26,7 +31,12 @@ export default function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
         {blockTypes.map(({ type, label, icon }) => (
           <button
             key={type}
-            onClick={() => onAdd(createBlock(type))}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onAdd(createBlock(type));
+            }}
             className="flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-rose-500 transition-colors text-left"
           >
             <span className="text-xl">{icon}</span>
@@ -37,5 +47,4 @@ export default function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
     </div>
   );
 }
-
 
