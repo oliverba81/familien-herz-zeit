@@ -11,7 +11,12 @@
 
 # next.js
 /.next/
+/.next.new/
+/.next.old/
 /out/
+
+# self-update: Status- und Log-Dateien (vom Update-Skript erzeugt)
+/.update/
 
 # production
 /build
