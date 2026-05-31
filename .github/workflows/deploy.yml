@@ -1,0 +1,36 @@
+name: deploy
+
+# Deployt automatisch auf den Hetzner-Server, sobald ein GitHub-Release
+# veröffentlicht wird (durch Merge des release-please-PR).
+#
+# Benötigte Repo-Secrets (Settings -> Secrets and variables -> Actions):
+#   SSH_HOST  – Server-IP/Host (z. B. 49.12.10.11)
+#   SSH_USER  – SSH-Benutzer (z. B. root)
+#   SSH_KEY   – privater SSH-Deploy-Key (gesamter Inhalt, inkl. BEGIN/END-Zeilen)
+#   SSH_PORT  – optional, Standard 22
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            cd /root/srv/cursor-projects/familien-herz-zeit
+            # Auto-generierte, getrackte Datei verwerfen, damit der Pull sauber durchläuft
+            git checkout -- src/generated/version.ts 2>/dev/null || true
+            git fetch --all --tags --force
+            git checkout main
+            git pull --ff-only origin main
+            npm install
+            npm run deploy

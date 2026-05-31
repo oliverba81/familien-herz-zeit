@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/gen-version.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/gen-version.mjs",
     "build": "next build",
     "build:clean": "rm -rf .next && next build",
     "deploy:build": "bash scripts/deploy-build.sh",

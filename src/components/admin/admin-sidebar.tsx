@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import AppVersion from "./app-version";
 
 interface MenuItem {
   href: string;
@@ -312,6 +313,7 @@ export default function AdminSidebar() {
           <span className="text-xl">🏠</span>
           {!collapsed && <span className="font-medium">Zur Startseite</span>}
         </Link>
+        <AppVersion collapsed={collapsed} />
       </div>
     </aside>
   );

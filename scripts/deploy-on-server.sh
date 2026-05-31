@@ -7,6 +7,8 @@
 set -e
 cd "$(dirname "$0")/.."
 echo "=== Deploy auf Server ==="
+echo "0. Git-Tags aktualisieren (fuer Versionsanzeige)..."
+git fetch --tags --force || echo "  (git fetch fehlgeschlagen – fahre fort)"
 echo "1. Alten Build entfernen..."
 rm -rf .next
 echo "2. Neu bauen..."

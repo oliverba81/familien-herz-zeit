@@ -1,0 +1,26 @@
+name: release-please
+
+# Erstellt automatisch einen "Release-PR" (Version-Bump in package.json + CHANGELOG)
+# aus den Conventional-Commits auf main. Merge des PR -> Git-Tag vX.Y.Z + GitHub-Release.
+#
+# Voraussetzung: In den Repo-Einstellungen unter
+#   Settings -> Actions -> General -> Workflow permissions
+# "Allow GitHub Actions to create and approve pull requests" aktivieren.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
