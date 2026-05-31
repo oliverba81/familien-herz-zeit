@@ -41,10 +41,11 @@ export default function AdminSidebar() {
         pathname.startsWith("/admin/discounts")) {
       return "Buchungen & Zahlungen";
     }
-    if (pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/invoice-settings") || 
+    if (pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/invoice-settings") ||
         pathname.startsWith("/admin/env") || pathname.startsWith("/admin/email-templates") ||
-        pathname.startsWith("/admin/logs") || pathname.startsWith("/admin/users") || 
-        pathname.startsWith("/admin/activity") || pathname.startsWith("/admin/cookies")) {
+        pathname.startsWith("/admin/logs") || pathname.startsWith("/admin/users") ||
+        pathname.startsWith("/admin/activity") || pathname.startsWith("/admin/cookies") ||
+        pathname.startsWith("/admin/updates")) {
       return "System";
     }
     return null;
@@ -119,6 +120,7 @@ export default function AdminSidebar() {
         { href: "/admin/activity", label: "Aktivitäten", icon: "📊" },
         { href: "/admin/logs", label: "System-Logs", icon: "📋" },
         { href: "/admin/env", label: "Environment", icon: "🔐" },
+        { href: "/admin/updates", label: "Updates", icon: "⬆️" },
       ],
     },
   ];

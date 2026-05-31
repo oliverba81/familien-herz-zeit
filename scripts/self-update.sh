@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+#
+# Self-Update (Server-/Linux-only!)
+# =================================
+# Wird vom Admin-Endpoint `POST /api/admin/updates/apply` als *detachter*
+# Hintergrundprozess gestartet:
+#
+#   spawn("bash", ["-l", "<tmp-kopie-dieses-skripts>"], { detached: true, ... })
+#
+# WICHTIG:
+#  * Das Skript wird vor dem Start nach `os.tmpdir()` kopiert und von dort
+#    ausgeführt, weil `git reset --hard` (Schritt 2) die getrackte Datei
+#    `scripts/self-update.sh` im Repo überschreibt. Würde die laufende Kopie
+#    aus dem Repo gelesen, wäre das Verhalten undefiniert.
+#  * Der Projektpfad wird als $1 übergeben (vom Apply-Endpoint = process.cwd()),
+#    da das Skript NICHT mehr im Repo liegt und `dirname $0` daher ins tmp-Verz.
+#    zeigen würde.
+#  * `pm2 restart` (Schritt 6) killt den App-Prozess, der dieses Update angestoßen
+#    hat — deshalb läuft alles detached und schreibt den Fortschritt in
+#    `.update/status.json`, das die wiederkehrende App per /status pollt.
+#
+# Nutzung (intern):
+#   bash -l scripts/self-update.sh /pfad/zum/projekt <fromSha>
+#
+set -uo pipefail
+
+PROJECT_DIR="${1:-}"
+FROM_SHA="${2:-}"
+PM2_APP="fhz-test"
+BRANCH="main"
+REMOTE="origin"
+
+if [ -z "$PROJECT_DIR" ] || [ ! -d "$PROJECT_DIR" ]; then
+  echo "FEHLER: Projektverzeichnis ungültig: '$PROJECT_DIR'" >&2
+  exit 1
+fi
+
+cd "$PROJECT_DIR" || exit 1
+
+export GIT_TERMINAL_PROMPT=0
+
+UPDATE_DIR="$PROJECT_DIR/.update"
+STATUS_FILE="$UPDATE_DIR/status.json"
+mkdir -p "$UPDATE_DIR"
+
+STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+# JSON-String-Escape (Backslash + Anführungszeichen) für sichere status.json.
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  # Zeilenumbrüche entfernen, damit das JSON einzeilig/gültig bleibt
+  s="${s//$'\n'/ }"
+  s="${s//$'\r'/}"
+  printf '%s' "$s"
+}
+
+# Schreibt status.json. Args: state, step, message, [toSha]
+write_status() {
+  local state="$1" step="$2" message="$3" to_sha="${4:-}"
+  local finished_at=""
+  if [ "$state" = "success" ] || [ "$state" = "error" ]; then
+    finished_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  fi
+  cat > "$STATUS_FILE" <<JSON
+{
+  "state": "$(json_escape "$state")",
+  "step": "$(json_escape "$step")",
+  "message": "$(json_escape "$message")",
+  "startedAt": "$(json_escape "$STARTED_AT")",
+  "finishedAt": "$(json_escape "$finished_at")",
+  "fromSha": "$(json_escape "$FROM_SHA")",
+  "toSha": "$(json_escape "$to_sha")"
+}
+JSON
+}
+
+CURRENT_STEP="init"
+
+# Bei jedem Fehler (set -e-artig über trap): Status auf error + letzte Logzeile.
+on_error() {
+  local exit_code=$?
+  local last_line
+  last_line="$(tail -n 1 "$UPDATE_DIR/update.log" 2>/dev/null || echo "")"
+  echo ">>> FEHLER in Schritt '$CURRENT_STEP' (Exit $exit_code)"
+  write_status "error" "$CURRENT_STEP" "Fehlgeschlagen in Schritt '$CURRENT_STEP' (Exit $exit_code): $last_line"
+  exit "$exit_code"
+}
+trap on_error ERR
+set -e
+
+echo "=================================================="
+echo "Self-Update gestartet: $STARTED_AT"
+echo "Projekt: $PROJECT_DIR"
+echo "Von Commit: ${FROM_SHA:-unbekannt}"
+echo "=================================================="
+
+# --- Schritt 1: Start ---------------------------------------------------------
+CURRENT_STEP="start"
+write_status "running" "$CURRENT_STEP" "Update gestartet"
+
+# --- Schritt 2: Code von GitHub holen ----------------------------------------
+CURRENT_STEP="git"
+write_status "running" "$CURRENT_STEP" "Hole neuesten Stand von $REMOTE/$BRANCH"
+echo ">>> [git] fetch + reset --hard $REMOTE/$BRANCH"
+git fetch "$REMOTE" --prune
+git reset --hard "$REMOTE/$BRANCH"
+NEW_SHA="$(git rev-parse HEAD)"
+echo ">>> Neuer Commit: $NEW_SHA"
+
+# --- Schritt 3: Dependencies installieren ------------------------------------
+CURRENT_STEP="install"
+write_status "running" "$CURRENT_STEP" "Installiere Abhängigkeiten (npm install)" "$NEW_SHA"
+echo ">>> [npm] install"
+npm install
+
+# --- Schritt 4: Prisma -------------------------------------------------------
+# `prisma generate` ist ZWINGEND: /src/generated/prisma ist gitignored und es
+# gibt kein postinstall → der Client existiert nach frischem Pull nicht.
+# `prisma db push` synchronisiert das Schema (Migrationen sind gitignored, daher
+# kein `migrate deploy`). BEWUSST OHNE --accept-data-loss: bei destruktiven
+# Schemaänderungen bricht der Schritt ab (Fail-safe), statt Daten zu verlieren.
+CURRENT_STEP="prisma-generate"
+write_status "running" "$CURRENT_STEP" "Generiere Prisma-Client" "$NEW_SHA"
+echo ">>> [prisma] generate"
+npx prisma generate
+
+CURRENT_STEP="prisma-db-push"
+write_status "running" "$CURRENT_STEP" "Synchronisiere Datenbankschema (prisma db push)" "$NEW_SHA"
+echo ">>> [prisma] db push (ohne --accept-data-loss)"
+npx prisma db push
+
+# --- Schritt 5: Build in separatem Ordner + atomarer Swap --------------------
+# Build schreibt nach .next.new (NEXT_DIST_DIR), während die laufende App
+# ununterbrochen aus .next bedient. Erst nach erfolgreichem Build atomarer Tausch.
+CURRENT_STEP="build"
+write_status "running" "$CURRENT_STEP" "Baue Anwendung (.next.new)" "$NEW_SHA"
+echo ">>> [build] rm -rf .next.new"
+rm -rf .next.new
+echo ">>> [build] NEXT_DIST_DIR=.next.new npm run build"
+NEXT_DIST_DIR=.next.new npm run build
+
+# Build erfolgreich → atomarer Swap
+CURRENT_STEP="swap"
+write_status "running" "$CURRENT_STEP" "Tausche neuen Build ein" "$NEW_SHA"
+echo ">>> [swap] mv .next .next.old && mv .next.new .next"
+rm -rf .next.old
+if [ -d .next ]; then
+  mv .next .next.old
+fi
+mv .next.new .next
+rm -rf .next.old
+echo ">>> [swap] erledigt"
+
+# --- Schritt 6: PM2 neu starten ----------------------------------------------
+# ACHTUNG: Dies killt den App-Prozess, der dieses Update angestoßen hat. Da das
+# Skript detached läuft, läuft es weiter; die App kommt danach zurück.
+CURRENT_STEP="restart"
+write_status "running" "$CURRENT_STEP" "Starte Anwendung neu (pm2 restart $PM2_APP)" "$NEW_SHA"
+echo ">>> [pm2] restart $PM2_APP --update-env"
+pm2 restart "$PM2_APP" --update-env
+
+# --- Schritt 7: Erfolg -------------------------------------------------------
+CURRENT_STEP="done"
+write_status "success" "$CURRENT_STEP" "Update erfolgreich abgeschlossen" "$NEW_SHA"
+echo "=================================================="
+echo "Self-Update ERFOLGREICH: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Neuer Commit: $NEW_SHA"
+echo "=================================================="
+exit 0

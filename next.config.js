@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Build-Zielordner konfigurierbar machen: Das Self-Update baut nach `.next.new`
+  // (NEXT_DIST_DIR=.next.new), während die laufende App weiter aus `.next` bedient.
+  // Nach erfolgreichem Build wird atomar getauscht. Ohne gesetzte Variable: Standard `.next`.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // Stelle sicher, dass PDFKit als externes Paket behandelt wird
   // Dies verhindert, dass Next.js PDFKit bundelt und die Font-Dateien verloren gehen
   // Funktioniert sowohl mit Webpack als auch mit Turbopack
