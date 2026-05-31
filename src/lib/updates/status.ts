@@ -11,7 +11,7 @@ export const UPDATE_DIR = join(process.cwd(), ".update");
 export const STATUS_FILE = join(UPDATE_DIR, "status.json");
 export const LOG_FILE = join(UPDATE_DIR, "update.log");
 
-export type UpdateState = "running" | "success" | "error";
+export type UpdateState = "idle" | "running" | "success" | "error";
 
 export interface UpdateStatus {
   state: UpdateState;

@@ -14,14 +14,21 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  writeFileSync,
   copyFileSync,
   openSync,
+  closeSync,
 } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Schreibt status.json atomar (einzeiliges, gültiges JSON). */
+function writeStatus(status: UpdateStatus): void {
+  writeFileSync(STATUS_FILE, JSON.stringify(status), "utf-8");
+}
 
 /**
  * Prüft, ob bereits ein Update läuft. Ein `running`-Status, der älter als
@@ -92,6 +99,22 @@ export async function POST(_request: NextRequest) {
     // Logfile im Truncate-Modus öffnen (ein FD pro Lauf, kein Anwachsen).
     const logFd = openSync(LOG_FILE, "w");
 
+    // Lock SOFORT setzen (direkt vor dem Spawn), damit ein zweiter Klick zwischen
+    // isUpdateRunning()-Check und dem ersten write_status des Bash-Skripts nicht
+    // durchrutscht (TOCTOU). Das Skript überschreibt diesen Status danach laufend.
+    // Bewusst NACH openSync, damit ein fehlschlagendes openSync keinen veralteten
+    // running-Lock hinterlässt.
+    const startedAt = new Date().toISOString();
+    writeStatus({
+      state: "running",
+      step: "start",
+      message: "Update wird gestartet …",
+      startedAt,
+      finishedAt: "",
+      fromSha,
+      toSha: "",
+    });
+
     // Detachter Hintergrundprozess über Login-Shell (PATH für npm/npx/pm2).
     const child = spawn("bash", ["-l", tmpScript, process.cwd(), fromSha], {
       detached: true,
@@ -99,6 +122,24 @@ export async function POST(_request: NextRequest) {
       cwd: process.cwd(),
       env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
     });
+
+    // Falls bash nicht startbar ist (z.B. fehlend unter Windows-Dev): kein
+    // unbehandeltes 'error'-Event (würde sonst zur uncaught exception) → Lock
+    // lösen und Fehlerstatus schreiben, damit das UI das anzeigt.
+    child.on("error", (err) => {
+      writeStatus({
+        state: "error",
+        step: "spawn",
+        message: `Update-Prozess konnte nicht gestartet werden: ${err.message}`,
+        startedAt,
+        finishedAt: new Date().toISOString(),
+        fromSha,
+        toSha: "",
+      });
+    });
+
+    // Parent-FD schließen — der Child hat seine eigene Kopie geerbt (kein Leak).
+    closeSync(logFd);
     child.unref();
 
     await logger.info(
