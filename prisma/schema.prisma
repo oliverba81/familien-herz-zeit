@@ -515,3 +515,37 @@ model SignTag {
   @@id([signId, tagId])
   @@index([tagId])
 }
+
+model FeedbackForm {
+  id           String             @id @default(cuid())
+  title        String
+  description  String?
+  status       FeedbackFormStatus @default(DRAFT)
+  shareToken   String             @unique
+  collectName  Boolean            @default(true)
+  collectEmail Boolean            @default(true)
+  questions    Json
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  responses    FeedbackResponse[]
+
+  @@index([status])
+}
+
+model FeedbackResponse {
+  id        String       @id @default(cuid())
+  formId    String
+  form      FeedbackForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  name      String?
+  email     String?
+  answers   Json
+  createdAt DateTime     @default(now())
+
+  @@index([formId])
+  @@index([createdAt])
+}
+
+enum FeedbackFormStatus {
+  DRAFT
+  PUBLISHED
+}
