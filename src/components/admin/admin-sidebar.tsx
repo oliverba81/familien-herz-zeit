@@ -37,9 +37,12 @@ export default function AdminSidebar() {
         pathname.startsWith("/admin/course-series") || pathname.startsWith("/admin/calendar")) {
       return "Kurse";
     }
-    if (pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/invoices") || 
+    if (pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/invoices") ||
         pathname.startsWith("/admin/discounts")) {
       return "Buchungen & Zahlungen";
+    }
+    if (pathname.startsWith("/admin/feedback")) {
+      return "Feedback";
     }
     if (pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/invoice-settings") ||
         pathname.startsWith("/admin/env") || pathname.startsWith("/admin/email-templates") ||
@@ -105,6 +108,13 @@ export default function AdminSidebar() {
         { href: "/admin/bookings", label: "Buchungen", icon: "📋" },
         { href: "/admin/invoices", label: "Rechnungen", icon: "🧾" },
         { href: "/admin/discounts", label: "Rabattcodes", icon: "🎟️", show: isAdmin },
+      ],
+    },
+    {
+      label: "Feedback",
+      icon: "📝",
+      items: [
+        { href: "/admin/feedback", label: "Feedbackbögen", icon: "🗳️" },
       ],
     },
     {
