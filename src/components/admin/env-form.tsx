@@ -13,12 +13,6 @@ interface EnvVars {
   MAIL_FROM?: string;
   MAIL_ADMIN_TO?: string;
   APP_BASE_URL?: string;
-  PAYPAL_CLIENT_ID?: string;
-  PAYPAL_CLIENT_SECRET?: string;
-  PAYPAL_MODE?: string;
-  STRIPE_SECRET_KEY?: string;
-  STRIPE_PUBLISHABLE_KEY?: string;
-  STRIPE_WEBHOOK_SECRET?: string;
 }
 
 export default function EnvForm() {
@@ -253,102 +247,6 @@ export default function EnvForm() {
             </div>
           </div>
 
-          <div className="border-t pt-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">PayPal Konfiguration</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  PayPal Client ID
-                </label>
-                <input
-                  type="text"
-                  {...register("PAYPAL_CLIENT_ID")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-                  placeholder="Client ID von PayPal Developer Dashboard"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  PayPal Client Secret
-                </label>
-                <input
-                  type="password"
-                  {...register("PAYPAL_CLIENT_SECRET")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  PayPal Mode
-                </label>
-                <select
-                  {...register("PAYPAL_MODE")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-                >
-                  <option value="sandbox">Sandbox (Test)</option>
-                  <option value="live">Live (Production)</option>
-                </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  Sandbox für Tests, Live für Produktion
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Stripe Konfiguration</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stripe Secret Key
-                </label>
-                <input
-                  type="password"
-                  {...register("STRIPE_SECRET_KEY")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-                  placeholder="sk_..."
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Secret Key von Stripe Dashboard
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stripe Publishable Key
-                </label>
-                <input
-                  type="text"
-                  {...register("STRIPE_PUBLISHABLE_KEY")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-                  placeholder="pk_..."
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Publishable Key für Frontend-Integration
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stripe Webhook Secret
-                </label>
-                <input
-                  type="password"
-                  {...register("STRIPE_WEBHOOK_SECRET")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-                  placeholder="whsec_..."
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Webhook Signing Secret (optional, für Webhook-Validierung)
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-4 border-t">
