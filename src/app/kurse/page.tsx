@@ -5,8 +5,8 @@ import { formatCents } from "@/lib/utils/money";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Live-Kurse",
-  description: "Entdecken Sie unsere Live-Kurse",
+  title: "Präsenz-Kurse",
+  description: "Entdecken Sie unsere Präsenz-Kurse",
 };
 
 // Immer serverseitig frisch rendern, damit Kursänderungen aus dem Admin sofort
@@ -58,9 +58,9 @@ export default async function CoursesPage() {
         <div className="mb-8">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">Live-Kurse</h1>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">Präsenz-Kurse</h1>
               <p className="text-lg text-gray-600">
-                Entdecken Sie unsere Auswahl an Live-Kursen
+                Entdecken Sie meine Auswahl an Präsenz-Kursen
               </p>
             </div>
             <Link
