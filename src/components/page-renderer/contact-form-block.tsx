@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ContactFormBlockData } from "@/lib/page-builder/types";
 import Script from "next/script";
+import { useConsent } from "@/components/consent/consent-provider";
 
 declare global {
   interface Window {
@@ -52,16 +53,22 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
   // reCAPTCHA Site Key aus ENV oder Block-Einstellungen
   const siteKey = recaptchaSiteKey || process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-  // Lade reCAPTCHA wenn aktiviert
+  // reCAPTCHA (Google) setzt das Cookie _GRECAPTCHA und ueberträgt Daten an
+  // Google – darf nach § 25 TDDDG erst nach Einwilligung (Marketing) geladen
+  // werden. Ohne Einwilligung schuetzt weiterhin das Honeypot-Feld vor Bots.
+  const { consent } = useConsent();
+  const recaptchaAllowed = enableRecaptcha && !!siteKey && consent.marketing === true;
+
+  // Lade reCAPTCHA wenn aktiviert und eingewilligt
   useEffect(() => {
-    if (enableRecaptcha && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+    if (recaptchaAllowed && typeof window !== "undefined" && window.grecaptcha) {
       setRecaptchaLoaded(true);
     }
-  }, [enableRecaptcha, siteKey]);
+  }, [recaptchaAllowed]);
 
   // Render reCAPTCHA Widget
   useEffect(() => {
-    if (recaptchaLoaded && enableRecaptcha && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+    if (recaptchaLoaded && recaptchaAllowed && typeof window !== "undefined" && window.grecaptcha) {
       const widgetId = window.grecaptcha.render("recaptcha-container", {
         sitekey: siteKey,
         callback: (token: string) => {
@@ -73,15 +80,15 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
       });
       setRecaptchaWidgetId(widgetId);
     }
-  }, [recaptchaLoaded, enableRecaptcha, siteKey]);
+  }, [recaptchaLoaded, recaptchaAllowed]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
-    // Prüfe reCAPTCHA wenn aktiviert
-    if (enableRecaptcha && !recaptchaToken) {
+    // Prüfe reCAPTCHA nur, wenn es geladen werden durfte (Einwilligung erteilt)
+    if (recaptchaAllowed && !recaptchaToken) {
       setError("Bitte bestätige, dass du kein Roboter bist.");
       return;
     }
@@ -133,7 +140,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
 
   return (
     <>
-      {enableRecaptcha && siteKey && (
+      {recaptchaAllowed && (
         <Script
           src={`https://www.google.com/recaptcha/api.js?render=explicit`}
           strategy="lazyOnload"
@@ -601,8 +608,8 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
                 {/* Honeypot */}
                 <input type="text" name="website" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
 
-                {/* reCAPTCHA */}
-                {enableRecaptcha && siteKey && (
+                {/* reCAPTCHA – nur nach Einwilligung (Marketing-Cookies) */}
+                {recaptchaAllowed && (
                   <div className="fhz-contactForm01__captcha" aria-label="Captcha">
                     <div id="recaptcha-container"></div>
                   </div>

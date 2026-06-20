@@ -144,23 +144,26 @@ export default function CookieBanner() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                {/* Ablehnen muss genauso einfach und gleich prominent sein wie
+                    Akzeptieren (DSK / EuGH). Daher gleicher gefüllter Stil und
+                    gleiche Größe – nur "Einstellungen" bleibt sekundär. */}
                 <button
                   onClick={handleRejectAll}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   Nur notwendige
-                </button>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Einstellungen
                 </button>
                 <button
                   onClick={handleAcceptAll}
                   className="px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors"
                 >
                   Alle akzeptieren
+                </button>
+                <button
+                  onClick={() => setShowSettings(true)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-transparent underline underline-offset-2 hover:text-gray-800 transition-colors"
+                >
+                  Einstellungen
                 </button>
               </div>
             </div>
