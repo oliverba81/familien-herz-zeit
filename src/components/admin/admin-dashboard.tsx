@@ -39,9 +39,9 @@ export default function AdminDashboard() {
             href="/admin/courses"
             className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
           >
-            <h3 className="font-semibold text-gray-900 mb-1">Live-Kurse verwalten</h3>
+            <h3 className="font-semibold text-gray-900 mb-1">Präsenz-Kurse verwalten</h3>
             <p className="text-sm text-gray-600">
-              Erstellen, bearbeiten und löschen Sie Live-Kurse
+              Erstellen, bearbeiten und löschen Sie Präsenz-Kurse
             </p>
           </Link>
           <Link
