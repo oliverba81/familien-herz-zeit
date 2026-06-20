@@ -60,6 +60,33 @@ export default function CookieBanner() {
     };
   }, [mounted]);
 
+  // Widerruf / nachträgliche Änderung: Banner-Einstellungen erneut öffnen.
+  // Auslöser: ein Klick auf einen beliebigen Link mit href "#cookie-einstellungen"
+  // bzw. ein Element mit [data-cookie-settings] (funktioniert auch im
+  // selbst gepflegten HTML-Footer), oder das Event "open-cookie-settings".
+  useEffect(() => {
+    const openSettings = () => {
+      setShowSettings(true);
+      setShowBanner(true);
+    };
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const trigger = target?.closest(
+        'a[href$="#cookie-einstellungen"], [data-cookie-settings]'
+      );
+      if (trigger) {
+        event.preventDefault();
+        openSettings();
+      }
+    };
+    window.addEventListener("open-cookie-settings", openSettings);
+    document.addEventListener("click", handleClick);
+    return () => {
+      window.removeEventListener("open-cookie-settings", openSettings);
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
+
   // Admin-Bereich: kein Banner
   if (pathname?.startsWith("/admin")) {
     return null;
