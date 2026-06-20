@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.2...v0.4.3) (2026-06-20)
+
+
+### Bug Fixes
+
+* Rechtstext-Popup lädt, AOK-Hinweis deutlicher, CTA-Kontaktlink ([f63b907](https://github.com/oliverba81/familien-herz-zeit/commit/f63b907111a5389323941602213bd2ac4a2db226))
+
 ## [0.4.2](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.1...v0.4.2) (2026-06-20)
 
 
