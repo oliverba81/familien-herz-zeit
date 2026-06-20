@@ -1,26 +1,39 @@
 import Stripe from "stripe";
+import { getPaymentConfig } from "@/lib/payment/config";
 
-// Lazy initialization to avoid errors during build if env var is missing
+// Lazy + key-bewusste Initialisierung: Wird der Secret Key im Admin geändert,
+// erzeugen wir die Instanz neu (kein Server-Neustart nötig).
 let stripeInstance: Stripe | null = null;
+let stripeInstanceKey: string | null = null;
 
-export function getStripe(): Stripe {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+/**
+ * Gibt die konfigurierte Stripe-Instanz zurück.
+ * Liest den Secret Key aus der Zahlungs-Konfiguration (DB > .env).
+ */
+export async function getStripe(): Promise<Stripe> {
+  const { stripe } = await getPaymentConfig();
+  const secretKey = stripe.secretKey;
+
+  if (!secretKey) {
+    throw new Error(
+      "Stripe ist nicht konfiguriert (kein Secret Key hinterlegt)"
+    );
   }
 
-  if (!stripeInstance) {
-    const secretKey = process.env.STRIPE_SECRET_KEY.trim();
-    // Entferne Anführungszeichen falls vorhanden
-    const cleanKey = secretKey.replace(/^["']|["']$/g, '');
-    stripeInstance = new Stripe(cleanKey, {
+  if (!stripeInstance || stripeInstanceKey !== secretKey) {
+    stripeInstance = new Stripe(secretKey, {
       apiVersion: "2025-12-15.clover",
     });
+    stripeInstanceKey = secretKey;
   }
 
   return stripeInstance;
 }
 
-// Export stripe - wird erst beim ersten Aufruf von getStripe() initialisiert
-// Verwende getStripe() direkt in den API-Routen für bessere Kontrolle
-export const stripe = getStripe();
-
+/**
+ * Webhook-Signing-Secret (DB > .env), null wenn nicht gesetzt.
+ */
+export async function getStripeWebhookSecret(): Promise<string | null> {
+  const { stripe } = await getPaymentConfig();
+  return stripe.webhookSecret;
+}

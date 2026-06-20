@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getPaymentConfig } from "@/lib/payment/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -137,6 +138,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Zahlungsart "Überweisung": Buchung wird mit Status PENDING angelegt,
+    // die Bankdaten werden in der Antwort mitgeschickt (Anzeige im Formular).
+    const isBankTransfer = body?.paymentMethod === "BANKTRANSFER";
+    let paymentConfig = null;
+    if (isBankTransfer) {
+      paymentConfig = await getPaymentConfig();
+      if (!paymentConfig.bankTransfer.available) {
+        return NextResponse.json(
+          { error: "Überweisung ist derzeit nicht verfügbar" },
+          { status: 403 }
+        );
+      }
+    }
+
     // Prüfe ob Kurs existiert
     let course;
     try {
@@ -260,6 +275,14 @@ export async function POST(request: NextRequest) {
           childName: `${validatedData.childFirstName} ${validatedData.childLastName}`,
           childAgeMonths: childAgeMonths,
           status: "PENDING",
+          // Überweisung: offene Zahlung vermerken (Admin bestätigt Zahlungseingang).
+          // amountPaidCents bleibt leer, bis der Zahlungseingang bestätigt ist.
+          ...(isBankTransfer
+            ? {
+                paymentProvider: "BANKTRANSFER",
+                paymentStatus: "PENDING",
+              }
+            : {}),
         },
       });
     } catch (dbError: any) {
@@ -363,10 +386,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Bankdaten für die Überweisungs-Anzeige zusammenstellen
+    let bankTransfer = null;
+    if (isBankTransfer && paymentConfig) {
+      const amountCents = validatedData.hasAokVoucher ? 0 : course.priceCents;
+      bankTransfer = {
+        accountHolder: paymentConfig.bankTransfer.accountHolder,
+        iban: paymentConfig.bankTransfer.iban,
+        bic: paymentConfig.bankTransfer.bic,
+        bankName: paymentConfig.bankTransfer.bankName,
+        info: paymentConfig.bankTransfer.info,
+        amountCents,
+        // Verwendungszweck: Kurs + Buchungsreferenz
+        reference: `${course.title} – ${booking.id}`,
+      };
+    }
+
     return NextResponse.json(
       {
         ...booking,
         mailSent,
+        bankTransfer,
       },
       { status: 201 }
     );

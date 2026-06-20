@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { stripe } from "@/lib/stripe/client";
+import { getStripe } from "@/lib/stripe/client";
+import { getPaymentConfig } from "@/lib/payment/config";
 import { db } from "@/lib/db";
 import { bookingSchema } from "@/lib/validations/bookings";
 
@@ -17,6 +18,15 @@ const createCheckoutSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
+    // Prüfe, ob Stripe als Zahlungsart aktiviert und konfiguriert ist
+    const paymentConfig = await getPaymentConfig();
+    if (!paymentConfig.stripe.available) {
+      return NextResponse.json(
+        { error: "Kartenzahlung (Stripe) ist derzeit nicht verfügbar" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const validatedData = createCheckoutSchema.parse(body);
     const bookingData = validatedData.bookingData;
@@ -96,6 +106,7 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
 
     // Erstelle Stripe Checkout Session
+    const stripe = await getStripe();
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [

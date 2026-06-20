@@ -5,6 +5,7 @@ import { formatCents } from "@/lib/utils/money";
 import { Metadata } from "next";
 import BookingForm from "@/components/courses/booking-form";
 import { cachedCourseById } from "@/lib/cache/prisma-cache";
+import { getAvailablePaymentMethods } from "@/lib/payment/config";
 import { absoluteUrl, buildOpenGraph } from "@/lib/seo/meta";
 
 interface CourseDetailPageProps {
@@ -55,6 +56,9 @@ export default async function CourseDetailPage({
   if (!course || course.status !== "PUBLISHED") {
     notFound();
   }
+
+  // Im Admin konfigurierte, verfügbare Zahlungsarten für das Buchungsformular
+  const paymentMethods = await getAvailablePaymentMethods();
 
   // Alle Sessions (auch vergangene) für die Anzeige
   const allSessions = course.sessions || [];
@@ -189,7 +193,7 @@ export default async function CourseDetailPage({
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Jetzt buchen
                 </h2>
-                <BookingForm courseId={course.id} />
+                <BookingForm courseId={course.id} enabledMethods={paymentMethods} />
               </div>
             )}
 

@@ -2,8 +2,6 @@ import Stripe from "stripe";
 import { DiscountType } from "@prisma/client";
 import { getStripe } from "./client";
 
-const stripe = getStripe();
-
 interface CreateStripeCouponAndPromoParams {
   code: string;
   type: DiscountType;
@@ -25,6 +23,8 @@ export async function createStripeCouponAndPromo({
   couponId: string;
   promotionCodeId: string;
 }> {
+  const stripe = await getStripe();
+
   // Erstelle Coupon
   let coupon: Stripe.Coupon;
 
@@ -60,6 +60,7 @@ export async function createStripeCouponAndPromo({
  * Deaktiviert einen Stripe Promotion Code
  */
 export async function disableStripePromo(promotionCodeId: string): Promise<void> {
+  const stripe = await getStripe();
   await stripe.promotionCodes.update(promotionCodeId, {
     active: false,
   });

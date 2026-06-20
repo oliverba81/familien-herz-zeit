@@ -369,6 +369,33 @@ model InvoiceSettings {
   createdAt           DateTime @default(now())
 }
 
+// Zentrale Konfiguration der Zahlungsanbieter (Stripe, PayPal, ...).
+// Einzeiliger Datensatz. API-Keys werden hier gespeichert; fehlt ein Wert,
+// wird auf die entsprechende Umgebungsvariable zurückgegriffen (siehe
+// src/lib/payment/config.ts).
+model PaymentSettings {
+  id                   String   @id @default(cuid())
+  // Stripe
+  stripeEnabled        Boolean  @default(false)
+  stripeSecretKey      String? // sk_...
+  stripePublishableKey String? // pk_... (öffentlich)
+  stripeWebhookSecret  String? // whsec_...
+  // PayPal
+  paypalEnabled        Boolean  @default(false)
+  paypalClientId       String?
+  paypalClientSecret   String?
+  paypalMode           String   @default("sandbox") // "sandbox" | "live"
+  // Überweisung (kein API-Anschluss, nur Bankdaten für die Anzeige)
+  bankTransferEnabled  Boolean  @default(false)
+  bankAccountHolder    String? // Kontoinhaber
+  bankIban             String?
+  bankBic              String?
+  bankName             String?
+  bankTransferInfo     String? // Freitext-Hinweise (z. B. Zahlungsziel)
+  updatedAt            DateTime @updatedAt
+  createdAt            DateTime @default(now())
+}
+
 enum LogLevel {
   INFO
   SUCCESS

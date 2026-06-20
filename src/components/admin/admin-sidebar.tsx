@@ -45,6 +45,7 @@ export default function AdminSidebar() {
       return "Feedback";
     }
     if (pathname.startsWith("/admin/settings") || pathname.startsWith("/admin/invoice-settings") ||
+        pathname.startsWith("/admin/payment-settings") ||
         pathname.startsWith("/admin/env") || pathname.startsWith("/admin/email-templates") ||
         pathname.startsWith("/admin/logs") || pathname.startsWith("/admin/users") ||
         pathname.startsWith("/admin/activity") || pathname.startsWith("/admin/cookies") ||
@@ -124,6 +125,7 @@ export default function AdminSidebar() {
       items: [
         { href: "/admin/settings", label: "Website-Einstellungen", icon: "🌐" },
         { href: "/admin/invoice-settings", label: "Rechnungseinstellungen", icon: "🧾" },
+        { href: "/admin/payment-settings", label: "Zahlungseinstellungen", icon: "💳" },
         { href: "/admin/email-templates", label: "E-Mail-Vorlagen", icon: "✉️" },
         { href: "/admin/cookies", label: "Cookies", icon: "🍪" },
         { href: "/admin/users", label: "Benutzer", icon: "👥" },
