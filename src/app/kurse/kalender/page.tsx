@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   description: "Übersicht aller verfügbaren Kurse im Kalender",
 };
 
+// Immer serverseitig frisch rendern, damit Kursänderungen aus dem Admin sofort
+// im Kalender sichtbar sind.
+export const dynamic = "force-dynamic";
+
 export default async function PublicCalendarPage() {
   const now = new Date();
 

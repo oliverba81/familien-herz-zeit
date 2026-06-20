@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   description: "Entdecken Sie unsere Live-Kurse",
 };
 
+// Immer serverseitig frisch rendern, damit Kursänderungen aus dem Admin sofort
+// sichtbar sind (freie Plätze, Termine und Buchungszahlen sind dynamisch).
+export const dynamic = "force-dynamic";
+
 export default async function CoursesPage() {
   const now = new Date();
   
