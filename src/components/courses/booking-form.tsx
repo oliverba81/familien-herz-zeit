@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { bookingSchema, type BookingData } from "@/lib/validations/bookings";
 import ErrorMessage from "@/components/auth/error-message";
+import LegalContentModal from "@/components/courses/legal-content-modal";
 import { track } from "@/lib/analytics/track";
 import { formatCents } from "@/lib/utils/money";
 
@@ -20,6 +20,7 @@ export default function BookingForm({ courseId }: BookingFormProps) {
   const [acceptsAokVoucher, setAcceptsAokVoucher] = useState(false);
   const [coursePriceCents, setCoursePriceCents] = useState<number>(0);
   const [loadingCourse, setLoadingCourse] = useState(true);
+  const [legalModal, setLegalModal] = useState<"privacy" | "terms" | null>(null);
 
   // Lade Kurs-Daten, um zu prüfen, ob AOK-Gutscheine akzeptiert werden und den Preis zu laden
   useEffect(() => {
@@ -462,9 +463,13 @@ export default function BookingForm({ courseId }: BookingFormProps) {
           />
           <label htmlFor="privacyAccepted" className="ml-2 text-sm text-gray-700">
             Ich stimme zu, dass meine Angaben aus dem Kontaktformular zur Beantwortung meiner Anfrage erhoben und verarbeitet werden. Detaillierte Informationen zum Umgang mit Nutzerdaten findest du in unserer{" "}
-            <Link href="/datenschutzerklaerung" target="_blank" className="text-rose-500 hover:text-rose-600 underline">
+            <button
+              type="button"
+              onClick={() => setLegalModal("privacy")}
+              className="text-rose-500 hover:text-rose-600 underline"
+            >
               Datenschutzerklärung
-            </Link>
+            </button>
             . *
           </label>
         </div>
@@ -481,9 +486,13 @@ export default function BookingForm({ courseId }: BookingFormProps) {
           />
           <label htmlFor="termsAccepted" className="ml-2 text-sm text-gray-700">
             Ich habe die{" "}
-            <Link href="/kursbedingungen" target="_blank" className="text-rose-500 hover:text-rose-600 underline">
+            <button
+              type="button"
+              onClick={() => setLegalModal("terms")}
+              className="text-rose-500 hover:text-rose-600 underline"
+            >
               Kursbedingungen
-            </Link>
+            </button>
             {" "}zur Kenntnis genommen und erkenne sie hiermit an. *
           </label>
         </div>
@@ -551,6 +560,19 @@ export default function BookingForm({ courseId }: BookingFormProps) {
           {isLoading ? "Wird gesendet..." : "Verbindlich Anmelden"}
         </button>
       )}
+
+      <LegalContentModal
+        slug="datenschutzerklaerung"
+        title="Datenschutzerklärung"
+        open={legalModal === "privacy"}
+        onClose={() => setLegalModal(null)}
+      />
+      <LegalContentModal
+        slug="kursbedingungen"
+        title="Kursbedingungen"
+        open={legalModal === "terms"}
+        onClose={() => setLegalModal(null)}
+      />
     </form>
   );
 }
