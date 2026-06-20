@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.0...v0.3.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* Self-Update entfernt veraltete Typdefinitionen vor dem Build ([ff1f7f6](https://github.com/oliverba81/familien-herz-zeit/commit/ff1f7f66758ba854584d0520f1c970040640575f))
+* Self-Update entfernt veraltete Typdefinitionen vor dem Build ([afc23c3](https://github.com/oliverba81/familien-herz-zeit/commit/afc23c33e6fec8490529c7cb5663681e12cfe21c))
+
 ## [0.3.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.2.0...v0.3.0) (2026-06-01)
 
 
