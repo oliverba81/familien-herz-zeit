@@ -7,7 +7,7 @@ interface Invoice {
   createdAt: Date;
   pdfUrl: string;
   purchase: {
-    provider: "STRIPE" | "PAYPAL";
+    provider: "STRIPE" | "PAYPAL" | "BANKTRANSFER";
     amountCents: number;
     email: string;
     user: {
@@ -43,8 +43,12 @@ export default function InvoicesTable({ invoices }: InvoicesTableProps) {
     return invoice.purchase.email;
   };
 
-  const formatPaymentMethod = (provider: "STRIPE" | "PAYPAL"): string => {
-    return provider === "STRIPE" ? "Karte" : "PayPal";
+  const formatPaymentMethod = (
+    provider: "STRIPE" | "PAYPAL" | "BANKTRANSFER"
+  ): string => {
+    if (provider === "STRIPE") return "Karte";
+    if (provider === "PAYPAL") return "PayPal";
+    return "Überweisung";
   };
 
   return (
