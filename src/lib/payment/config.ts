@@ -78,8 +78,9 @@ export async function getPaymentConfig(): Promise<PaymentConfig> {
   const stripeWebhookSecret =
     clean(row?.stripeWebhookSecret) ?? clean(process.env.STRIPE_WEBHOOK_SECRET);
   const stripeConfigured = !!stripeSecretKey;
-  // Ohne DB-Datensatz: aktiviert, sofern per .env konfiguriert (Backward-Compat).
-  const stripeEnabled = row ? row.stripeEnabled : stripeConfigured;
+  // Aktivierung kommt ausschließlich aus dem Admin-Schalter (Default: aus).
+  // Keys dürfen aus der .env stammen, aber angeboten wird nur, was aktiviert ist.
+  const stripeEnabled = row?.stripeEnabled ?? false;
 
   // --- PayPal ---
   const paypalClientId =
@@ -94,7 +95,7 @@ export async function getPaymentConfig(): Promise<PaymentConfig> {
   const paypalMode: "sandbox" | "live" =
     paypalModeRaw === "live" ? "live" : "sandbox";
   const paypalConfigured = !!(paypalClientId && paypalClientSecret);
-  const paypalEnabled = row ? row.paypalEnabled : paypalConfigured;
+  const paypalEnabled = row?.paypalEnabled ?? false;
 
   // --- Überweisung ---
   const bankAccountHolder = clean(row?.bankAccountHolder);
@@ -103,7 +104,7 @@ export async function getPaymentConfig(): Promise<PaymentConfig> {
   const bankName = clean(row?.bankName);
   const bankTransferInfo = clean(row?.bankTransferInfo);
   const bankConfigured = !!(bankAccountHolder && bankIban);
-  const bankEnabled = row ? row.bankTransferEnabled : false;
+  const bankEnabled = row?.bankTransferEnabled ?? false;
 
   return {
     stripe: {
