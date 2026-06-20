@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useConsent } from "./consent-provider";
 import { Consent } from "@/lib/consent/types";
 import { getConsentFromCookie } from "@/lib/consent/storage";
-import { CookieCatalogItem, parseCookieCatalog } from "@/lib/consent/catalog";
+import { CookieCatalogItem, mergeWithDefaultCatalog, parseCookieCatalog } from "@/lib/consent/catalog";
 
 export default function CookieBanner() {
   const pathname = usePathname();
@@ -31,15 +31,22 @@ export default function CookieBanner() {
       try {
         const response = await fetch("/api/settings");
         if (!response.ok) {
+          // Auch ohne gepflegten Katalog: bekannte Default-Cookies anzeigen
+          if (!cancelled) {
+            setCatalog(mergeWithDefaultCatalog([]));
+          }
           return;
         }
         const data = await response.json();
         const items = parseCookieCatalog(data?.cookie_catalog);
         if (!cancelled) {
-          setCatalog(items);
+          setCatalog(mergeWithDefaultCatalog(items));
         }
       } catch {
-        // Ignorieren: Banner funktioniert auch ohne Katalog
+        // Banner funktioniert auch ohne Katalog – bekannte Defaults anzeigen
+        if (!cancelled) {
+          setCatalog(mergeWithDefaultCatalog([]));
+        }
       } finally {
         if (!cancelled) {
           setCatalogLoaded(true);
