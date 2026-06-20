@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.2](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.1...v0.4.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* Link zum Kontaktformular bei fehlender Zahlungsart ([b195627](https://github.com/oliverba81/familien-herz-zeit/commit/b1956279ae35607b3f58f56f31893acc9e3b03ad))
+* Link zum Kontaktformular bei fehlender Zahlungsart ([a01bf47](https://github.com/oliverba81/familien-herz-zeit/commit/a01bf47c412af83f8be38b4233d8ecec96e26ac4))
+
 ## [0.4.1](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.0...v0.4.1) (2026-06-20)
 
 
