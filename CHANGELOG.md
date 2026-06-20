@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.2.0...v0.3.0) (2026-06-01)
+
+
+### Features
+
+* Feedbackbögen anlegen, teilen und auswerten ([d80c6a9](https://github.com/oliverba81/familien-herz-zeit/commit/d80c6a92fba1ed7c3c61a61fea6e77ec353350e1))
+* Feedbackbögen anlegen, teilen und auswerten ([888cddf](https://github.com/oliverba81/familien-herz-zeit/commit/888cddf53aaa3e6ff5fec40d51ffd0c8b4ba7356))
+
+
+### Bug Fixes
+
+* devDependencies beim Deploy/Self-Update mitinstallieren ([8ddb327](https://github.com/oliverba81/familien-herz-zeit/commit/8ddb32787603ba17a4b28ec9dd61196b8d0161f2))
+* devDependencies beim Deploy/Self-Update mitinstallieren ([0b30e9f](https://github.com/oliverba81/familien-herz-zeit/commit/0b30e9fe0b481a4badd35fa66702dac8320b20d2))
+* Self-Update absichern (Lock-Race, FD-Leak, error-Handling) ([590b522](https://github.com/oliverba81/familien-herz-zeit/commit/590b522190dfe6d689894ddc5c0ba1f2306caed4))
+* Self-Update haengt nicht mehr auf Schritt 'restart' ([b082907](https://github.com/oliverba81/familien-herz-zeit/commit/b0829070f279bca7b0ad14510810103f690c27e0))
+* Self-Update haengt nicht mehr auf Schritt 'restart' ([9632710](https://github.com/oliverba81/familien-herz-zeit/commit/96327107485a327c09d2bff45f774ca0b5119a87))
+
 ## [0.2.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.1.1...v0.2.0) (2026-05-31)
 
 
