@@ -291,9 +291,6 @@ export async function PUT(
 
     // Cache invalidierten, wenn Seite veröffentlicht ist
     if (page.published === true) {
-      // #region agent log
-      fetch("http://localhost:7243/ingest/1d60de62-6032-4976-9878-2ebaff9d4a67", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "debug-session", runId: "page-update", hypothesisId: "H3", location: "src/app/api/pages/[id]/route.ts:revalidate", message: "Revalidate tags after page update", data: { slug: page.slug, published: page.published }, timestamp: Date.now() }) }).catch(() => {});
-      // #endregion
       // @ts-ignore - TypeScript type issue with revalidateTag
       revalidateTag(tagPage(page.slug));
       // @ts-ignore - TypeScript type issue with revalidateTag
