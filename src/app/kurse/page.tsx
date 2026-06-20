@@ -41,6 +41,7 @@ export default async function CoursesPage() {
               },
             },
           },
+          sessions: true,
         },
       },
     },
@@ -86,6 +87,16 @@ export default async function CoursesPage() {
               const isFull = availableSpots <= 0;
               const firstSession = course.sessions[0];
               const sessionDuration = firstSession.durationMinutes || 60;
+              const sessionCount = course._count.sessions;
+
+              // Kursart bestimmen: explizite Kategorie hat Vorrang, sonst
+              // automatisch anhand der Termin-Anzahl (mehrere Termine = Kurs).
+              const isCourse =
+                course.category === "COURSE"
+                  ? true
+                  : course.category === "TOPIC"
+                  ? false
+                  : sessionCount > 1;
 
               return (
                 <Link
@@ -95,13 +106,24 @@ export default async function CoursesPage() {
                 >
                   <div className="p-6">
                     <div className="mb-4">
+                      <span
+                        className={`inline-block mb-2 px-2.5 py-1 text-xs font-semibold rounded-full ${
+                          isCourse
+                            ? "bg-rose-100 text-rose-700"
+                            : "bg-gray-200 text-gray-800"
+                        }`}
+                      >
+                        {isCourse ? "Babyzeichenkurs" : "Themenstunde"}
+                      </span>
                       <div className="text-sm font-semibold text-rose-500 mb-1">
                         {formatBerlinDate(firstSession.startAt)} um {formatBerlinTime(firstSession.startAt)}
                       </div>
                       <div className="text-xs text-gray-500">
                         {sessionDuration} Minuten
-                        {course.sessions.length > 1 && (
-                          <span className="ml-2">• {course.sessions.length} Termine</span>
+                        {sessionCount > 1 && (
+                          <span className="ml-2">
+                            • {sessionCount} Termine
+                          </span>
                         )}
                       </div>
                     </div>
