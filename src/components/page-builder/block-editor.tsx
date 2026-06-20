@@ -977,9 +977,9 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
                 </label>
                 <input
                   type="text"
-                  value={block.data.contactLinkUrl ?? "#kontakt"}
+                  value={block.data.contactLinkUrl ?? "/kontakt"}
                   onChange={(e) => updateData({ contactLinkUrl: e.target.value || undefined })}
-                  placeholder="#kontakt oder /kontakt"
+                  placeholder="/kontakt oder #anker"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
                 />
                 <p className="mt-1 text-xs text-gray-500">

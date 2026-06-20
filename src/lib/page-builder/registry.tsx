@@ -433,7 +433,7 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       backgroundImageOpacity: 75,
       title: "Entdecke die Welt der Babyzeichen",
       subtitle: "In unserer Master-Übersicht findest du alle aktuellen Angebote. Tauche ein in eine entspannte Atmosphäre und stärke die Bindung zu deinem Kind.",
-      contactLinkUrl: "#kontakt",
+      contactLinkUrl: "/kontakt",
       contactLinkLabel: "Jetzt Kontakt aufnehmen",
     }),
     CanvasComponent: BlockCanvasWrapper,
