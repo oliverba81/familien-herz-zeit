@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatCents, euroToCents, centsToEuro } from "@/lib/utils/money";
+import { formatCents, centsToEuro, parseEuroToCents } from "@/lib/utils/money";
 import ErrorMessage from "@/components/auth/error-message";
 
 interface CourseSeriesBatchUpdateProps {
@@ -30,10 +30,13 @@ export default function CourseSeriesBatchUpdate({ seriesId }: CourseSeriesBatchU
     // Baue fields object (nur gesetzte Felder)
     const fields: any = {};
     if (priceInput) {
-      const euro = parseFloat(priceInput.replace(",", "."));
-      if (!isNaN(euro) && euro >= 0) {
-        fields.priceCents = euroToCents(euro);
+      const priceCents = parseEuroToCents(priceInput);
+      if (priceCents === null) {
+        setError("Bitte einen gültigen Preis eingeben (z. B. 19,99)");
+        setIsLoading(false);
+        return;
       }
+      fields.priceCents = priceCents;
     }
     if (durationMinutes !== "") {
       fields.durationMinutes = durationMinutes;

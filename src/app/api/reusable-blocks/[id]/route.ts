@@ -3,12 +3,13 @@ import { requireRole } from "@/lib/auth/require-role";
 import { db } from "@/lib/db";
 import { logger } from "@/lib/logging/logger";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
-import { AuditAction } from "@prisma/client";
+import { AuditAction, Prisma } from "@prisma/client";
 import { z } from "zod";
 
 const updateReusableBlockSchema = z.object({
   name: z.string().min(1).optional(),
-  contentJson: z.any().optional(),
+  // Frei-form Inhalt, aber zwingend ein Objekt, wenn gesetzt.
+  contentJson: z.record(z.string(), z.unknown()).optional(),
 });
 
 // GET /api/reusable-blocks/[id] - Einzelnen Reusable Block abrufen
@@ -82,9 +83,16 @@ export async function PUT(
       );
     }
 
+    const { contentJson, ...rest } = validatedData;
     const reusableBlock = await db.reusableBlock.update({
       where: { id },
-      data: validatedData,
+      data: {
+        ...rest,
+        // Validiert als Objekt; Cast auf den Prisma-JSON-Eingabetyp.
+        ...(contentJson !== undefined
+          ? { contentJson: contentJson as Prisma.InputJsonValue }
+          : {}),
+      },
     });
 
     await logger.success(

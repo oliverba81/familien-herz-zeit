@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { logger } from "@/lib/logging/logger";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
-import { revalidateTag } from "next/cache";
+import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
 import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
 
@@ -88,9 +88,7 @@ export async function POST(
     });
 
     // Revalidate Cache
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagPage(updatedPage.slug));
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagPages());
 
     return NextResponse.json({ ok: true, page: updatedPage });

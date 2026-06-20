@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { DiscountProvider, DiscountType } from "@prisma/client";
-import { formatCents } from "@/lib/utils/money";
+import { formatCents, parseEuroToCents } from "@/lib/utils/money";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 
@@ -103,9 +103,21 @@ export default function DiscountsAdmin() {
       };
 
       if (formData.type === "PERCENT") {
-        payload.percentOff = parseInt(formData.percentOff);
+        const percent = parseInt(formData.percentOff, 10);
+        if (Number.isNaN(percent) || percent <= 0 || percent > 100) {
+          setError("Bitte einen gültigen Prozentwert zwischen 1 und 100 eingeben.");
+          setCreating(false);
+          return;
+        }
+        payload.percentOff = percent;
       } else {
-        payload.amountOffCents = Math.round(parseFloat(formData.amountOffCents) * 100);
+        const amountOffCents = parseEuroToCents(formData.amountOffCents);
+        if (amountOffCents === null || amountOffCents <= 0) {
+          setError("Bitte einen gültigen Rabattbetrag eingeben.");
+          setCreating(false);
+          return;
+        }
+        payload.amountOffCents = amountOffCents;
       }
 
       if (formData.startsAt) payload.startsAt = new Date(formData.startsAt).toISOString();

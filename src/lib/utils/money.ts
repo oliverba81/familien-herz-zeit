@@ -50,3 +50,39 @@ export function formatEuroFromCents(cents: number): string {
   return formatCents(cents, "EUR", "de-DE");
 }
 
+/**
+ * Parst eine Benutzereingabe (Euro als String) sicher in Cents.
+ *
+ * Akzeptiert sowohl Komma- als auch Punkt-Dezimaltrennzeichen (z. B. "19,99"
+ * oder "19.99") sowie Tausenderpunkte im deutschen Format ("1.234,56").
+ * Gibt `null` zurück, wenn die Eingabe leer, kein gültiger Betrag oder negativ
+ * ist — damit ungültige Eingaben NICHT als `NaN` weiterverarbeitet werden.
+ *
+ * @param input Roh-Eingabe (String). `null`/`undefined` werden als ungültig behandelt.
+ * @returns Betrag in Cents (>= 0) oder `null` bei ungültiger Eingabe.
+ */
+export function parseEuroToCents(input: string | null | undefined): number | null {
+  if (input === null || input === undefined) return null;
+
+  const trimmed = String(input).trim();
+  if (trimmed === "") return null;
+
+  // Normalisiere deutsches Format: Wenn sowohl "." als auch "," vorkommen,
+  // ist "." der Tausendertrenner und "," das Dezimaltrennzeichen.
+  let normalized = trimmed;
+  if (normalized.includes(",") && normalized.includes(".")) {
+    normalized = normalized.replace(/\./g, "").replace(",", ".");
+  } else {
+    // Nur Komma -> Dezimaltrennzeichen.
+    normalized = normalized.replace(",", ".");
+  }
+
+  // Erlaube nur Ziffern, ein optionales Vorzeichen und genau einen Dezimalpunkt.
+  if (!/^-?\d+(\.\d+)?$/.test(normalized)) return null;
+
+  const euro = Number(normalized);
+  if (!Number.isFinite(euro) || euro < 0) return null;
+
+  return euroToCents(euro);
+}
+

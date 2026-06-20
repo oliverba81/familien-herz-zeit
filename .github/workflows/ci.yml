@@ -1,0 +1,40 @@
+name: CI
+
+# Regressions-Gate: läuft bei jedem Push und PR. Typecheck und Tests blockieren
+# (sie fangen die behobenen Fehlerklassen ab). Lint läuft informativ, da der
+# Bestand noch Alt-Lint-Schulden aus dem Next.js-16-Upgrade enthält.
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # Platzhalter — wird nur für `prisma generate`/Typecheck/Build benötigt,
+      # es wird keine echte Datenbankverbindung aufgebaut. Tests sind rein
+      # (pure Funktionen) und brauchen keine DB.
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm run test
+
+      - name: Lint (informativ, blockiert nicht)
+        run: npm run lint
+        continue-on-error: true

@@ -5,6 +5,7 @@ import { generateToken } from "@/lib/utils/token";
 import { sendEmail } from "@/lib/email/mailer";
 import { renderVideoAccessEmail } from "@/lib/email/templates/videoAccess";
 import { createInvoiceForPurchase } from "@/lib/invoice/create-invoice";
+import { getChildAgeMonths } from "@/lib/utils/age";
 import { logger } from "@/lib/logging/logger";
 
 export const runtime = "nodejs";
@@ -76,6 +77,16 @@ export async function POST(request: NextRequest) {
         try {
           bookingData = JSON.parse(bookingDataStr);
         } catch (parseError) {
+          // Nicht still verschlucken: strukturiert protokollieren, damit eine
+          // fehlgeschlagene Buchung sichtbar wird (sonst denkt der Kunde, die
+          // Zahlung sei erfolgreich verbucht).
+          await logger.error(
+            "PAYMENT",
+            "STRIPE_WEBHOOK_BOOKINGDATA_PARSE_FAILED",
+            `Failed to parse bookingData for session ${session.id}`,
+            parseError instanceof Error ? parseError : undefined,
+            { sessionId: session.id }
+          );
           console.error("Failed to parse bookingData:", parseError);
           return NextResponse.json({ received: true });
         }
@@ -115,11 +126,9 @@ export async function POST(request: NextRequest) {
           (s) => new Date(s.startAt) >= now
         );
 
-        // Berechne Alter in Monaten
+        // Berechne Alter in Monaten (zentrale, getestete Funktion)
         const birthDate = new Date(bookingData.childBirthDate);
-        const today = new Date();
-        const monthsDiff = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
-        const childAgeMonths = monthsDiff >= 0 ? monthsDiff : 0;
+        const childAgeMonths = getChildAgeMonths(birthDate);
 
         // Erstelle Booking
         const amountPaid = session.amount_total || course.priceCents;
@@ -236,6 +245,15 @@ export async function POST(request: NextRequest) {
       const email =
         session.customer_details?.email || session.customer_email || "";
       if (!email) {
+        // Keine E-Mail -> kein Zugang möglich. Nicht still verschlucken,
+        // sondern sichtbar protokollieren (kein VideoPurchase mit leerer E-Mail).
+        await logger.error(
+          "PAYMENT",
+          "STRIPE_WEBHOOK_MISSING_EMAIL",
+          `Missing email in checkout session ${session.id}`,
+          undefined,
+          { sessionId: session.id, videoCourseId }
+        );
         console.error("Missing email in session");
         return NextResponse.json({ received: true });
       }

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { courseSchema } from "@/lib/validations/courses";
 import { logAudit, getActorFromSession, getChangedFields } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
-import { revalidateTag } from "next/cache";
+import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagCourse, tagCourses } from "@/lib/seo/tags";
 import { dateTimeToUtcDate } from "@/lib/utils/datetime-convert";
 
@@ -178,9 +178,7 @@ export async function PUT(
     });
 
     // Revalidation
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagCourse(id));
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagCourses());
 
     return NextResponse.json(course);
