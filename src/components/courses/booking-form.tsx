@@ -603,9 +603,17 @@ export default function BookingForm({
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800 mb-2">
               <strong>Zahlung erforderlich:</strong>{" "}
-              {enabledMethods.stripe || enabledMethods.paypal || enabledMethods.bankTransfer
-                ? "Bitte wähle eine Zahlungsmethode aus."
-                : "Derzeit ist keine Zahlung verfügbar. Bitte kontaktiere uns."}
+              {enabledMethods.stripe || enabledMethods.paypal || enabledMethods.bankTransfer ? (
+                "Bitte wähle eine Zahlungsmethode aus."
+              ) : (
+                <>
+                  Derzeit ist keine Zahlung verfügbar. Bitte{" "}
+                  <a href="/kontakt" className="text-rose-600 underline hover:text-rose-700">
+                    kontaktiere uns
+                  </a>
+                  .
+                </>
+              )}
             </p>
             <p className="text-sm text-blue-700">
               Preis: {formatCents(coursePriceCents)}
