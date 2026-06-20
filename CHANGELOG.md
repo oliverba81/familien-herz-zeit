@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.3...v0.4.0) (2026-06-20)
+
+
+### Features
+
+* Zahlungseinstellungen im Admin (Stripe, PayPal, Überweisung) ([f24c28d](https://github.com/oliverba81/familien-herz-zeit/commit/f24c28d63d78f1b7177c3e5f85bf9f73bf473592))
+* Zahlungseinstellungen im Admin (Stripe, PayPal, Überweisung) ([ab02e07](https://github.com/oliverba81/familien-herz-zeit/commit/ab02e07c1a1da8fe7ce97f4a2d0d9db80f2aaa88))
+
 ## [0.3.3](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.2...v0.3.3) (2026-06-20)
 
 
