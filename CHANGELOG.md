@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.0...v0.4.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* Build-Fehler – Server-Code (pg) im Client-Bundle des Rechtstext-Popups ([d92ee39](https://github.com/oliverba81/familien-herz-zeit/commit/d92ee3974195435d830f6bc31ed67151fb0b26ee))
+
 ## [0.4.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.3...v0.4.0) (2026-06-20)
 
 
