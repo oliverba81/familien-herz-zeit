@@ -1,0 +1,12 @@
+.wysiwyg-word-count-bar {
+  padding: 4px var(--wysiwyg-padding);
+  font-size: 11px;
+  color: var(--wysiwyg-placeholder-color);
+  border-top: 1px solid var(--wysiwyg-border-color);
+  user-select: none;
+}
+
+.wysiwyg-word-count-bar.wysiwyg-limit-warning {
+  color: #ef4444;
+  font-weight: 600;
+}

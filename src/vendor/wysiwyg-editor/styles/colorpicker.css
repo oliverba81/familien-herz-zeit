@@ -1,0 +1,61 @@
+.wysiwyg-color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.wysiwyg-color-canvas {
+  border-radius: 4px;
+  cursor: crosshair;
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+
+.wysiwyg-hue-canvas {
+  border-radius: 4px;
+  cursor: crosshair;
+  width: 100%;
+  height: 20px;
+  display: block;
+}
+
+.wysiwyg-color-presets,
+.wysiwyg-recent-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.wysiwyg-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.wysiwyg-color-swatch:hover {
+  transform: scale(1.2);
+}
+
+.wysiwyg-color-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wysiwyg-color-preview {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--wysiwyg-border-color);
+  flex-shrink: 0;
+}
+
+.wysiwyg-hex-input {
+  flex: 1;
+}

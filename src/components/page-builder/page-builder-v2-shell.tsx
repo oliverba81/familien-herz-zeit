@@ -2,7 +2,10 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Editor } from "@tinymce/tinymce-react";
+import { WysiwygEditor, type WysiwygEditorHandle } from "@/vendor/wysiwyg-editor/react";
+import type { Editor as WysiwygCore } from "@/vendor/wysiwyg-editor/core/Editor";
+import { V2_TOOLBAR } from "@/lib/wysiwyg/toolbars";
+import { uploadImageToMedia } from "@/lib/wysiwyg/upload-image";
 import type { PageContentV2 } from "@/lib/page-builder/schema";
 import { isPageContentV2 } from "@/lib/page-builder/schema";
 import {
@@ -64,6 +67,30 @@ interface PageBuilderV2ShellProps {
 
 const isCreateMode = (id: string | undefined) => id === undefined || id === "";
 
+/**
+ * Ermittelt das aktuell „aktive" Element im Editor (Ersatz für TinyMCEs
+ * `editor.selection.getNode()`). Bevorzugt die Text-Selection; fällt auf das
+ * zuletzt angeklickte Element zurück, da Bilder/`contenteditable=false`-Embeds
+ * beim Anklicken keine Text-Selection erzeugen.
+ */
+function getSelectedElement(
+  e: WysiwygCore,
+  lastClicked: HTMLElement | null
+): HTMLElement | null {
+  const sel = typeof window !== "undefined" ? window.getSelection() : null;
+  if (sel && sel.rangeCount > 0) {
+    let n: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+    if (n.nodeType === Node.TEXT_NODE) n = n.parentElement;
+    if (n && e.editorEl.contains(n) && n !== e.editorEl) {
+      return n as HTMLElement;
+    }
+  }
+  if (lastClicked && e.editorEl.contains(lastClicked) && lastClicked !== e.editorEl) {
+    return lastClicked;
+  }
+  return null;
+}
+
 export default function PageBuilderV2Shell({
   pageId,
   initialContentJson,
@@ -76,7 +103,11 @@ export default function PageBuilderV2Shell({
   currentHtmlRef,
 }: PageBuilderV2ShellProps) {
   const router = useRouter();
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<WysiwygEditorHandle>(null);
+  /** Liefert die Core-Editor-Instanz (insertHTML/editorEl/commands leben nur dort). */
+  const ed = useCallback(() => editorRef.current?.getEditor() ?? null, []);
+  /** Zuletzt im Editor angeklicktes Element (Fallback für Stylevorlagen auf Bilder/Embeds). */
+  const lastClickedElRef = useRef<HTMLElement | null>(null);
   const createMode = isCreateMode(pageId);
 
   const initialHtml =
@@ -159,14 +190,14 @@ export default function PageBuilderV2Shell({
 
   const handleMediaSelect = useCallback(
     (media: { id: string; url: string; type: string; alt?: string }) => {
-      const editor = editorRef.current;
-      if (!editor) return;
+      const e = ed();
+      if (!e) return;
       const altEsc = (media.alt || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
       const srcEsc = media.url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-      editor.insertContent(`<img src="${srcEsc}" alt="${altEsc}" />`);
+      e.insertHTML(`<img src="${srcEsc}" alt="${altEsc}" />`);
       setMediaPickerOpen(false);
     },
-    []
+    [ed]
   );
 
   useEffect(() => {
@@ -188,43 +219,45 @@ export default function PageBuilderV2Shell({
 
   const applyStylePreset = useCallback(
     (preset: StylePreset) => {
-      const editor = editorRef.current;
-      if (!editor) {
+      const e = ed();
+      if (!e) {
         showApplyMessage("Editor nicht bereit.");
         return;
       }
       try {
-        const node = editor.selection.getNode();
-        if (!node || node === editor.getBody()) {
+        const node = getSelectedElement(e, lastClickedElRef.current);
+        if (!node) {
           showApplyMessage("Bitte zuerst ein Element (Absatz, Bild, Tabelle) im Editor auswählen.");
           return;
         }
-        editor.dom.addClass(node, preset.className);
+        node.classList.add(preset.className);
+        // DOM-Mutation per JS löst kein input/onChange aus → React-State manuell syncen.
+        setHtml(e.getHTML());
         showApplyMessage(`Vorlage „${preset.label}" angewendet.`);
-      } catch (e) {
+      } catch (err) {
         showApplyMessage("Vorlage konnte nicht angewendet werden.");
       }
     },
-    [showApplyMessage]
+    [ed, showApplyMessage]
   );
 
   const insertBlockPlaceholder = useCallback(
     (blockType: V2EmbedBlockType) => {
-      const editor = editorRef.current;
-      if (!editor) {
+      const e = ed();
+      if (!e) {
         showApplyMessage("Editor nicht bereit.");
         return;
       }
       try {
         const defaultData = getV2EmbedDefaultData(blockType);
         const snippet = getV2EmbedPlaceholderHtml(blockType, defaultData);
-        editor.insertContent(snippet);
+        e.insertHTML(snippet);
         showApplyMessage(`${V2_BLOCK_LABELS[blockType]} eingefügt. Klicke den Block an, um ihn zu konfigurieren.`);
-      } catch (e) {
+      } catch (err) {
         showApplyMessage("Block konnte nicht eingefügt werden.");
       }
     },
-    [showApplyMessage]
+    [ed, showApplyMessage]
   );
 
   const handleEmbedBlockChange = useCallback(
@@ -239,6 +272,48 @@ export default function PageBuilderV2Shell({
     },
     [html]
   );
+
+  const handleEditorReady = useCallback(() => {
+    const e = editorRef.current?.getEditor();
+    if (!e) return;
+
+    // Custom-Befehl für den statischen Toolbar-Button "fhzMedia".
+    if (!e.commands.has("fhzMedia")) {
+      e.commands.register("fhzMedia", () => openMediaPickerRef.current?.());
+    }
+
+    // Aktuellen Inhalt direkt aus der Editor-Instanz lesen (z. B. für „Mit KI ausfüllen").
+    if (currentHtmlRef) {
+      currentHtmlRef.current = () => editorRef.current?.getHTML() ?? "";
+    }
+
+    // Ersatz für TinyMCEs "NodeChange": Klick im Editor erkennt FHZ-Embed-Blöcke.
+    // (contenteditable=false-Embeds erzeugen keine Text-Selection → Click-Listener nötig.)
+    const onClick = (ev: MouseEvent) => {
+      const target = ev.target as HTMLElement | null;
+      lastClickedElRef.current = target;
+      const embed = target?.closest?.(".fhz-embed") as HTMLElement | null;
+      if (embed) {
+        const bid = embed.getAttribute("data-fhz-block-id");
+        const btype = embed.getAttribute("data-fhz-block");
+        const dataRaw = embed.getAttribute("data-fhz-block-data");
+        if (bid && btype && V2_EMBED_BLOCK_TYPES.includes(btype as V2EmbedBlockType)) {
+          const data =
+            parseEmbedDataFromAttribute(dataRaw) ??
+            getV2EmbedDefaultData(btype as V2EmbedBlockType);
+          onSelectEmbedRef.current?.({
+            blockId: bid,
+            blockType: btype as V2EmbedBlockType,
+            data,
+          });
+          return;
+        }
+      }
+      onSelectEmbedRef.current?.(null);
+    };
+    e.editorEl.addEventListener("click", onClick);
+    e.on("destroy", () => e.editorEl.removeEventListener("click", onClick));
+  }, [currentHtmlRef]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -399,99 +474,18 @@ export default function PageBuilderV2Shell({
           onDragOver={handleDragOver}
         >
           <div className="flex-1 overflow-hidden border-r border-gray-200">
-            <Editor
-              apiKey={
-                process.env.NEXT_PUBLIC_TINYMCE_API_KEY ||
-                "pbh7342n8ezrtnqzp9ykk6x8bd5wu8roanu67oa5091kekr9"
-              }
+            <WysiwygEditor
+              ref={editorRef}
               value={html}
-              onEditorChange={(newHtml) => setHtml(newHtml)}
-              init={{
-                height: "100%",
-                menubar: false,
-                toolbar_mode: "wrap",
-                setup: (editor: any) => {
-                  editorRef.current = editor;
-                  // Aktuellen Inhalt immer direkt aus der Editor-Instanz lesen (für „Mit KI ausfüllen“)
-                  if (currentHtmlRef) {
-                    currentHtmlRef.current = () => editorRef.current?.getContent() ?? "";
-                  }
-                  editor.ui.registry.addButton("fhzmedia", {
-                    text: "Aus Mediathek",
-                    tooltip: "Bild aus Mediathek einfügen",
-                    onAction: () => {
-                      openMediaPickerRef.current?.();
-                    },
-                  });
-                  editor.on("NodeChange", (e: { element: Element | null }) => {
-                    const el = e.element;
-                    const embed =
-                      el?.closest?.(".fhz-embed") ??
-                      (el?.classList?.contains?.("fhz-embed") ? el : null);
-                    if (embed) {
-                      const bid = embed.getAttribute("data-fhz-block-id");
-                      const btype = embed.getAttribute("data-fhz-block");
-                      const dataRaw = embed.getAttribute("data-fhz-block-data");
-                      if (
-                        bid &&
-                        btype &&
-                        V2_EMBED_BLOCK_TYPES.includes(btype as V2EmbedBlockType)
-                      ) {
-                        const data =
-                          parseEmbedDataFromAttribute(dataRaw) ??
-                          getV2EmbedDefaultData(btype as V2EmbedBlockType);
-                        onSelectEmbedRef.current?.({
-                          blockId: bid,
-                          blockType: btype as V2EmbedBlockType,
-                          data,
-                        });
-                      } else {
-                        onSelectEmbedRef.current?.(null);
-                      }
-                    } else {
-                      onSelectEmbedRef.current?.(null);
-                    }
-                  });
-                },
-                plugins: [
-                  "advlist",
-                  "autolink",
-                  "lists",
-                  "link",
-                  "image",
-                  "charmap",
-                  "preview",
-                  "anchor",
-                  "searchreplace",
-                  "visualblocks",
-                  "code",
-                  "fullscreen",
-                  "insertdatetime",
-                  "media",
-                  "table",
-                  "help",
-                  "wordcount",
-                ],
-                // Schriftgröße in px statt H-Überschriften
-                font_size_formats: "12px 14px 16px 18px 20px 24px 28px 32px 36px 48px",
-                toolbar:
-                  "undo redo | fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor | " +
-                  "alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | " +
-                  "link image fhzmedia | table | blockquote hr | charmap searchreplace insertdatetime | " +
-                  "removeformat | visualblocks code fullscreen preview | help",
-                content_css: "/page-builder-v2-presets.css",
-                content_style:
-                  "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.5; } " +
-                  "table { border-collapse: collapse; width: 100%; } td, th { padding: 0.4em 0.6em; } " +
-                  ".fhz-embed { display: inline-block; padding: 0.25em 0.5em; background: #f3f4f6; border: 1px dashed #9ca3af; border-radius: 0.25rem; margin: 0.25em 0; }",
-                extended_valid_elements:
-                  "div[data-fhz-block|data-fhz-block-id|data-fhz-block-data|class|contenteditable],*[*]",
-                valid_elements: "*[*]",
-                valid_children: "+body[style]",
-                paste_retain_style_properties: "all",
-                allow_script_urls: false,
-                forced_root_block: "p",
-              }}
+              onChange={(newHtml) => setHtml(newHtml)}
+              onReady={handleEditorReady}
+              toolbar={V2_TOOLBAR}
+              locale="de"
+              height="100%"
+              onChangeDebounceMs={0}
+              dragDrop={false}
+              onImageUpload={uploadImageToMedia}
+              className="h-full"
             />
           </div>
         </div>

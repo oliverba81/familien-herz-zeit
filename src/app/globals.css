@@ -65,6 +65,50 @@ body {
 .tinymce-preview-content a { color: #e11d48; text-decoration: underline; }
 .tinymce-preview-content a:hover { color: #be123c; }
 
+/* WYSIWYG-Editor (vendored): Layout-Klassen für gespeicherten Content im Frontend.
+   Spiegelt src/vendor/wysiwyg-editor/styles/image.css für die Veröffentlichungs-Ansicht. */
+.tinymce-preview-content figure.wysiwyg-figure {
+  display: inline-block;
+  margin: 1em auto;
+  text-align: center;
+}
+.tinymce-preview-content figure.wysiwyg-figure figcaption {
+  font-size: 0.875em;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 4px;
+}
+.tinymce-preview-content img.wysiwyg-img-left {
+  float: left;
+  margin-right: 16px;
+  margin-bottom: 8px;
+}
+.tinymce-preview-content img.wysiwyg-img-center {
+  display: block;
+  margin: 0 auto;
+}
+.tinymce-preview-content img.wysiwyg-img-right {
+  float: right;
+  margin-left: 16px;
+  margin-bottom: 8px;
+}
+.tinymce-preview-content img.wysiwyg-img-full {
+  width: 100%;
+  display: block;
+}
+
+/* FHZ-Embed-Platzhalter im WYSIWYG-Builder (kein iframe mehr → globales Styling).
+   Im Frontend werden diese Platzhalter durch echte Blöcke ersetzt. */
+.wysiwyg-editor-area .fhz-embed {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  background: #f3f4f6;
+  border: 1px dashed #9ca3af;
+  border-radius: 0.25rem;
+  margin: 0.25em 0;
+  cursor: pointer;
+}
+
 /* Hover-Effekte für Tabellen-Zellen mit Gradient-Rahmen */
 td.table-cell-gradient:hover,
 figure.table-cell-gradient:hover {

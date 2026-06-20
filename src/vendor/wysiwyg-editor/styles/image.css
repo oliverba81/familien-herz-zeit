@@ -1,0 +1,120 @@
+.wysiwyg-editor-area .wysiwyg-figure {
+  display: inline-block;
+  margin: 1em auto;
+  text-align: center;
+}
+
+.wysiwyg-editor-area .wysiwyg-figure figcaption {
+  font-size: 0.875em;
+  color: var(--wysiwyg-placeholder-color);
+  font-style: italic;
+  margin-top: 4px;
+  min-height: 1.4em;
+  outline: none;
+}
+
+.wysiwyg-editor-area .wysiwyg-figure figcaption:empty::before {
+  content: attr(data-placeholder);
+  color: var(--wysiwyg-placeholder-color);
+  pointer-events: none;
+}
+
+.wysiwyg-editor-area img.wysiwyg-img {
+  cursor: pointer;
+  transition: outline 0.1s;
+}
+
+.wysiwyg-editor-area img.wysiwyg-img-selected {
+  outline: 2px solid var(--wysiwyg-btn-active-color);
+}
+
+.wysiwyg-editor-area img.wysiwyg-img-left {
+  float: left;
+  margin-right: 16px;
+  margin-bottom: 8px;
+}
+
+.wysiwyg-editor-area img.wysiwyg-img-center {
+  display: block;
+  margin: 0 auto;
+}
+
+.wysiwyg-editor-area img.wysiwyg-img-right {
+  float: right;
+  margin-left: 16px;
+  margin-bottom: 8px;
+}
+
+.wysiwyg-editor-area img.wysiwyg-img-full {
+  width: 100%;
+  display: block;
+}
+
+.wysiwyg-img-toolbar {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  background: #1f2937;
+  border-radius: 6px;
+  padding: 4px;
+  gap: 2px;
+  z-index: var(--wysiwyg-z-floating-toolbar);
+  box-shadow: var(--wysiwyg-shadow);
+}
+
+.wysiwyg-img-toolbar button {
+  min-width: 28px;
+  height: 26px;
+  border: none;
+  background: none;
+  color: #f9fafb;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.wysiwyg-img-toolbar button:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.wysiwyg-img-toolbar .wysiwyg-img-size-btn {
+  width: auto;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+.wysiwyg-img-toolbar-separator {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: rgba(255,255,255,0.25);
+}
+
+.wysiwyg-img-size-input {
+  width: 52px;
+  height: 26px;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 12px;
+}
+
+.wysiwyg-editor-area .wysiwyg-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  margin: 1em 0;
+  border-radius: 6px;
+  background: #000;
+}
+
+.wysiwyg-editor-area .wysiwyg-video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}

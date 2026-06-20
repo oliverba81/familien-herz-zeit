@@ -1,0 +1,120 @@
+.wysiwyg-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--wysiwyg-toolbar-bg);
+  border-bottom: 1px solid var(--wysiwyg-toolbar-border);
+  border-radius: var(--wysiwyg-border-radius) var(--wysiwyg-border-radius) 0 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  white-space: nowrap;
+  touch-action: pan-x;
+}
+
+.wysiwyg-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.wysiwyg-separator {
+  width: 1px;
+  height: 22px;
+  background: var(--wysiwyg-toolbar-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.wysiwyg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--wysiwyg-text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+  position: relative;
+}
+
+.wysiwyg-btn:hover:not(:disabled) {
+  background: var(--wysiwyg-btn-hover-bg);
+}
+
+.wysiwyg-btn--active,
+.wysiwyg-btn[aria-pressed="true"] {
+  background: var(--wysiwyg-btn-active-bg);
+  color: var(--wysiwyg-btn-active-color);
+}
+
+.wysiwyg-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wysiwyg-btn svg {
+  width: var(--wysiwyg-btn-icon-size);
+  height: var(--wysiwyg-btn-icon-size);
+  display: block;
+  pointer-events: none;
+}
+
+.wysiwyg-btn-primary {
+  width: auto;
+  padding: 4px 12px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.wysiwyg-btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.wysiwyg-select {
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--wysiwyg-input-border);
+  border-radius: 4px;
+  background: var(--wysiwyg-select-bg);
+  color: var(--wysiwyg-text);
+  font-size: 12px;
+  cursor: pointer;
+  max-width: 130px;
+}
+
+.wysiwyg-dropdown-wrapper {
+  position: relative;
+}
+
+.wysiwyg-limit-warning {
+  color: #ef4444 !important;
+}
+
+.wysiwyg-shortcut-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.wysiwyg-shortcut-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--wysiwyg-border-color);
+  font-size: 13px;
+}
+
+.wysiwyg-shortcut-table kbd {
+  background: var(--wysiwyg-toolbar-bg);
+  border: 1px solid var(--wysiwyg-border-color);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 12px;
+}

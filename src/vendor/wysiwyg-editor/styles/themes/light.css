@@ -1,0 +1,16 @@
+[data-wysiwyg-theme="light"],
+.wysiwyg-wrapper {
+  --wysiwyg-bg: #ffffff;
+  --wysiwyg-text: #1f2937;
+  --wysiwyg-toolbar-bg: #f9fafb;
+  --wysiwyg-toolbar-border: #e5e7eb;
+  --wysiwyg-border-color: #d1d5db;
+  --wysiwyg-btn-hover-bg: #e5e7eb;
+  --wysiwyg-btn-active-bg: #dbeafe;
+  --wysiwyg-btn-active-color: #1d4ed8;
+  --wysiwyg-input-bg: #ffffff;
+  --wysiwyg-input-border: #d1d5db;
+  --wysiwyg-modal-bg: #ffffff;
+  --wysiwyg-select-bg: #ffffff;
+  --wysiwyg-placeholder-color: #9ca3af;
+}

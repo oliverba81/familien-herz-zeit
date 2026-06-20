@@ -1,0 +1,35 @@
+:root {
+  --wysiwyg-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --wysiwyg-font-size: 15px;
+  --wysiwyg-line-height: 1.2;
+  --wysiwyg-border-radius: 6px;
+  --wysiwyg-border-color: #d1d5db;
+  --wysiwyg-bg: #ffffff;
+  --wysiwyg-text: #1f2937;
+  --wysiwyg-toolbar-bg: #f9fafb;
+  --wysiwyg-toolbar-border: #e5e7eb;
+  --wysiwyg-btn-hover-bg: #e5e7eb;
+  --wysiwyg-btn-active-bg: #dbeafe;
+  --wysiwyg-btn-active-color: #1d4ed8;
+  --wysiwyg-btn-disabled-color: #9ca3af;
+  --wysiwyg-focus-ring: 2px solid #3b82f6;
+  --wysiwyg-min-height: 200px;
+  --wysiwyg-padding: 1rem;
+  --wysiwyg-btn-icon-size: 16px;
+  --wysiwyg-input-bg: #ffffff;
+  --wysiwyg-input-border: #d1d5db;
+  --wysiwyg-modal-bg: #ffffff;
+  --wysiwyg-modal-overlay: rgba(0,0,0,0.5);
+  --wysiwyg-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  --wysiwyg-select-bg: #ffffff;
+  --wysiwyg-placeholder-color: #9ca3af;
+
+  --wysiwyg-z-fullscreen:       9000;
+  --wysiwyg-z-table-toolbar:    9100;
+  --wysiwyg-z-slash-menu:       9200;
+  --wysiwyg-z-floating-toolbar: 9300;
+  --wysiwyg-z-tooltip:          9400;
+  --wysiwyg-z-modal-overlay:    9500;
+  --wysiwyg-z-modal:            9501;
+  --wysiwyg-z-autosave-banner:  9600;
+}
