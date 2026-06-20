@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.2...v0.3.3) (2026-06-20)
+
+
+### Bug Fixes
+
+* Kurse sofort aktualisieren + Umbenennung "Live-Kurse" → "Präsenz-Kurse" ([d435942](https://github.com/oliverba81/familien-herz-zeit/commit/d4359422038225f4ef95249a5ee2f12d4e2d965e))
+
 ## [0.3.2](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.1...v0.3.2) (2026-06-20)
 
 
