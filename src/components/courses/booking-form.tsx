@@ -458,7 +458,7 @@ export default function BookingForm({
                   <span aria-hidden="true">⚠️</span>
                   <span>
                     Wichtig: Bitte bringe den Gutschein unbedingt zur ersten
-                    Kursstunde mit und zeige ihn vor.
+                    Kursstunde mit.
                   </span>
                 </p>
               </label>
