@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.1...v0.3.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* Startseiten-Slug auf / umleiten (Duplicate Content vermeiden) ([ec67a6b](https://github.com/oliverba81/familien-herz-zeit/commit/ec67a6babae96ec30726ded0e701af066589334d))
+
 ## [0.3.1](https://github.com/oliverba81/familien-herz-zeit/compare/v0.3.0...v0.3.1) (2026-06-20)
 
 
