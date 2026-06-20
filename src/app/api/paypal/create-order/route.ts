@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { paypalFetch } from "@/lib/paypal/client";
+import { getPaymentConfig } from "@/lib/payment/config";
 import { z } from "zod";
 import { validateDiscount, markRedeemed } from "@/lib/discounts/engine";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
@@ -22,6 +23,15 @@ const createOrderSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
+    // Prüfe, ob PayPal als Zahlungsart aktiviert und konfiguriert ist
+    const paymentConfig = await getPaymentConfig();
+    if (!paymentConfig.paypal.available) {
+      return NextResponse.json(
+        { error: "PayPal ist derzeit nicht verfügbar" },
+        { status: 403 }
+      );
+    }
+
     // Prüfe ob User eingeloggt ist
     const session = await getServerSession(authOptions);
 

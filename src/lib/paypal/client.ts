@@ -1,13 +1,14 @@
 /**
  * PayPal Client Helper
- * Server-only utilities for PayPal API interactions
+ * Server-only utilities for PayPal API interactions.
+ *
+ * Liest Client-ID/Secret/Modus aus der zentralen Zahlungs-Konfiguration
+ * (DB > .env, siehe src/lib/payment/config.ts).
  */
+import { getPaymentConfig, type PaypalConfig } from "@/lib/payment/config";
 
-// Unterstütze sowohl PAYPAL_MODE (aus Admin-Form) als auch PAYPAL_ENV (für Backward Compatibility)
-const PAYPAL_MODE = (process.env.PAYPAL_MODE || process.env.PAYPAL_ENV || "sandbox") as "sandbox" | "live";
-
-function getPaypalBaseUrl(): string {
-  return PAYPAL_MODE === "live"
+function baseUrlForMode(mode: "sandbox" | "live"): string {
+  return mode === "live"
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
 }
@@ -18,25 +19,41 @@ interface AccessTokenResponse {
   expires_in: number;
 }
 
-let cachedToken: { token: string; expiresAt: number } | null = null;
+// Token-Cache, geschlüsselt nach Credentials+Modus, damit ein Wechsel der
+// Konfiguration im Admin nicht zu einem veralteten Token führt.
+let cachedToken: { key: string; token: string; expiresAt: number } | null = null;
+
+function credKey(cfg: PaypalConfig): string {
+  return `${cfg.mode}:${cfg.clientId ?? ""}`;
+}
+
+async function getPaypalConfigOrThrow(): Promise<PaypalConfig> {
+  const { paypal } = await getPaymentConfig();
+  if (!paypal.clientId || !paypal.clientSecret) {
+    throw new Error("PayPal ist nicht konfiguriert (Client-ID/Secret fehlen)");
+  }
+  return paypal;
+}
 
 /**
  * Get PayPal OAuth2 Access Token
  * Uses in-memory cache (dev ok, production should use Redis)
  */
-async function getAccessToken(): Promise<string> {
-  // Return cached token if still valid (with 60s buffer)
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60000) {
+async function getAccessToken(cfg: PaypalConfig): Promise<string> {
+  const key = credKey(cfg);
+
+  // Return cached token if still valid (with 60s buffer) und gleiche Credentials
+  if (
+    cachedToken &&
+    cachedToken.key === key &&
+    cachedToken.expiresAt > Date.now() + 60000
+  ) {
     return cachedToken.token;
   }
 
-  if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
-    throw new Error("PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET must be set");
-  }
-
-  const baseUrl = getPaypalBaseUrl();
+  const baseUrl = baseUrlForMode(cfg.mode);
   const auth = Buffer.from(
-    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+    `${cfg.clientId}:${cfg.clientSecret}`
   ).toString("base64");
 
   const response = await fetch(`${baseUrl}/v1/oauth2/token`, {
@@ -54,9 +71,10 @@ async function getAccessToken(): Promise<string> {
   }
 
   const data: AccessTokenResponse = await response.json();
-  
+
   // Cache token
   cachedToken = {
+    key,
     token: data.access_token,
     expiresAt: Date.now() + (data.expires_in - 60) * 1000, // -60s buffer
   };
@@ -72,8 +90,9 @@ export async function paypalFetch(
   path: string,
   options: RequestInit = {}
 ): Promise<any> {
-  const baseUrl = getPaypalBaseUrl();
-  const token = await getAccessToken();
+  const cfg = await getPaypalConfigOrThrow();
+  const baseUrl = baseUrlForMode(cfg.mode);
+  const token = await getAccessToken(cfg);
 
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,
@@ -105,5 +124,10 @@ export async function paypalFetch(
   return JSON.parse(text);
 }
 
-export { getPaypalBaseUrl };
-
+/**
+ * Aktuelle PayPal-Basis-URL (abhängig vom konfigurierten Modus).
+ */
+export async function getPaypalBaseUrl(): Promise<string> {
+  const { paypal } = await getPaymentConfig();
+  return baseUrlForMode(paypal.mode);
+}

@@ -8,6 +8,7 @@ import VideoAccessRequestForm from "@/components/video-courses/video-access-requ
 import PurchaseButton from "@/components/video-courses/purchase-button";
 import PaypalButton from "@/components/video-courses/paypal-button";
 import DiscountInputWrapper from "@/components/video-courses/discount-input-wrapper";
+import { getAvailablePaymentMethods } from "@/lib/payment/config";
 
 interface VideoCoursePageProps {
   params: Promise<{ slug: string }>;
@@ -45,6 +46,10 @@ export default async function VideoCourseDetailPage({
   if (!course || course.status !== "PUBLISHED") {
     notFound();
   }
+
+  // Verfügbare Online-Zahlungsarten (Videokurse: nur Stripe/PayPal,
+  // da der Zugang sofort gewährt wird)
+  const paymentMethods = await getAvailablePaymentMethods();
 
   return (
     <div className="bg-gray-50 py-12">
@@ -93,6 +98,10 @@ export default async function VideoCourseDetailPage({
                 <DiscountInputWrapper
                   videoCourseId={course.id}
                   priceCents={course.priceCents}
+                  enabledMethods={{
+                    stripe: paymentMethods.stripe,
+                    paypal: paymentMethods.paypal,
+                  }}
                 />
               ) : (
                 <VideoAccessRequestForm courseId={course.id} />

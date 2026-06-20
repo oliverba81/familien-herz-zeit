@@ -9,14 +9,32 @@ import ErrorMessage from "@/components/auth/error-message";
 import { track } from "@/lib/analytics/track";
 import { formatCents } from "@/lib/utils/money";
 
-interface BookingFormProps {
-  courseId: string;
+interface BankTransferDetails {
+  accountHolder: string | null;
+  iban: string | null;
+  bic: string | null;
+  bankName: string | null;
+  info: string | null;
+  amountCents: number;
+  reference: string;
 }
 
-export default function BookingForm({ courseId }: BookingFormProps) {
+interface BookingFormProps {
+  courseId: string;
+  /** Im Checkout anbietbare Zahlungsarten (im Admin konfigurierbar). */
+  enabledMethods?: { stripe: boolean; paypal: boolean; bankTransfer: boolean };
+}
+
+export default function BookingForm({
+  courseId,
+  enabledMethods = { stripe: true, paypal: true, bankTransfer: false },
+}: BookingFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ mailSent: boolean } | null>(null);
+  const [success, setSuccess] = useState<{
+    mailSent: boolean;
+    bankTransfer?: BankTransferDetails | null;
+  } | null>(null);
   const [acceptsAokVoucher, setAcceptsAokVoucher] = useState(false);
   const [coursePriceCents, setCoursePriceCents] = useState<number>(0);
   const [loadingCourse, setLoadingCourse] = useState(true);
@@ -201,7 +219,40 @@ export default function BookingForm({ courseId }: BookingFormProps) {
     }
   };
 
+  const handleBankTransfer = async (data: BookingData) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...data, paymentMethod: "BANKTRANSFER" }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Buchung fehlgeschlagen");
+      }
+
+      const result = await response.json();
+      setSuccess({
+        mailSent: result.mailSent ?? false,
+        bankTransfer: result.bankTransfer ?? null,
+      });
+      reset();
+      track("booking_submitted", { courseId, provider: "banktransfer" });
+    } catch (err: any) {
+      setError(err.message || "Fehler beim Absenden der Buchung");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (success) {
+    const bt = success.bankTransfer;
     return (
       <div className="p-6 bg-green-50 border border-green-200 rounded-lg">
         <h3 className="text-lg font-semibold text-green-800 mb-2">
@@ -210,6 +261,52 @@ export default function BookingForm({ courseId }: BookingFormProps) {
         <p className="text-green-700 mb-2">
           Wir haben deine Buchung erhalten und melden uns in Kürze zur Bestätigung.
         </p>
+
+        {bt && (
+          <div className="mt-4 bg-white border border-green-200 rounded-lg p-4">
+            <h4 className="font-semibold text-gray-900 mb-2">
+              Bitte überweise den Betrag auf folgendes Konto:
+            </h4>
+            <dl className="text-sm text-gray-700 space-y-1">
+              <div className="flex justify-between gap-4">
+                <dt className="text-gray-500">Betrag</dt>
+                <dd className="font-semibold">{formatCents(bt.amountCents)}</dd>
+              </div>
+              {bt.accountHolder && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-gray-500">Kontoinhaber</dt>
+                  <dd className="font-medium text-right">{bt.accountHolder}</dd>
+                </div>
+              )}
+              {bt.iban && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-gray-500">IBAN</dt>
+                  <dd className="font-mono text-right">{bt.iban}</dd>
+                </div>
+              )}
+              {bt.bic && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-gray-500">BIC</dt>
+                  <dd className="font-mono text-right">{bt.bic}</dd>
+                </div>
+              )}
+              {bt.bankName && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-gray-500">Bank</dt>
+                  <dd className="text-right">{bt.bankName}</dd>
+                </div>
+              )}
+              <div className="flex justify-between gap-4">
+                <dt className="text-gray-500">Verwendungszweck</dt>
+                <dd className="font-medium text-right">{bt.reference}</dd>
+              </div>
+            </dl>
+            {bt.info && (
+              <p className="text-xs text-gray-600 mt-3 whitespace-pre-line">{bt.info}</p>
+            )}
+          </div>
+        )}
+
         {!success.mailSent && (
           <p className="text-sm text-yellow-700 mt-2">
             Hinweis: Die Bestätigungs-E-Mail konnte nicht gesendet werden. Deine Buchung wurde jedoch erfolgreich gespeichert.
@@ -496,51 +593,82 @@ export default function BookingForm({ courseId }: BookingFormProps) {
         <div className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800 mb-2">
-              <strong>Zahlung erforderlich:</strong> Bitte wähle eine Zahlungsmethode aus.
+              <strong>Zahlung erforderlich:</strong>{" "}
+              {enabledMethods.stripe || enabledMethods.paypal || enabledMethods.bankTransfer
+                ? "Bitte wähle eine Zahlungsmethode aus."
+                : "Derzeit ist keine Zahlung verfügbar. Bitte kontaktiere uns."}
             </p>
             <p className="text-sm text-blue-700">
               Preis: {formatCents(coursePriceCents)}
             </p>
           </div>
-          
-          <button
-            type="button"
-            onClick={() => handleSubmit((data) => handleStripePayment(data))()}
-            disabled={isLoading}
-            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Wird verarbeitet..." : "Mit Karte bezahlen (Stripe)"}
-          </button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">oder</span>
-            </div>
-          </div>
+          {enabledMethods.stripe && (
+            <button
+              type="button"
+              onClick={() => handleSubmit((data) => handleStripePayment(data))()}
+              disabled={isLoading}
+              className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Wird verarbeitet..." : "Mit Karte bezahlen (Stripe)"}
+            </button>
+          )}
 
-          <button
-            type="button"
-            onClick={() => handleSubmit((data) => handlePaypalPayment(data))()}
-            disabled={isLoading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Wird verarbeitet...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.174 1.351 1.05 3.3.93 4.857v.004h-3.22c-.105-1.547-.197-2.894-1.05-3.527-.84-.623-2.157-.735-3.216-.735h-3.98l-.73 4.18h2.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H9.22l-.692 3.96h2.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H6.77l-.73 4.18h3.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H5.22l-.692 3.96h3.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H2.47l-.73 4.18h4.606c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313z"/>
-                </svg>
-                <span>Mit PayPal bezahlen</span>
-              </>
-            )}
-          </button>
+          {enabledMethods.stripe && enabledMethods.paypal && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">oder</span>
+              </div>
+            </div>
+          )}
+
+          {enabledMethods.paypal && (
+            <button
+              type="button"
+              onClick={() => handleSubmit((data) => handlePaypalPayment(data))()}
+              disabled={isLoading}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Wird verarbeitet...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.174 1.351 1.05 3.3.93 4.857v.004h-3.22c-.105-1.547-.197-2.894-1.05-3.527-.84-.623-2.157-.735-3.216-.735h-3.98l-.73 4.18h2.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H9.22l-.692 3.96h2.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H6.77l-.73 4.18h3.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H5.22l-.692 3.96h3.49c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313H2.47l-.73 4.18h4.606c.703 0 1.27.59 1.27 1.313 0 .723-.567 1.313-1.27 1.313z"/>
+                  </svg>
+                  <span>Mit PayPal bezahlen</span>
+                </>
+              )}
+            </button>
+          )}
+
+          {(enabledMethods.stripe || enabledMethods.paypal) && enabledMethods.bankTransfer && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">oder</span>
+              </div>
+            </div>
+          )}
+
+          {enabledMethods.bankTransfer && (
+            <button
+              type="button"
+              onClick={() => handleSubmit((data) => handleBankTransfer(data))()}
+              disabled={isLoading}
+              className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? "Wird verarbeitet..." : "Per Überweisung bezahlen"}
+            </button>
+          )}
         </div>
       ) : (
         <button
