@@ -17,12 +17,8 @@ const EDITABLE_ENV_VARS = [
   "MAIL_FROM",
   "MAIL_ADMIN_TO",
   "APP_BASE_URL",
-  "PAYPAL_CLIENT_ID",
-  "PAYPAL_CLIENT_SECRET",
-  "PAYPAL_MODE",
-  "STRIPE_SECRET_KEY",
-  "STRIPE_PUBLISHABLE_KEY",
-  "STRIPE_WEBHOOK_SECRET",
+  // Hinweis: Stripe-/PayPal-Zugangsdaten werden nicht mehr hier verwaltet,
+  // sondern unter "Zahlungseinstellungen" (in der Datenbank gespeichert).
 ];
 
 // Variablen, die nicht bearbeitet werden sollten

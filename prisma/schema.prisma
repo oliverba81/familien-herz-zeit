@@ -133,6 +133,7 @@ enum VideoCourseStatus {
 enum PaymentProvider {
   STRIPE
   PAYPAL
+  BANKTRANSFER
 }
 
 enum PurchaseStatus {

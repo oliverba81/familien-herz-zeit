@@ -47,8 +47,8 @@ export default async function VideoCourseDetailPage({
     notFound();
   }
 
-  // Verfügbare Online-Zahlungsarten (Videokurse: nur Stripe/PayPal,
-  // da der Zugang sofort gewährt wird)
+  // Verfügbare Zahlungsarten. Bei Überweisung wird der Zugang erst nach
+  // manueller Zahlungsbestätigung im Admin freigeschaltet.
   const paymentMethods = await getAvailablePaymentMethods();
 
   return (
@@ -101,6 +101,7 @@ export default async function VideoCourseDetailPage({
                   enabledMethods={{
                     stripe: paymentMethods.stripe,
                     paypal: paymentMethods.paypal,
+                    bankTransfer: paymentMethods.bankTransfer,
                   }}
                 />
               ) : (

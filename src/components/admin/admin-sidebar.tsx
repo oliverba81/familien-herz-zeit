@@ -38,7 +38,7 @@ export default function AdminSidebar() {
       return "Kurse";
     }
     if (pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/invoices") ||
-        pathname.startsWith("/admin/discounts")) {
+        pathname.startsWith("/admin/discounts") || pathname.startsWith("/admin/video-purchases")) {
       return "Buchungen & Zahlungen";
     }
     if (pathname.startsWith("/admin/feedback")) {
@@ -107,6 +107,7 @@ export default function AdminSidebar() {
       icon: "💰",
       items: [
         { href: "/admin/bookings", label: "Buchungen", icon: "📋" },
+        { href: "/admin/video-purchases", label: "Videokäufe (Überweisung)", icon: "🏦", show: isAdmin },
         { href: "/admin/invoices", label: "Rechnungen", icon: "🧾" },
         { href: "/admin/discounts", label: "Rabattcodes", icon: "🎟️", show: isAdmin },
       ],
