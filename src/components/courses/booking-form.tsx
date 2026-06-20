@@ -452,7 +452,14 @@ export default function BookingForm({
               <label htmlFor="hasAokVoucher" className="ml-2 text-sm text-gray-700">
                 <span className="font-medium">AOK-Gutschein vorhanden?</span>
                 <p className="text-xs text-gray-600 mt-1">
-                  Wenn du einen AOK-Gutschein hast, ist der Kurs für dich kostenlos. Bitte bringe den Gutschein zur ersten Kursstunde mit und zeige ihn vor.
+                  Wenn du einen AOK-Gutschein hast, ist der Kurs für dich kostenlos.
+                </p>
+                <p className="mt-2 flex items-start gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-2 py-1.5 text-xs font-semibold text-amber-800">
+                  <span aria-hidden="true">⚠️</span>
+                  <span>
+                    Wichtig: Bitte bringe den Gutschein unbedingt zur ersten
+                    Kursstunde mit und zeige ihn vor.
+                  </span>
                 </p>
               </label>
             </div>

@@ -687,7 +687,14 @@ export default async function CoursesBlock({ data }: { data: CoursesBlockData })
                     <p>Keine Sorge! Melde dich einfach bei uns. Wir finden gemeinsam den richtigen Termin oder setzen dich auf die Warteliste.</p>
                   </div>
                 </div>
-                <a className="btn" href={data.contactLinkUrl || "#kontakt"}>
+                <a
+                  className="btn"
+                  href={
+                    !data.contactLinkUrl || data.contactLinkUrl === "#kontakt"
+                      ? "/kontakt"
+                      : data.contactLinkUrl
+                  }
+                >
                   {data.contactLinkLabel || "Jetzt Kontakt aufnehmen"}
                 </a>
               </div>
