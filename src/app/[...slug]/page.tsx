@@ -1,10 +1,10 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { db } from "@/lib/db";
 import PageRendererServer from "@/components/page-renderer/page-renderer-server";
 import PageRendererHtml from "@/components/page-renderer/page-renderer-html";
 import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
 import type { Metadata } from "next";
-import { cachedPageBySlug } from "@/lib/cache/prisma-cache";
+import { cachedPageBySlug, cachedHomepageSlug } from "@/lib/cache/prisma-cache";
 import { absoluteUrl, buildOpenGraph, extractTextFromContent, truncateAtWordBoundary } from "@/lib/seo/meta";
 
 // Route-Konfiguration für bessere Performance
@@ -66,6 +66,14 @@ export async function generateMetadata({
 export default async function SlugPage({ params }: PageProps) {
   const { slug: slugArray } = await params;
   const slug = slugArray.join("/");
+
+  // Die als Startseite konfigurierte Seite ist bereits unter "/" erreichbar.
+  // Den Slug-Aufruf (z. B. /startseite) dauerhaft (308) auf "/" umleiten, damit
+  // derselbe Inhalt nicht unter zwei URLs ausgeliefert wird (Duplicate Content).
+  const homepageSlug = await cachedHomepageSlug();
+  if (slug === homepageSlug) {
+    permanentRedirect("/");
+  }
 
   const page = await cachedPageBySlug(slug);
 
