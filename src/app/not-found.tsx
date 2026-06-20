@@ -9,7 +9,7 @@ export default function NotFound() {
           Seite nicht gefunden
         </h2>
         <p className="text-gray-600 mt-4">
-          Die von Ihnen gesuchte Seite existiert leider nicht oder wurde verschoben.
+          Die von dir gesuchte Seite existiert leider nicht oder wurde verschoben.
         </p>
         <div className="mt-8 space-y-4">
           <Link

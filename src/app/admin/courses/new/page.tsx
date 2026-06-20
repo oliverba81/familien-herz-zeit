@@ -22,7 +22,7 @@ export default async function NewCoursePage({ searchParams }: NewCoursePageProps
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Neuer Kurs</h1>
           <p className="text-gray-600 mt-1">
-            Erstellen Sie einen neuen Präsenz-Kurs
+            Erstelle einen neuen Präsenz-Kurs
             {prefilledStartAt && (
               <span className="text-rose-500"> (Datum vorausgefüllt)</span>
             )}

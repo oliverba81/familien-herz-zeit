@@ -11,7 +11,7 @@ export default async function NewVideoCoursePage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Neuer Videokurs</h1>
           <p className="text-gray-600 mt-1">
-            Erstellen Sie einen neuen Videokurs
+            Erstelle einen neuen Videokurs
           </p>
         </div>
 

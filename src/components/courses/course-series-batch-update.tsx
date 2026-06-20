@@ -50,7 +50,7 @@ export default function CourseSeriesBatchUpdate({ seriesId }: CourseSeriesBatchU
 
     // Prüfe ob mindestens ein Feld gesetzt ist
     if (Object.keys(fields).length === 0) {
-      setError("Bitte wählen Sie mindestens ein Feld zum Aktualisieren");
+      setError("Bitte wähle mindestens ein Feld zum Aktualisieren");
       setIsLoading(false);
       return;
     }

@@ -218,7 +218,7 @@ export default function SignForm({ mode, initialData }: SignFormProps) {
                 controls
                 className="max-w-full max-h-48 rounded-lg border border-gray-200"
               >
-                Ihr Browser unterstützt das Video-Element nicht.
+                Dein Browser unterstützt das Video-Element nicht.
               </video>
             </div>
           )}

@@ -131,7 +131,7 @@ export default function CookieBanner() {
                   Cookie-Einstellungen
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung zu bieten. 
+                  Wir verwenden Cookies, um dir die bestmögliche Erfahrung zu bieten.
                   Einige Cookies sind notwendig für die Funktionalität der Website, 
                   andere helfen uns, die Nutzung zu analysieren und zu verbessern.
                 </p>
@@ -164,7 +164,7 @@ export default function CookieBanner() {
               Cookie-Einstellungen
             </h3>
             <p className="text-sm text-gray-600">
-              Wählen Sie, welche Cookies Sie zulassen möchten:
+              Wähle, welche Cookies du zulassen möchtest:
             </p>
 
             <div className="space-y-3">
@@ -221,7 +221,7 @@ export default function CookieBanner() {
                     Marketing-Cookies
                   </h4>
                   <p className="text-xs text-gray-600 mt-1">
-                    Werden verwendet, um Ihnen relevante Werbung anzuzeigen.
+                    Werden verwendet, um dir relevante Werbung anzuzeigen.
                   </p>
                   {renderCookieList(marketingCookies)}
                 </div>

@@ -219,7 +219,7 @@ export default function PageBuilderV2Shell({
         const defaultData = getV2EmbedDefaultData(blockType);
         const snippet = getV2EmbedPlaceholderHtml(blockType, defaultData);
         editor.insertContent(snippet);
-        showApplyMessage(`${V2_BLOCK_LABELS[blockType]} eingefügt. Klicken Sie den Block an, um ihn zu konfigurieren.`);
+        showApplyMessage(`${V2_BLOCK_LABELS[blockType]} eingefügt. Klicke den Block an, um ihn zu konfigurieren.`);
       } catch (e) {
         showApplyMessage("Block konnte nicht eingefügt werden.");
       }
@@ -344,7 +344,7 @@ export default function PageBuilderV2Shell({
           <div className="flex items-center gap-2">
             {createMode ? (
               <span className="text-sm text-gray-500">
-                Speichern Sie die Seite mit dem Button „Speichern“ unten im Formular.
+                Speichere die Seite mit dem Button „Speichern“ unten im Formular.
               </span>
             ) : (
               <>
@@ -529,14 +529,14 @@ export default function PageBuilderV2Shell({
           ) : (
             <div className="p-3 border-b border-gray-200">
               <p className="text-xs text-gray-500">
-                Klicken Sie im Editor auf einen Inhaltsblock (Kurse, Termine, …), um ihn hier zu konfigurieren.
+                Klicke im Editor auf einen Inhaltsblock (Kurse, Termine, …), um ihn hier zu konfigurieren.
               </p>
             </div>
           )}
           <div className="p-3 border-b border-gray-200">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Stylevorlagen</h3>
             <p className="text-xs text-gray-500 mb-3">
-              Ziehen Sie eine Vorlage auf den Editor oder wählen Sie ein Element und klicken Sie auf die Vorlage.
+              Ziehe eine Vorlage auf den Editor oder wähle ein Element und klicke auf die Vorlage.
             </p>
             <div className="space-y-3">
               {categories.map((cat) => (
@@ -571,7 +571,7 @@ export default function PageBuilderV2Shell({
           <div className="p-3 flex-1">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Inhaltsblöcke</h3>
             <p className="text-xs text-gray-500 mb-3">
-              Ziehen Sie auf den Editor oder klicken Sie, um an der Cursor-Position einzufügen.
+              Ziehe auf den Editor oder klicke, um an der Cursor-Position einzufügen.
             </p>
             <div className="space-y-2">
               {V2_EMBED_BLOCK_TYPES.map((blockType) => (

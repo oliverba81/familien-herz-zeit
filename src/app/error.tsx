@@ -25,7 +25,7 @@ export default function Error({
           Ups, da ist etwas schiefgelaufen
         </h2>
         <p className="text-gray-600 mt-4">
-          Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es erneut.
+          Es ist ein unerwarteter Fehler aufgetreten. Bitte versuche es erneut.
         </p>
         <div className="mt-8 space-y-4">
           <button

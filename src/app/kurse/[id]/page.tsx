@@ -200,12 +200,12 @@ export default async function CourseDetailPage({
                     Dieser Kurs hat keine zukünftigen Termine mehr.
                   </p>
                   <p className="text-yellow-700 text-sm mt-1">
-                    Bitte wählen Sie einen anderen Kurs oder kontaktieren Sie uns für weitere Informationen.
+                    Bitte wähle einen anderen Kurs oder kontaktiere uns für weitere Informationen.
                   </p>
                 </div>
               </div>
             )}
-            
+
             {futureSessions.length === 0 && hasPlannedDate && (
               <div className="border-t border-gray-200 pt-6">
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -213,7 +213,7 @@ export default async function CourseDetailPage({
                     Termine werden noch bekannt gegeben
                   </p>
                   <p className="text-blue-700 text-sm mt-1">
-                    Die genauen Termine für diesen Kurs werden noch festgelegt. Bitte kontaktieren Sie uns für weitere Informationen oder um sich auf die Warteliste setzen zu lassen.
+                    Die genauen Termine für diesen Kurs werden noch festgelegt. Bitte kontaktiere uns für weitere Informationen oder um dich auf die Warteliste setzen zu lassen.
                   </p>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default async function CourseDetailPage({
                     Dieser Kurs ist leider ausgebucht.
                   </p>
                   <p className="text-red-700 text-sm mt-1">
-                    Bitte wählen Sie einen anderen Kurs oder kontaktieren Sie uns für weitere Informationen.
+                    Bitte wähle einen anderen Kurs oder kontaktiere uns für weitere Informationen.
                   </p>
                 </div>
               </div>

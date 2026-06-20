@@ -34,13 +34,13 @@ export async function GET(request: NextRequest) {
 
     const testEmail = {
       subject: "Test-E-Mail von Familien Herz Zeit",
-      text: "Dies ist eine Test-E-Mail. Wenn Sie diese erhalten, funktioniert der E-Mail-Versand korrekt.",
+      text: "Dies ist eine Test-E-Mail. Wenn du diese erhältst, funktioniert der E-Mail-Versand korrekt.",
       html: renderLayout({
         title: "Test-E-Mail",
         preheader: "E-Mail-Versand Test",
         bodyHtml: `
           <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-            Dies ist eine Test-E-Mail. Wenn Sie diese erhalten, funktioniert der E-Mail-Versand korrekt.
+            Dies ist eine Test-E-Mail. Wenn du diese erhältst, funktioniert der E-Mail-Versand korrekt.
           </p>
           <p style="margin: 0; color: #6b7280; font-size: 14px;">
             Zeitpunkt: ${new Date().toLocaleString("de-DE")}

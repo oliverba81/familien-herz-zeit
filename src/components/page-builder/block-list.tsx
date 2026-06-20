@@ -63,7 +63,7 @@ export default function BlockList({
     return (
       <div className="p-8 text-center text-gray-500 bg-gray-50 rounded-lg">
         <p>Noch keine Blocks vorhanden.</p>
-        <p className="text-sm mt-2">Fügen Sie einen Block hinzu.</p>
+        <p className="text-sm mt-2">Füge einen Block hinzu.</p>
       </div>
     );
   }

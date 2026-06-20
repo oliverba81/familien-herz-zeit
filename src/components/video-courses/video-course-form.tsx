@@ -123,7 +123,7 @@ export default function VideoCourseForm({ initialData, mode }: VideoCourseFormPr
 
   const handleDelete = async () => {
     if (!initialData?.id) return;
-    if (!confirm("Möchten Sie diesen Videokurs wirklich löschen?")) {
+    if (!confirm("Möchtest du diesen Videokurs wirklich löschen?")) {
       return;
     }
 
@@ -284,7 +284,7 @@ export default function VideoCourseForm({ initialData, mode }: VideoCourseFormPr
               controls
               preload="metadata"
             >
-              Ihr Browser unterstützt das Video-Element nicht.
+              Dein Browser unterstützt das Video-Element nicht.
             </video>
           </div>
         )}

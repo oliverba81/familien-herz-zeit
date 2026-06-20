@@ -15,7 +15,7 @@ export function renderBookingUserEmail({
   bookingId: string;
   priceCents: number;
 }): { subject: string; text: string; html: string } {
-  const subject = `Ihre Buchungsanfrage für: ${courseTitle}`;
+  const subject = `Deine Buchungsanfrage für: ${courseTitle}`;
 
   const startAtFormatted = formatBerlinDateTime(startAt);
   const price = priceCents > 0 ? formatEuroFromCents(priceCents) : "kostenlos";
@@ -23,28 +23,28 @@ export function renderBookingUserEmail({
   const text = `
 Hallo ${parentName},
 
-vielen Dank für Ihre Buchungsanfrage!
+vielen Dank für deine Buchungsanfrage!
 
 Kurs: ${courseTitle}
 Datum & Zeit: ${startAtFormatted}
 Preis: ${price}
 Buchungs-ID: ${bookingId}
 
-Ihre Buchung hat den Status "PENDING" (Ausstehend). Wir werden Ihre Anfrage prüfen und Ihnen eine Bestätigung zusenden.
+Deine Buchung hat den Status "PENDING" (Ausstehend). Wir prüfen deine Anfrage und senden dir eine Bestätigung zu.
 
 Mit freundlichen Grüßen,
 Familien Herz Zeit
   `.trim();
 
   const html = renderLayout({
-    title: "Ihre Buchungsanfrage",
+    title: "Deine Buchungsanfrage",
     preheader: `Kurs: ${courseTitle}`,
     bodyHtml: `
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
         Hallo ${parentName},
       </p>
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-        vielen Dank für Ihre Buchungsanfrage!
+        vielen Dank für deine Buchungsanfrage!
       </p>
       <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -68,7 +68,7 @@ Familien Herz Zeit
       </div>
       <div style="margin: 20px 0; padding: 12px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
         <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
-          <strong>Status:</strong> Ihre Buchung hat den Status "PENDING" (Ausstehend). Wir werden Ihre Anfrage prüfen und Ihnen eine Bestätigung zusenden.
+          <strong>Status:</strong> Deine Buchung hat den Status "PENDING" (Ausstehend). Wir prüfen deine Anfrage und senden dir eine Bestätigung zu.
         </p>
       </div>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
@@ -102,14 +102,14 @@ export function renderBookingConfirmedEmail({
   const text = `
 Hallo ${parentName},
 
-Ihre Buchung wurde bestätigt!
+Deine Buchung wurde bestätigt!
 
 Kurs: ${courseTitle}
 Datum & Zeit: ${startAtFormatted}
 Preis: ${price}
 Buchungs-ID: ${bookingId}
 
-Wir freuen uns, Sie beim Kurs begrüßen zu dürfen!
+Wir freuen uns, dich beim Kurs begrüßen zu dürfen!
 
 Mit freundlichen Grüßen,
 Familien Herz Zeit
@@ -123,7 +123,7 @@ Familien Herz Zeit
         Hallo ${parentName},
       </p>
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-        Ihre Buchung wurde bestätigt!
+        Deine Buchung wurde bestätigt!
       </p>
       <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -147,7 +147,7 @@ Familien Herz Zeit
       </div>
       <div style="margin: 20px 0; padding: 12px; background-color: #d1fae5; border-left: 4px solid #10b981; border-radius: 4px;">
         <p style="margin: 0; color: #065f46; font-size: 14px; line-height: 1.6;">
-          <strong>✓ Status: Bestätigt</strong> - Wir freuen uns, Sie beim Kurs begrüßen zu dürfen!
+          <strong>✓ Status: Bestätigt</strong> - Wir freuen uns, dich beim Kurs begrüßen zu dürfen!
         </p>
       </div>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">

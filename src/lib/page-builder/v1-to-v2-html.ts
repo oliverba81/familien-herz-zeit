@@ -242,7 +242,7 @@ function convertVideo(data: VideoBlockData): string {
     overflow: "hidden",
     border: "1px solid rgb(229,231,235)",
   });
-  return `<div style="${wrapperStyle}">${titleHtml}<div style="${videoWrapperStyle}"><video src="${escapeHtml(videoUrl)}" controls style="width:100%;height:auto;">Ihr Browser unterstützt das Video-Element nicht.</video></div></div>`;
+  return `<div style="${wrapperStyle}">${titleHtml}<div style="${videoWrapperStyle}"><video src="${escapeHtml(videoUrl)}" controls style="width:100%;height:auto;">Dein Browser unterstützt das Video-Element nicht.</video></div></div>`;
 }
 
 function convertFeatures(data: FeaturesBlockData): string {

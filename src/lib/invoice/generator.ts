@@ -248,7 +248,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       doc.moveDown(3);
 
       // Fußzeile
-      doc.text("Vielen Dank für Ihren Einkauf!", { align: "center" });
+      doc.text("Vielen Dank für deinen Einkauf!", { align: "center" });
 
       doc.end();
     } catch (error) {

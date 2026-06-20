@@ -22,7 +22,7 @@ export default async function NewWaitlistEntryPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Neuer Wartelisten-Eintrag</h1>
           <p className="text-gray-600 mt-1">
-            Tragen Sie Interessenten manuell ein und ordnen Sie optional einen Kurs zu.
+            Trage Interessenten manuell ein und ordne optional einen Kurs zu.
           </p>
         </div>
 

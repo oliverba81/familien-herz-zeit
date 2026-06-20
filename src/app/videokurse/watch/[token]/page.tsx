@@ -83,7 +83,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
                 : "Dieser Videokurs ist nicht mehr verfügbar."}
             </p>
             <p className="text-sm text-gray-500 mt-4">
-              Bitte fordern Sie einen neuen Zugang an.
+              Bitte fordere einen neuen Zugang an.
             </p>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
                 poster={course.thumbnailUrl || undefined}
                 className="w-full rounded-lg shadow-md"
               >
-                Ihr Browser unterstützt das Video-Element nicht.
+                Dein Browser unterstützt das Video-Element nicht.
               </video>
             </div>
 

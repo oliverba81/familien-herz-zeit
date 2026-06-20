@@ -3,7 +3,7 @@ import PaypalCaptureClient from "@/components/video-courses/paypal-capture-clien
 
 export const metadata: Metadata = {
   title: "PayPal Zahlung erfolgreich",
-  description: "Vielen Dank für Ihren Kauf",
+  description: "Vielen Dank für deinen Kauf",
 };
 
 interface SuccessPageProps {
@@ -23,7 +23,7 @@ export default async function PaypalSuccessPage({ searchParams }: SuccessPagePro
               Fehler
             </h1>
             <p className="text-gray-600 mb-6">
-              Keine Order-ID gefunden. Bitte kontaktieren Sie uns, wenn Sie eine Zahlung getätigt haben.
+              Keine Order-ID gefunden. Bitte kontaktiere uns, wenn du eine Zahlung getätigt hast.
             </p>
           </div>
         </div>

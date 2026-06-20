@@ -11,7 +11,7 @@ export default async function NewCourseSeriesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Neue Terminserie</h1>
           <p className="text-gray-600 mt-1">
-            Erstellen Sie eine neue Serie wiederkehrender Kurstermine
+            Erstelle eine neue Serie wiederkehrender Kurstermine
           </p>
         </div>
 

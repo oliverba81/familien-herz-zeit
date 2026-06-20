@@ -43,7 +43,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
   if (!block) {
     return (
       <div className="p-8 text-center text-gray-500 bg-gray-50 rounded-lg">
-        <p>Wählen Sie einen Block aus, um ihn zu bearbeiten.</p>
+        <p>Wähle einen Block aus, um ihn zu bearbeiten.</p>
       </div>
     );
   }
@@ -531,7 +531,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
                   controls
                   className="w-full max-h-48 bg-gray-50"
                 >
-                  Ihr Browser unterstützt das Video-Element nicht.
+                  Dein Browser unterstützt das Video-Element nicht.
                 </video>
               </div>
             )}
@@ -657,7 +657,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">Aktuelle Termine Block</h3>
           <p className="text-sm text-gray-600">
-            Dieser Block zeigt aktuelle Termine aus dem Kalender an. Wählen Sie aus, welche Kursarten angezeigt werden sollen.
+            Dieser Block zeigt aktuelle Termine aus dem Kalender an. Wähle aus, welche Kursarten angezeigt werden sollen.
           </p>
           
           {/* Überschrift */}
@@ -745,7 +745,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
               </label>
             </div>
             <p className="mt-1 text-xs text-gray-500">
-              Wählen Sie aus, welche Kursarten im Block angezeigt werden sollen.
+              Wähle aus, welche Kursarten im Block angezeigt werden sollen.
             </p>
           </div>
 
@@ -1647,7 +1647,7 @@ function HerzZeitStoryEditor({ block, onChange }: BlockEditorProps) {
       <div className="space-y-4">
         {stories.length === 0 ? (
           <div className="p-4 bg-gray-50 rounded-lg text-center text-gray-500">
-            <p className="text-sm">Keine Geschichten vorhanden. Fügen Sie eine Geschichte hinzu.</p>
+            <p className="text-sm">Keine Geschichten vorhanden. Füge eine Geschichte hinzu.</p>
           </div>
         ) : (
           stories.map((story: any, index: number) => (
@@ -1913,7 +1913,7 @@ function HerzZeitStoryEditor({ block, onChange }: BlockEditorProps) {
                         if (!file) return;
 
                         if (!file.type.startsWith("audio/")) {
-                          setAudioUploadError("Bitte wählen Sie eine Audio-Datei aus");
+                          setAudioUploadError("Bitte wähle eine Audio-Datei aus");
                           const input = audioFileInputRefs.current.get(story.id);
                           if (input) input.value = "";
                           return;
@@ -1948,7 +1948,7 @@ function HerzZeitStoryEditor({ block, onChange }: BlockEditorProps) {
                     <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-200">
                       <p className="text-xs text-gray-600 mb-1">Aktuelle Audio-Datei:</p>
                       <audio controls src={story.audioUrl} className="w-full">
-                        Ihr Browser unterstützt das Audio-Element nicht.
+                        Dein Browser unterstützt das Audio-Element nicht.
                       </audio>
                     </div>
                   )}
@@ -2343,7 +2343,7 @@ function TableEditor({ block, onChange }: BlockEditorProps) {
 
       {rows.length === 0 ? (
         <div className="p-4 bg-gray-50 rounded-lg text-center text-gray-500">
-          <p className="text-sm">Tabelle ist leer. Fügen Sie eine Zeile hinzu.</p>
+          <p className="text-sm">Tabelle ist leer. Füge eine Zeile hinzu.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -3002,7 +3002,7 @@ function CellBlockEditor({ block, onUpdate, onRemove }: CellBlockEditorProps) {
                       controls
                       className="w-full max-h-24 bg-gray-50"
                     >
-                      Ihr Browser unterstützt das Video-Element nicht.
+                      Dein Browser unterstützt das Video-Element nicht.
                     </video>
                   </div>
                 )}
@@ -3648,7 +3648,7 @@ function TextEditorModal({ block, onChange, onClose }: TextEditorModalProps) {
               }}
               rows={20}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-              placeholder="Geben Sie Ihren Text ein..."
+              placeholder="Gib deinen Text ein..."
             />
           </div>
         </div>

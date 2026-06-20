@@ -14,7 +14,7 @@ export default function AdminDashboard() {
           >
             <h3 className="font-semibold text-gray-900 mb-1">Seiten verwalten</h3>
             <p className="text-sm text-gray-600">
-              Erstellen, bearbeiten und löschen Sie Seiten
+              Erstelle, bearbeite und lösche Seiten
             </p>
           </Link>
           <Link
@@ -23,7 +23,7 @@ export default function AdminDashboard() {
           >
             <h3 className="font-semibold text-gray-900 mb-1">Medien verwalten</h3>
             <p className="text-sm text-gray-600">
-              Verwalten Sie Ihre hochgeladenen Bilder und Videos
+              Verwalte deine hochgeladenen Bilder und Videos
             </p>
           </Link>
           <Link
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
           >
             <h3 className="font-semibold text-gray-900 mb-1">Videokurse verwalten</h3>
             <p className="text-sm text-gray-600">
-              Erstellen, bearbeiten und löschen Sie Videokurse
+              Erstelle, bearbeite und lösche Videokurse
             </p>
           </Link>
           <Link
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
           >
             <h3 className="font-semibold text-gray-900 mb-1">Präsenz-Kurse verwalten</h3>
             <p className="text-sm text-gray-600">
-              Erstellen, bearbeiten und löschen Sie Präsenz-Kurse
+              Erstelle, bearbeite und lösche Präsenz-Kurse
             </p>
           </Link>
           <Link
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
           >
             <h3 className="font-semibold text-gray-900 mb-1">Buchungen verwalten</h3>
             <p className="text-sm text-gray-600">
-              Verwalten Sie alle Buchungen und ändern Sie den Status
+              Verwalte alle Buchungen und ändere den Status
             </p>
           </Link>
         </div>

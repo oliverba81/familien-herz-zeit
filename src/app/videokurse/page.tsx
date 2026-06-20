@@ -5,7 +5,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Videokurse",
-  description: "Entdecken Sie unsere Videokurse",
+  description: "Entdecke unsere Videokurse",
 };
 
 export default async function VideoCoursesPage() {
@@ -24,7 +24,7 @@ export default async function VideoCoursesPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Videokurse</h1>
           <p className="text-lg text-gray-600">
-            Entdecken Sie unsere Auswahl an hochwertigen Videokursen
+            Entdecke unsere Auswahl an hochwertigen Videokursen
           </p>
         </div>
 

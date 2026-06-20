@@ -5,7 +5,7 @@ import SignsListClient from "@/components/signs/signs-list-client";
 
 export const metadata: Metadata = {
   title: "Babyzeichen-Lexikon | Familien Herz Zeit",
-  description: "Entdecken Sie unsere Sammlung von Babyzeichen",
+  description: "Entdecke unsere Sammlung von Babyzeichen",
 };
 
 interface PageProps {
@@ -78,7 +78,7 @@ export default async function SignsPage({ searchParams }: PageProps) {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Babyzeichen-Lexikon</h1>
           <p className="text-lg text-gray-600">
-            Entdecken Sie unsere Sammlung von Babyzeichen
+            Entdecke unsere Sammlung von Babyzeichen
           </p>
         </div>
 

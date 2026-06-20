@@ -99,14 +99,14 @@ export default function MediaPicker({
     const isVideo = mimeType.startsWith("video/");
     
     if (type === "IMAGE" && !isImage) {
-      setUploadError("Bitte wählen Sie ein Bild aus");
+      setUploadError("Bitte wähle ein Bild aus");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       return;
     }
     if (type === "VIDEO" && !isVideo) {
-      setUploadError("Bitte wählen Sie ein Video aus");
+      setUploadError("Bitte wähle ein Video aus");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -393,7 +393,7 @@ export default function MediaPicker({
 
           {!loading && !error && media.length === 0 && !showUpload && (
             <div className="text-center py-8 text-gray-500">
-              Keine Medien gefunden. Laden Sie zuerst ein Medium hoch.
+              Keine Medien gefunden. Lade zuerst ein Medium hoch.
             </div>
           )}
 

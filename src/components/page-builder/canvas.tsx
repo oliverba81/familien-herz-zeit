@@ -87,7 +87,7 @@ export default function Canvas({
       <div className="flex items-center justify-center h-full text-center">
         <div className="text-gray-500">
           <p className="text-lg mb-2">Keine Blocks vorhanden</p>
-          <p className="text-sm">Fügen Sie einen Block aus der Bibliothek hinzu</p>
+          <p className="text-sm">Füge einen Block aus der Bibliothek hinzu</p>
         </div>
       </div>
     );

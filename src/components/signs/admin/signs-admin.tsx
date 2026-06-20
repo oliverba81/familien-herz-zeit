@@ -75,7 +75,7 @@ export default function SignsAdmin() {
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Möchten Sie das Zeichen "${title}" wirklich löschen?`)) {
+    if (!confirm(`Möchtest du das Zeichen "${title}" wirklich löschen?`)) {
       return;
     }
 

@@ -82,7 +82,7 @@ export default function NavigationItemForm({
     e.preventDefault();
 
     if (!label.trim()) {
-      alert("Bitte geben Sie ein Label ein");
+      alert("Bitte gib ein Label ein");
       return;
     }
 
