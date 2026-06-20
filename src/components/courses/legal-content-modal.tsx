@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import PageRenderer from "@/components/page-renderer/page-renderer";
-import PageRendererHtml from "@/components/page-renderer/page-renderer-html";
+import LegalHtmlContent from "@/components/page-renderer/legal-html-content";
 import type { PageContentV1 } from "@/lib/page-builder/schema";
 
 interface PageContentResponse {
@@ -163,7 +163,7 @@ export default function LegalContentModal({
           {!isLoading && !error && data && (
             <>
               {data.isV2 && data.html !== null ? (
-                <PageRendererHtml html={data.html} />
+                <LegalHtmlContent html={data.html} />
               ) : data.content ? (
                 <PageRenderer content={data.content} />
               ) : null}
