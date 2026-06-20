@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Honeypot: Wenn website Feld gefüllt ist, antworte ok aber speichere nichts
     if (validatedData.website) {
       return NextResponse.json(
-        { message: "Vielen Dank für Ihre Anfrage!" },
+        { message: "Vielen Dank für deine Anfrage!" },
         { status: 200 }
       );
     }

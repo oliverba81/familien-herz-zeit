@@ -18,7 +18,7 @@ export default function CourseSeriesInfo({ courseId, series }: CourseSeriesInfoP
   const [error, setError] = useState<string | null>(null);
 
   const handleDetach = async () => {
-    if (!confirm("Möchten Sie diesen Kurs wirklich von der Serie abkoppeln? Er wird danach nicht mehr automatisch synchronisiert.")) {
+    if (!confirm("Möchtest du diesen Kurs wirklich von der Serie abkoppeln? Er wird danach nicht mehr automatisch synchronisiert.")) {
       return;
     }
 

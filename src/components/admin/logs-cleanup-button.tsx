@@ -7,7 +7,7 @@ export default function LogsCleanupButton() {
   const [message, setMessage] = useState<string | null>(null);
 
   const handleCleanup = async () => {
-    if (!confirm("Möchten Sie alte Logs (älter als 30 Tage) jetzt löschen?")) {
+    if (!confirm("Möchtest du alte Logs (älter als 30 Tage) jetzt löschen?")) {
       return;
     }
 

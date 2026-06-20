@@ -55,7 +55,7 @@ export default async function EditWaitlistEntryPage({
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Wartelisten-Eintrag bearbeiten</h1>
           <p className="text-gray-600 mt-1">
-            Bearbeiten Sie die Kontaktdaten und Kurszuordnung des Interessenten.
+            Bearbeite die Kontaktdaten und Kurszuordnung des Interessenten.
           </p>
         </div>
 

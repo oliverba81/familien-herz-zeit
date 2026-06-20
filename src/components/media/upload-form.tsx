@@ -53,7 +53,7 @@ export default function UploadForm() {
     ) as HTMLInputElement;
 
     if (!fileInput?.files?.[0]) {
-      setError("Bitte wählen Sie eine Datei aus");
+      setError("Bitte wähle eine Datei aus");
       return;
     }
 

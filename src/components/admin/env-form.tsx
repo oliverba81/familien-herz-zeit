@@ -110,13 +110,13 @@ export default function EnvForm() {
 
         {success && (
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
-            Environment-Variablen erfolgreich aktualisiert. Bitte starten Sie den Server neu, damit die Änderungen wirksam werden.
+            Environment-Variablen erfolgreich aktualisiert. Bitte starte den Server neu, damit die Änderungen wirksam werden.
           </div>
         )}
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <p className="text-sm text-yellow-800">
-            <strong>Hinweis:</strong> Nach dem Speichern müssen Sie den Server neu starten, damit die Änderungen wirksam werden.
+            <strong>Hinweis:</strong> Nach dem Speichern musst du den Server neu starten, damit die Änderungen wirksam werden.
           </p>
         </div>
 

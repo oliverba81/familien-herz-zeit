@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (!textContent || textContent.length < 50) {
       return NextResponse.json(
-        { error: "Der Text ist zu kurz. Bitte geben Sie mehr Inhalt ein." },
+        { error: "Der Text ist zu kurz. Bitte gib mehr Inhalt ein." },
         { status: 400 }
       );
     }

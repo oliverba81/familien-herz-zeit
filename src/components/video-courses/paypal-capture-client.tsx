@@ -100,8 +100,8 @@ export default function PaypalCaptureClient({ orderId }: PaypalCaptureClientProp
         </h2>
         <p className="text-green-700 mb-4">
           {mailSent
-            ? "Wir haben Ihnen den Zugangslink per E-Mail geschickt."
-            : "Ihr Zugangslink wurde erstellt."}
+            ? "Wir haben dir den Zugangslink per E-Mail geschickt."
+            : "Dein Zugangslink wurde erstellt."}
         </p>
       </div>
       {watchUrl && (

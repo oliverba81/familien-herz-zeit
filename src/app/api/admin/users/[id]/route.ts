@@ -56,7 +56,7 @@ export async function PATCH(
     // Warnung: User versucht sich selbst zu deaktivieren
     if (validatedData.isActive === false && session.user.id === id) {
       return NextResponse.json(
-        { error: "Sie können sich nicht selbst deaktivieren" },
+        { error: "Du kannst dich nicht selbst deaktivieren" },
         { status: 400 }
       );
     }

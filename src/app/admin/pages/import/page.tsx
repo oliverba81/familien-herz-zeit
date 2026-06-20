@@ -12,7 +12,7 @@ export default function ImportPagesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleImport = async () => {
-    if (!confirm("Möchten Sie wirklich alle Seiten von der Original-Website importieren?\n\nHinweis: Bereits existierende Seiten werden übersprungen.")) {
+    if (!confirm("Möchtest du wirklich alle Seiten von der Original-Website importieren?\n\nHinweis: Bereits existierende Seiten werden übersprungen.")) {
       return;
     }
 

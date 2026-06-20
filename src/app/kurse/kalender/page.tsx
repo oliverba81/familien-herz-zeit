@@ -84,8 +84,8 @@ export default async function PublicCalendarPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Kurskalender</h1>
           <p className="text-gray-600">
-            Hier finden Sie eine Übersicht aller verfügbaren Kurse im Kalenderformat.
-            Klicken Sie auf einen Kurs, um mehr Details zu erfahren.
+            Hier findest du eine Übersicht aller verfügbaren Kurse im Kalenderformat.
+            Klicke auf einen Kurs, um mehr Details zu erfahren.
           </p>
         </div>
 

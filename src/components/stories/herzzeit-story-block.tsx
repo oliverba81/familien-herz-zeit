@@ -264,7 +264,7 @@ function StoryModal({ story, isOpen, onClose }: StoryModalProps) {
                 className="w-full"
                 src={story.audioUrl}
               >
-                Ihr Browser unterstützt das Audio-Element nicht.
+                Dein Browser unterstützt das Audio-Element nicht.
               </audio>
             </div>
           )}

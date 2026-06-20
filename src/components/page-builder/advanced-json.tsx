@@ -80,7 +80,7 @@ export default function AdvancedJSON({
       />
 
       <p className="text-xs text-gray-500">
-        ⚠️ Vorsicht: Ungültiges JSON kann zu Datenverlust führen. Verwenden Sie "Export"
+        ⚠️ Vorsicht: Ungültiges JSON kann zu Datenverlust führen. Verwende "Export"
         um den aktuellen Stand zu sehen.
       </p>
     </div>

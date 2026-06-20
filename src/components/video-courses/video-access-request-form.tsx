@@ -72,11 +72,11 @@ export default function VideoAccessRequestForm({ courseId }: VideoAccessRequestF
           Zugang erfolgreich angefordert!
         </h3>
         <p className="text-green-700 mb-4">
-          Ihr Zugangslink wurde erstellt. Der Link ist gültig bis zum {expiresFormatted}.
+          Dein Zugangslink wurde erstellt. Der Link ist gültig bis zum {expiresFormatted}.
         </p>
         {success.mailSent && (
           <p className="text-sm text-green-600 mb-4 text-center">
-            ✓ Wir haben Ihnen den Link auch per E-Mail geschickt.
+            ✓ Wir haben dir den Link auch per E-Mail geschickt.
           </p>
         )}
         <Link
@@ -86,7 +86,7 @@ export default function VideoAccessRequestForm({ courseId }: VideoAccessRequestF
           Jetzt ansehen
         </Link>
         <p className="text-sm text-green-600 mt-2 text-center">
-          Hinweis: Speichern Sie diesen Link, um später darauf zuzugreifen.
+          Hinweis: Speichere diesen Link, um später darauf zuzugreifen.
         </p>
       </div>
     );
@@ -104,7 +104,7 @@ export default function VideoAccessRequestForm({ courseId }: VideoAccessRequestF
           {...register("email")}
           type="email"
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
-          placeholder="ihre@email.de"
+          placeholder="deine@email.de"
         />
         {errors.email && (
           <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -128,7 +128,7 @@ export default function VideoAccessRequestForm({ courseId }: VideoAccessRequestF
         {isLoading ? "Wird verarbeitet..." : "Zugang anfordern"}
       </button>
       <p className="text-center text-sm text-gray-500 mt-2">
-        Sie erhalten einen Zugangslink, der 48 Stunden gültig ist.
+        Du erhältst einen Zugangslink, der 48 Stunden gültig ist.
       </p>
     </form>
   );

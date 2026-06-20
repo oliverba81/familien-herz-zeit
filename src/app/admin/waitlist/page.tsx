@@ -38,7 +38,7 @@ export default async function WaitlistPage({ searchParams }: WaitlistPageProps) 
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Warteliste</h1>
             <p className="text-gray-600 mt-1">
-              Verwalten Sie Interessenten, die noch keine feste Buchung haben.
+              Verwalte Interessenten, die noch keine feste Buchung haben.
             </p>
           </div>
           <Link

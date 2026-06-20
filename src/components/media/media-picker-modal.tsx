@@ -128,7 +128,7 @@ export default function MediaPickerModal({
                 <p className="text-lg mb-2">
                   {type === "image" ? "Keine Bilder gefunden" : "Keine Videos gefunden"}
                 </p>
-                <p className="text-sm">Laden Sie zuerst Medien hoch</p>
+                <p className="text-sm">Lade zuerst Medien hoch</p>
               </div>
             </div>
           ) : (

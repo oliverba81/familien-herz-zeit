@@ -85,7 +85,7 @@ export default function MediaGrid({ media, filter = "all", onFilterChange }: Med
   };
 
   const handleDelete = async (id: string, fileName: string) => {
-    if (!confirm(`Möchten Sie "${fileName}" wirklich löschen?`)) {
+    if (!confirm(`Möchtest du "${fileName}" wirklich löschen?`)) {
       return;
     }
 

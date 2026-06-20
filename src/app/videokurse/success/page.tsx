@@ -4,7 +4,7 @@ import SuccessPageClient from "@/components/video-courses/success-page-client";
 
 export const metadata: Metadata = {
   title: "Zahlung erfolgreich",
-  description: "Vielen Dank für Ihren Kauf",
+  description: "Vielen Dank für deinen Kauf",
 };
 
 interface SuccessPageProps {
@@ -37,10 +37,10 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Vielen Dank für Ihren Kauf!
+              Vielen Dank für deinen Kauf!
             </h1>
             <p className="text-gray-600 mb-6">
-              Wenn die Zahlung erfolgreich war, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Zugangslink zum Videokurs.
+              Wenn die Zahlung erfolgreich war, erhältst du in Kürze eine E-Mail mit deinem persönlichen Zugangslink zum Videokurs.
             </p>
           </div>
 
@@ -51,11 +51,11 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
             <ul className="text-left text-blue-800 space-y-2">
               <li className="flex items-start">
                 <span className="mr-2">✓</span>
-                <span>Ihre Zahlung wird verarbeitet</span>
+                <span>Deine Zahlung wird verarbeitet</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">✓</span>
-                <span>Sie erhalten eine E-Mail mit Ihrem Zugangslink</span>
+                <span>Du erhältst eine E-Mail mit deinem Zugangslink</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">✓</span>
@@ -89,9 +89,9 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
 
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              Falls Sie keine E-Mail erhalten haben, überprüfen Sie bitte Ihren Spam-Ordner oder{" "}
+              Falls du keine E-Mail erhalten hast, überprüfe bitte deinen Spam-Ordner oder{" "}
               <Link href="/kontakt" className="text-rose-500 hover:text-rose-600">
-                kontaktieren Sie uns
+                kontaktiere uns
               </Link>
               .
             </p>

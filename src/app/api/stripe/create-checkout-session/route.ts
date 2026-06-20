@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.email) {
       return NextResponse.json(
-        { error: "Bitte melden Sie sich an, um einen Kurs zu kaufen" },
+        { error: "Bitte melde dich an, um einen Kurs zu kaufen" },
         { status: 401 }
       );
     }

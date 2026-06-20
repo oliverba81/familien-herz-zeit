@@ -157,7 +157,7 @@ export default function CourseForm({ initialData, mode, prefilledStartAt, onSave
 
   const handleDelete = async () => {
     if (!initialData?.id) return;
-    if (!confirm("Möchten Sie diesen Kurs wirklich löschen? Alle Termine und Buchungen werden ebenfalls gelöscht.")) {
+    if (!confirm("Möchtest du diesen Kurs wirklich löschen? Alle Termine und Buchungen werden ebenfalls gelöscht.")) {
       return;
     }
 
@@ -226,7 +226,7 @@ export default function CourseForm({ initialData, mode, prefilledStartAt, onSave
           Geplantes Startdatum (optional)
         </h3>
         <p className="text-xs text-gray-600 mb-4">
-          Wenn noch kein genaues Startdatum bekannt ist, können Sie hier Monat und Jahr angeben. 
+          Wenn noch kein genaues Startdatum bekannt ist, kannst du hier Monat und Jahr angeben.
           Im Frontend wird dann z.B. "ab Mai 2026" angezeigt.
         </p>
         <div className="grid grid-cols-2 gap-4">
@@ -274,7 +274,7 @@ export default function CourseForm({ initialData, mode, prefilledStartAt, onSave
           </div>
         </div>
         <p className="mt-2 text-xs text-gray-500">
-          <strong>Hinweis:</strong> Wenn Sie Termine mit genauen Daten angeben, werden diese verwendet. 
+          <strong>Hinweis:</strong> Wenn du Termine mit genauen Daten angibst, werden diese verwendet.
           Das geplante Datum wird nur angezeigt, wenn keine Termine vorhanden sind.
         </p>
       </div>

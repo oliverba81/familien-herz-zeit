@@ -40,7 +40,7 @@ export default async function InvoiceSettingsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Rechnungseinstellungen</h1>
           <p className="text-gray-600 mt-1">
-            Konfigurieren Sie die Rechnungsdaten für automatisch generierte Rechnungen
+            Konfiguriere die Rechnungsdaten für automatisch generierte Rechnungen
           </p>
         </div>
         <InvoiceSettingsForm initialSettings={settings} />

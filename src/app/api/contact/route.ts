@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     // Honeypot: Wenn website Feld gefüllt ist, antworte ok aber speichere nichts
     if (validatedData.website) {
       return NextResponse.json(
-        { ok: true, message: "Vielen Dank für Ihre Nachricht!" },
+        { ok: true, message: "Vielen Dank für deine Nachricht!" },
         { status: 200 }
       );
     }
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       mailSent,
-      message: "Vielen Dank für Ihre Nachricht!",
+      message: "Vielen Dank für deine Nachricht!",
     });
   } catch (error: any) {
     if (error.name === "ZodError") {

@@ -63,7 +63,7 @@ export default async function CourseSeriesPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Terminserien</h1>
             <p className="text-gray-600 mt-1">
-              Verwalten Sie wiederkehrende Kurstermine
+              Verwalte wiederkehrende Kurstermine
             </p>
           </div>
           <Link

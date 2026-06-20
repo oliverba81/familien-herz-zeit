@@ -25,7 +25,7 @@ export default function PageFormClient({ initialData }: PageFormClientProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Möchten Sie diese Seite wirklich löschen?")) {
+    if (!confirm("Möchtest du diese Seite wirklich löschen?")) {
       return;
     }
 

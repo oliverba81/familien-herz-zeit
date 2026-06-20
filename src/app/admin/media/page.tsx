@@ -19,7 +19,7 @@ export default async function MediaPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Medien</h1>
           <p className="text-gray-600 mt-1">
-            Verwalten Sie Ihre hochgeladenen Bilder und Videos
+            Verwalte deine hochgeladenen Bilder und Videos
           </p>
         </div>
 

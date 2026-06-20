@@ -23,7 +23,7 @@ export default async function BookingsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Buchungen</h1>
           <p className="text-gray-600 mt-1">
-            Verwalten Sie alle Buchungen
+            Verwalte alle Buchungen
           </p>
         </div>
 

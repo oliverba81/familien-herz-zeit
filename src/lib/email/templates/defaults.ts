@@ -21,29 +21,29 @@ export function getDefaultTemplates(): Record<string, DefaultTemplate> {
     booking_user: {
       name: "Buchungsanfrage an Teilnehmer",
       description: "E-Mail, die an den Teilnehmer gesendet wird, wenn eine Buchung erstellt wird",
-      subject: "Ihre Buchungsanfrage für: {{courseTitle}}",
+      subject: "Deine Buchungsanfrage für: {{courseTitle}}",
       textBody: `Hallo {{parentName}},
 
-vielen Dank für Ihre Buchungsanfrage!
+vielen Dank für deine Buchungsanfrage!
 
 Kurs: {{courseTitle}}
 Datum & Zeit: {{startAt}}
 Preis: {{price}}
 Buchungs-ID: {{bookingId}}
 
-Ihre Buchung hat den Status "PENDING" (Ausstehend). Wir werden Ihre Anfrage prüfen und Ihnen eine Bestätigung zusenden.
+Deine Buchung hat den Status "PENDING" (Ausstehend). Wir prüfen deine Anfrage und senden dir eine Bestätigung zu.
 
 Mit freundlichen Grüßen,
 Familien Herz Zeit`,
       htmlBody: renderLayout({
-        title: "Ihre Buchungsanfrage",
+        title: "Deine Buchungsanfrage",
         preheader: "Kurs: {{courseTitle}}",
         bodyHtml: `
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
         Hallo {{parentName}},
       </p>
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-        vielen Dank für Ihre Buchungsanfrage!
+        vielen Dank für deine Buchungsanfrage!
       </p>
       <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -67,7 +67,7 @@ Familien Herz Zeit`,
       </div>
       <div style="margin: 20px 0; padding: 12px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
         <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
-          <strong>Status:</strong> Ihre Buchung hat den Status "PENDING" (Ausstehend). Wir werden Ihre Anfrage prüfen und Ihnen eine Bestätigung zusenden.
+          <strong>Status:</strong> Deine Buchung hat den Status "PENDING" (Ausstehend). Wir prüfen deine Anfrage und senden dir eine Bestätigung zu.
         </p>
       </div>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
@@ -83,14 +83,14 @@ Familien Herz Zeit`,
       subject: "Buchungsbestätigung: {{courseTitle}}",
       textBody: `Hallo {{parentName}},
 
-Ihre Buchung wurde bestätigt!
+Deine Buchung wurde bestätigt!
 
 Kurs: {{courseTitle}}
 Datum & Zeit: {{startAt}}
 Preis: {{price}}
 Buchungs-ID: {{bookingId}}
 
-Wir freuen uns, Sie beim Kurs begrüßen zu dürfen!
+Wir freuen uns, dich beim Kurs begrüßen zu dürfen!
 
 Mit freundlichen Grüßen,
 Familien Herz Zeit`,
@@ -102,7 +102,7 @@ Familien Herz Zeit`,
         Hallo {{parentName}},
       </p>
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-        Ihre Buchung wurde bestätigt!
+        Deine Buchung wurde bestätigt!
       </p>
       <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -126,7 +126,7 @@ Familien Herz Zeit`,
       </div>
       <div style="margin: 20px 0; padding: 12px; background-color: #d1fae5; border-left: 4px solid #10b981; border-radius: 4px;">
         <p style="margin: 0; color: #065f46; font-size: 14px; line-height: 1.6;">
-          <strong>✓ Status: Bestätigt</strong> - Wir freuen uns, Sie beim Kurs begrüßen zu dürfen!
+          <strong>✓ Status: Bestätigt</strong> - Wir freuen uns, dich beim Kurs begrüßen zu dürfen!
         </p>
       </div>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
@@ -184,14 +184,14 @@ Status: PENDING`,
     video_access: {
       name: "Videokurs-Zugang",
       description: "E-Mail mit Zugangslink zum Videokurs",
-      subject: "Ihr Zugang zum Videokurs: {{courseTitle}}",
+      subject: "Dein Zugang zum Videokurs: {{courseTitle}}",
       textBody: `Hallo,
 
-vielen Dank für Ihr Interesse an unserem Videokurs!
+vielen Dank für dein Interesse an unserem Videokurs!
 
 Kurs: {{courseTitle}}
 
-Ihr persönlicher Zugangslink:
+Dein persönlicher Zugangslink:
 {{watchUrl}}
 
 Dieser Link ist gültig bis: {{expiresAt}}
@@ -199,19 +199,19 @@ Dieser Link ist gültig bis: {{expiresAt}}
 Mit freundlichen Grüßen,
 Familien Herz Zeit`,
       htmlBody: renderLayout({
-        title: "Ihr Videokurs-Zugang",
+        title: "Dein Videokurs-Zugang",
         preheader: "Kurs: {{courseTitle}}",
         bodyHtml: `
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
         Hallo,
       </p>
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-        vielen Dank für Ihr Interesse an unserem Videokurs!
+        vielen Dank für dein Interesse an unserem Videokurs!
       </p>
       <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;"><strong>Kurs:</strong></p>
         <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; font-weight: 600;">{{courseTitle}}</p>
-        <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;"><strong>Ihr persönlicher Zugangslink:</strong></p>
+        <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;"><strong>Dein persönlicher Zugangslink:</strong></p>
         <a href="{{watchUrl}}" style="display: inline-block; margin: 10px 0; padding: 12px 24px; background-color: #e11d48; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
           Jetzt Videokurs ansehen
         </a>
@@ -221,7 +221,7 @@ Familien Herz Zeit`,
       </div>
       <div style="margin: 20px 0; padding: 12px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
         <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
-          <strong>Hinweis:</strong> Dieser Link ist gültig bis zum <strong>{{expiresAt}}</strong>. Bitte speichern Sie diesen Link, um später darauf zuzugreifen.
+          <strong>Hinweis:</strong> Dieser Link ist gültig bis zum <strong>{{expiresAt}}</strong>. Bitte speichere diesen Link, um später darauf zuzugreifen.
         </p>
       </div>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
@@ -253,7 +253,7 @@ Nachricht:
         <p style="margin: 0; color: #374151; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">{{message}}</p>
       </div>
       <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px;">
-        Bitte antworten Sie direkt auf diese E-Mail, um dem Absender zu antworten.
+        Bitte antworte direkt auf diese E-Mail, um dem Absender zu antworten.
       </p>
     `,
       }),
@@ -261,22 +261,22 @@ Nachricht:
     contact_user_confirm: {
       name: "Kontaktbestätigung an Absender",
       description: "E-Mail, die an den Absender einer Kontaktanfrage als Bestätigung gesendet wird",
-      subject: "Vielen Dank für Ihre Nachricht",
+      subject: "Vielen Dank für deine Nachricht",
       textBody: `Hallo {{name}},
 
-vielen Dank für Ihre Nachricht. Wir haben sie erhalten und werden uns in Kürze bei Ihnen melden.
+vielen Dank für deine Nachricht. Wir haben sie erhalten und melden uns in Kürze bei dir.
 
 Mit freundlichen Grüßen,
 Familien Herz Zeit`,
       htmlBody: renderLayout({
-        title: "Vielen Dank für Ihre Nachricht",
-        preheader: "Wir haben Ihre Nachricht erhalten",
+        title: "Vielen Dank für deine Nachricht",
+        preheader: "Wir haben deine Nachricht erhalten",
         bodyHtml: `
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
         Hallo {{name}},
       </p>
       <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-        vielen Dank für Ihre Nachricht. Wir haben sie erhalten und werden uns in Kürze bei Ihnen melden.
+        vielen Dank für deine Nachricht. Wir haben sie erhalten und melden uns in Kürze bei dir.
       </p>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
         Mit freundlichen Grüßen,<br>

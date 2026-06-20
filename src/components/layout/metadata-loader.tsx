@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const metadata: Metadata = {
     title: siteName,
-    description: `${siteName} - Ihre Familienwebsite`,
+    description: `${siteName} - Deine Familienwebsite`,
   };
 
   if (faviconUrl) {

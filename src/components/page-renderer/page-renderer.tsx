@@ -656,7 +656,7 @@ function VideoBlock({ data }: { data: VideoBlockData }) {
           controls
           className="w-full h-auto"
         >
-          Ihr Browser unterstützt das Video-Element nicht.
+          Dein Browser unterstützt das Video-Element nicht.
         </video>
       </div>
     </div>

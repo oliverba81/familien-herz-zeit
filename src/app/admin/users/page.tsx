@@ -11,7 +11,7 @@ export default async function UsersPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Benutzer-Verwaltung</h1>
           <p className="text-gray-600 mt-1">
-            Verwalten Sie Benutzer und deren Rollen
+            Verwalte Benutzer und deren Rollen
           </p>
         </div>
 

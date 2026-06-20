@@ -110,7 +110,7 @@ export default async function SignDetailPage({ params }: PageProps) {
                   controls
                   className="w-full h-full"
                 >
-                  Ihr Browser unterstützt das Video-Element nicht.
+                  Dein Browser unterstützt das Video-Element nicht.
                 </video>
               </div>
             )}

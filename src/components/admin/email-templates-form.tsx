@@ -204,7 +204,7 @@ export default function EmailTemplatesForm() {
                   onChange={(html) => updateTemplate(template.type, "htmlBody", html)}
                 />
                 <p className="mt-2 text-xs text-gray-500">
-                  <strong>Tipp:</strong> Verwenden Sie den WYSIWYG-Editor für visuelle Bearbeitung. Platzhalter wie {"{{courseTitle}}"} bleiben erhalten und werden beim Versenden automatisch ersetzt.
+                  <strong>Tipp:</strong> Verwende den WYSIWYG-Editor für visuelle Bearbeitung. Platzhalter wie {"{{courseTitle}}"} bleiben erhalten und werden beim Versenden automatisch ersetzt.
                 </p>
               </div>
 

@@ -324,7 +324,7 @@ export default function PageBuilderShell({
       (e) => e.path.includes("type") || e.message.includes("ungültig")
     );
     if (fatalErrors.length > 0) {
-      setSaveError("Kritische Fehler gefunden. Bitte korrigieren Sie die Fehler vor dem Speichern.");
+      setSaveError("Kritische Fehler gefunden. Bitte korrigiere die Fehler vor dem Speichern.");
       return;
     }
 
@@ -360,7 +360,7 @@ export default function PageBuilderShell({
     // Publish: Blockiere bei Errors
     if (validation.errors.length > 0) {
       setSaveError(
-        `${validation.errors.length} Fehler gefunden. Bitte korrigieren Sie die Fehler vor der Veröffentlichung.`
+        `${validation.errors.length} Fehler gefunden. Bitte korrigiere die Fehler vor der Veröffentlichung.`
       );
       return;
     }

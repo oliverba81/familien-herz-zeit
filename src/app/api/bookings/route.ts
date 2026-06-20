@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
     // Honeypot: Wenn website Feld gefüllt ist, antworte ok aber speichere nichts
     if (validatedData.website) {
       return NextResponse.json(
-        { message: "Vielen Dank für Ihre Buchung!" },
+        { message: "Vielen Dank für deine Buchung!" },
         { status: 200 }
       );
     }
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
       // Prüfe auf Unique Constraint Violation (Doppelbuchung)
       if (dbError.code === "P2002") {
         return NextResponse.json(
-          { error: "Sie haben bereits eine Buchung für diesen Kurs" },
+          { error: "Du hast bereits eine Buchung für diesen Kurs" },
           { status: 409 }
         );
       }
@@ -393,7 +393,7 @@ export async function POST(request: NextRequest) {
       // Prüfe auf Unique Constraint Violation (Doppelbuchung)
       if (error.code === "P2002") {
         return NextResponse.json(
-          { error: "Sie haben bereits eine Buchung für diesen Kurs" },
+          { error: "Du hast bereits eine Buchung für diesen Kurs" },
           { status: 409 }
         );
       }

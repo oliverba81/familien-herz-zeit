@@ -25,10 +25,10 @@ export const bookingSchema = z.object({
   // Weitere Informationen
   howDidYouHear: z.string().optional().nullable(),
   privacyAccepted: z.boolean().refine((val) => val === true, {
-    message: "Sie müssen der Datenschutzerklärung zustimmen",
+    message: "Du musst der Datenschutzerklärung zustimmen",
   }),
   termsAccepted: z.boolean().refine((val) => val === true, {
-    message: "Sie müssen den Kursbedingungen zustimmen",
+    message: "Du musst den Kursbedingungen zustimmen",
   }),
   website: z.string().optional().nullable(), // Honeypot
 });

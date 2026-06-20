@@ -300,7 +300,7 @@ export default function FeedbackFormBuilder({ mode, initialData }: Props) {
                           })}
                           type="text"
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 text-sm"
-                          placeholder="Ihre Frage..."
+                          placeholder="Deine Frage..."
                         />
                         {errors.questions?.[index]?.label && (
                           <p className="mt-1 text-xs text-red-600">

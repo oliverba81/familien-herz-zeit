@@ -20,7 +20,7 @@ export default async function VideoCoursesPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Videokurse</h1>
             <p className="text-gray-600 mt-1">
-              Verwalten Sie Ihre Videokurse
+              Verwalte deine Videokurse
             </p>
           </div>
           <div className="flex gap-2">

@@ -82,7 +82,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
 
     // Prüfe reCAPTCHA wenn aktiviert
     if (enableRecaptcha && !recaptchaToken) {
-      setError("Bitte bestätigen Sie, dass Sie kein Roboter sind.");
+      setError("Bitte bestätige, dass du kein Roboter bist.");
       return;
     }
 
@@ -533,7 +533,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
               )}
               {success && (
                 <div className="fhz-contactForm01__message fhz-contactForm01__message--success" role="alert">
-                  Vielen Dank für Ihre Nachricht! Wir melden uns bald bei Ihnen.
+                  Vielen Dank für deine Nachricht! Wir melden uns bald bei dir.
                 </div>
               )}
               <form className="fhz-contactForm01__form" onSubmit={handleSubmit}>

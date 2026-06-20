@@ -123,7 +123,7 @@ export default function NavigationEditor() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Möchten Sie dieses Element wirklich löschen? Alle Unterelemente werden ebenfalls gelöscht.")) {
+    if (!confirm("Möchtest du dieses Element wirklich löschen? Alle Unterelemente werden ebenfalls gelöscht.")) {
       return;
     }
 

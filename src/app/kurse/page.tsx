@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Präsenz-Kurse",
-  description: "Entdecken Sie unsere Präsenz-Kurse",
+  description: "Entdecke unsere Präsenz-Kurse",
 };
 
 // Immer serverseitig frisch rendern, damit Kursänderungen aus dem Admin sofort
@@ -60,7 +60,7 @@ export default async function CoursesPage() {
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-4">Präsenz-Kurse</h1>
               <p className="text-lg text-gray-600">
-                Entdecken Sie meine Auswahl an Präsenz-Kursen
+                Entdecke meine Auswahl an Präsenz-Kursen
               </p>
             </div>
             <Link

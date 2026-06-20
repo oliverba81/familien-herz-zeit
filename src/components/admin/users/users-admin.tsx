@@ -121,15 +121,15 @@ export default function UsersAdmin() {
 
   const handleToggleActive = async (userId: string, currentActive: boolean) => {
     if (session?.user?.id === userId && !currentActive) {
-      setError("Sie können sich nicht selbst deaktivieren");
+      setError("Du kannst dich nicht selbst deaktivieren");
       return;
     }
 
-    if (!currentActive && !confirm("Möchten Sie diesen Benutzer wirklich aktivieren?")) {
+    if (!currentActive && !confirm("Möchtest du diesen Benutzer wirklich aktivieren?")) {
       return;
     }
 
-    if (currentActive && !confirm("Möchten Sie diesen Benutzer wirklich deaktivieren?")) {
+    if (currentActive && !confirm("Möchtest du diesen Benutzer wirklich deaktivieren?")) {
       return;
     }
 
