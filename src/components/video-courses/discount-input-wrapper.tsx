@@ -115,7 +115,11 @@ export default function DiscountInputWrapper({
       <DiscountInput onCodeChange={handleCodeChange} error={discountError} />
       {noMethods && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-          Derzeit ist keine Zahlung verfügbar. Bitte kontaktiere uns.
+          Derzeit ist keine Zahlung verfügbar. Bitte{" "}
+          <a href="/kontakt" className="underline hover:text-yellow-900">
+            kontaktiere uns
+          </a>
+          .
         </div>
       )}
       {enabledMethods.stripe && (
