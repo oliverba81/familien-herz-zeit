@@ -8,18 +8,12 @@ import { cachedHomepagePage } from "@/lib/cache/prisma-cache";
 export default async function Home() {
   // Startseite: konfiguriert in Admin (SiteSettings homepage_slug) oder Fallback "home"
   const homepage = await cachedHomepagePage();
-  // #region agent log
-  fetch("http://localhost:7243/ingest/1d60de62-6032-4976-9878-2ebaff9d4a67", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "debug-session", runId: "home-render", hypothesisId: "H1", location: "src/app/page.tsx:home-fetch", message: "Home page fetched", data: { found: !!homepage, published: homepage?.published, hasPublishedContent: !!homepage?.publishedContentJson, hasContent: !!homepage?.contentJson }, timestamp: Date.now() }) }).catch(() => {});
-  // #endregion
 
   // Wenn Homepage existiert, zeige sie an
   if (homepage) {
     const content = homepage.publishedContentJson ?? homepage.contentJson;
     const isV2 = isPageContentV2(content);
     const normalizedContent = isV2 ? null : normalizeContent(content);
-    // #region agent log
-    fetch("http://localhost:7243/ingest/1d60de62-6032-4976-9878-2ebaff9d4a67", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "debug-session", runId: "home-render", hypothesisId: "H2", location: "src/app/page.tsx:content-source", message: "Home page content source", data: { contentSource: homepage.publishedContentJson ? "publishedContentJson" : "contentJson" }, timestamp: Date.now() }) }).catch(() => {});
-    // #endregion
 
     const containerWidthClass = {
       full: "",
