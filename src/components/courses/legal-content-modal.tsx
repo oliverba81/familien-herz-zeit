@@ -41,9 +41,13 @@ export default function LegalContentModal({
     setMounted(true);
   }, []);
 
-  // Inhalt laden, sobald das Popup geöffnet wird
+  // Inhalt laden, sobald das Popup geöffnet wird.
+  // WICHTIG: Nur von [open, slug] abhängig. isLoading/data dürfen NICHT in den
+  // Dependencies stehen – sonst löst setIsLoading(true) sofort die Cleanup aus
+  // (cancelled=true), bevor der fetch zurückkommt, und der Inhalt wird nie
+  // gesetzt ("Wird geladen …" bleibt für immer stehen).
   useEffect(() => {
-    if (!open || data || isLoading) return;
+    if (!open) return;
 
     let cancelled = false;
     setIsLoading(true);
@@ -69,7 +73,7 @@ export default function LegalContentModal({
     return () => {
       cancelled = true;
     };
-  }, [open, slug, data, isLoading]);
+  }, [open, slug]);
 
   // ESC-Taste schließt das Popup + Body-Scroll sperren, solange offen
   useEffect(() => {
