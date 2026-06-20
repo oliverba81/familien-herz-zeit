@@ -143,6 +143,15 @@ CURRENT_STEP="build"
 write_status "running" "$CURRENT_STEP" "Baue Anwendung (.next.new)" "$NEW_SHA"
 echo ">>> [build] rm -rf .next.new"
 rm -rf .next.new
+# Veraltete TypeScript-Typdefinitionen aus dem laufenden .next entfernen.
+# Next.js trägt in tsconfig.json sowohl ".next/types/**/*.ts" als auch
+# ".next.new/types/**/*.ts" als include ein. Wurde seit dem letzten Deploy eine
+# Route gelöscht, verweist das alte .next/types/validator.ts noch auf das nicht
+# mehr existierende Modul und der TypeScript-Check des neuen Builds schlägt fehl.
+# Diese .ts-Typdateien werden zur Laufzeit NICHT gebraucht → die laufende App
+# bleibt unberührt; die frischen Typen entstehen im .next.new-Build.
+echo ">>> [build] veraltete Typdefinitionen entfernen (.next/types, .next/dev/types)"
+rm -rf .next/types .next/dev/types
 echo ">>> [build] NEXT_DIST_DIR=.next.new npm run build"
 NEXT_DIST_DIR=.next.new npm run build
 
