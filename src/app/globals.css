@@ -109,6 +109,43 @@ body {
   cursor: pointer;
 }
 
+/* WYSIWYG-Builder (V2): Editor-Fläche soll 1:1 wie die veröffentlichte Seite aussehen.
+   Die veröffentlichte Seite rendert den Inhalt in
+   <div class="bg-gray-50 …"><article class="bg-white rounded-lg shadow-sm p-8 md:p-12">.
+   Hier wird die contenteditable-Fläche optisch genauso gerahmt (graue Seite + weiße Karte),
+   damit man ohne separate Vorschau direkt das Endergebnis sieht. */
+.v2-builder-canvas {
+  background: #f9fafb; /* bg-gray-50 */
+}
+.v2-builder-canvas .wysiwyg-wrapper {
+  background: transparent;
+  border: none;
+  height: 100%;
+}
+.v2-builder-canvas .wysiwyg-wrapper:focus-within {
+  box-shadow: none;
+}
+.v2-builder-canvas .wysiwyg-editor-area {
+  max-width: 56rem; /* max-w-4xl – Standard-Containerbreite der Seiten */
+  margin-inline: auto;
+  background: #ffffff;
+  border: 1px solid #f3f4f6;
+  border-radius: 0.5rem; /* rounded-lg */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 1px 3px 0 rgb(0 0 0 / 0.1); /* shadow-sm */
+  padding: 2rem; /* p-8 */
+}
+@media (min-width: 768px) {
+  .v2-builder-canvas .wysiwyg-editor-area {
+    padding: 3rem; /* md:p-12 */
+  }
+}
+/* Site-Typografie (.tinymce-preview-content) hat Vorrang vor den Editor-Defaults,
+   damit Überschriften/Abstände exakt der veröffentlichten Seite entsprechen. */
+.v2-builder-canvas .wysiwyg-editor-area.tinymce-preview-content h1 { font-size: 2em; }
+.v2-builder-canvas .wysiwyg-editor-area.tinymce-preview-content h2 { font-size: 1.5em; }
+.v2-builder-canvas .wysiwyg-editor-area.tinymce-preview-content h3 { font-size: 1.25em; }
+.v2-builder-canvas .wysiwyg-editor-area.tinymce-preview-content a { color: #e11d48; }
+
 /* Hover-Effekte für Tabellen-Zellen mit Gradient-Rahmen */
 td.table-cell-gradient:hover,
 figure.table-cell-gradient:hover {

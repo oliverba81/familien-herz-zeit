@@ -496,7 +496,7 @@ export default function PageBuilderV2Shell({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
-          <div className="flex-1 overflow-hidden border-r border-gray-200">
+          <div className="v2-builder-canvas flex-1 overflow-hidden border-r border-gray-200">
             <WysiwygEditor
               ref={editorRef}
               value={html}
@@ -509,6 +509,9 @@ export default function PageBuilderV2Shell({
               dragDrop={false}
               onImageUpload={uploadImageToMedia}
               className="h-full"
+              // Gleiche Darstellung wie die veröffentlichte Seite (PageRendererHtml-Wrapper):
+              // Schrift, Überschriften, Links, Tabellen aus globals.css `.tinymce-preview-content`.
+              editorClass="tinymce-preview-content prose max-w-none text-md"
             />
           </div>
         </div>
