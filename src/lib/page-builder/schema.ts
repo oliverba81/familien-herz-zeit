@@ -55,6 +55,23 @@ export const pageContentSchemaV2 = z.object({
 export type PageContentV2 = z.infer<typeof pageContentSchemaV2>;
 
 /**
+ * Page Content V3 (Puck Visual Builder).
+ *
+ * Strukturelle Form der Puck-Daten (`@puckeditor/core`): ein `root`-Objekt und eine
+ * `content`-Liste (Top-Level-Komponenten); Kinder liegen ab Puck 0.19 inline als
+ * Slot-Felder in den Props (kein Top-Level `zones`). Wir taggen zusätzlich `version: 3`,
+ * verlassen uns für die Erkennung aber primär auf die Struktur (auch ungetaggte
+ * Puck-Daten aus der Library werden korrekt erkannt).
+ */
+export interface PageContentPuck {
+  version?: 3;
+  root: { props?: Record<string, unknown> } & Record<string, unknown>;
+  content: unknown[];
+  /** Legacy-Puck (< 0.19) — nur für Abwärtskompatibilität; neue Daten nutzen Slots. */
+  zones?: Record<string, unknown[]>;
+}
+
+/**
  * Prüft, ob der Wert Page-Content V2 ist (WYSIWYG HTML).
  */
 export function isPageContentV2(value: unknown): value is PageContentV2 {
@@ -66,6 +83,40 @@ export function isPageContentV2(value: unknown): value is PageContentV2 {
     "html" in value &&
     typeof (value as { html: unknown }).html === "string"
   );
+}
+
+/**
+ * Prüft, ob der Wert Puck-Daten (V3) sind.
+ *
+ * Erkennung: explizites `version: 3` ODER strukturell (`root`-Objekt + `content`-Array),
+ * solange es nicht bereits als V1/V2 getaggt ist. So werden auch Puck-Daten ohne
+ * `version`-Tag (direkt aus der Library) korrekt erkannt.
+ */
+export function isPageContentPuck(value: unknown): value is PageContentPuck {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  if (v.version === 3) return true;
+  // Explizit als V1/V2 getaggt → niemals Puck.
+  if (v.version === 1 || v.version === 2) return false;
+  return (
+    typeof v.root === "object" &&
+    v.root !== null &&
+    Array.isArray(v.content)
+  );
+}
+
+/**
+ * Einziger Content-Form-Guard für Routing/Validierung/Rendering.
+ *
+ * KRITISCH: Puck-Daten dürfen NIEMALS in `parsePageContent`/`migrateToV1` laufen — dort
+ * fallen sie auf `createEmptyContent()` zurück und die Seite würde beim Speichern auf LEER
+ * überschrieben (Totalverlust). Alle Konsumenten (PUT/Publish/Public-Route/SEO/Renderer)
+ * müssen ihre Form über diese Funktion bestimmen.
+ */
+export function resolveContentKind(value: unknown): "v1" | "v2" | "puck" {
+  if (isPageContentPuck(value)) return "puck";
+  if (isPageContentV2(value)) return "v2";
+  return "v1";
 }
 
 export interface ParseResult {

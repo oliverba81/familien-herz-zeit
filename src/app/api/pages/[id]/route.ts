@@ -7,7 +7,7 @@ import { logAudit, getActorFromSession, getChangedFields } from "@/lib/audit/log
 import { AuditAction } from "@prisma/client";
 import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
-import { parsePageContent, pageContentSchemaV1, isPageContentV2, pageContentSchemaV2 } from "@/lib/page-builder/schema";
+import { parsePageContent, pageContentSchemaV1, isPageContentV2, pageContentSchemaV2, resolveContentKind } from "@/lib/page-builder/schema";
 
 // GET /api/pages/:id - Einzelne Seite abrufen
 export async function GET(
@@ -167,8 +167,17 @@ export async function PUT(
       }
     }
 
-    // Validiere Page Content Schema (V1 oder V2)
-    if (isPageContentV2(draftContentJson)) {
+    // Validiere Page Content Schema (V1, V2 oder Puck/V3)
+    const contentKind = resolveContentKind(draftContentJson);
+    if (contentKind === "puck") {
+      // P0-b: Puck-Daten (V3) NICHT durch parsePageContent/migrateToV1 schicken — sonst
+      // würde die Seite auf LEER überschrieben (Totalverlust). Strukturell bereits durch
+      // resolveContentKind garantiert (root-Objekt + content-Array); volle Config-Validierung
+      // erfolgt clientseitig im Editor. Nur den version:3-Tag sicherstellen.
+      if ((draftContentJson as { version?: number }).version !== 3) {
+        draftContentJson = { version: 3, ...(draftContentJson as object) };
+      }
+    } else if (isPageContentV2(draftContentJson)) {
       try {
         pageContentSchemaV2.parse(draftContentJson);
         // V2: unverändert speichern

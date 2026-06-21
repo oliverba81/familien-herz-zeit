@@ -2,6 +2,55 @@
  * SEO Helper Functions
  */
 
+import { isPageContentPuck } from "@/lib/page-builder/schema";
+
+/** Prop-Schlüssel, die in Puck-Komponenten lesbaren Text tragen. */
+const PUCK_TEXT_KEYS = new Set([
+  "heading",
+  "subheading",
+  "title",
+  "subtitle",
+  "text",
+  "teaser",
+  "fullText",
+  "html",
+  "caption",
+  "buttonText",
+  "label",
+]);
+
+/**
+ * Sammelt rekursiv Text aus einem Puck-Datenbaum (root + content + inline Slot-Props).
+ * Unabhängig von `@puckeditor/core` — läuft direkt über die JSON-Struktur.
+ */
+function collectPuckText(node: unknown, parts: string[]): void {
+  if (node == null) return;
+  if (Array.isArray(node)) {
+    for (const child of node) collectPuckText(child, parts);
+    return;
+  }
+  if (typeof node !== "object") return;
+  for (const [key, val] of Object.entries(node as Record<string, unknown>)) {
+    if (typeof val === "string") {
+      if (PUCK_TEXT_KEYS.has(key)) {
+        const text = (key === "html" ? val.replace(/<[^>]+>/g, " ") : val)
+          .replace(/\s+/g, " ")
+          .trim();
+        if (text) parts.push(text);
+      }
+    } else {
+      collectPuckText(val, parts);
+    }
+  }
+}
+
+/** Extrahiert zusammenhängenden Text aus Puck-Daten (V3) bis maxLength. */
+export function extractTextFromPuck(data: unknown, maxLength: number): string {
+  const parts: string[] = [];
+  collectPuckText(data, parts);
+  return parts.join(" ").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
 /**
  * Gibt die Base URL der App zurück
  */
@@ -83,6 +132,11 @@ export function extractTextFromContent(contentJson: any, maxLength: number = 160
     }
   }
 
+  // V3 Puck Content
+  if (isPageContentPuck(contentJson)) {
+    return extractTextFromPuck(contentJson, maxLength);
+  }
+
   // V2 Page Content (WYSIWYG HTML)
   if (
     contentJson &&
@@ -142,6 +196,11 @@ export function extractTextFromContentForAI(contentJson: any, maxLength: number 
     } catch {
       return contentJson.replace(/\s+/g, " ").trim().slice(0, maxLength);
     }
+  }
+
+  // V3 Puck Content
+  if (isPageContentPuck(contentJson)) {
+    return extractTextFromPuck(contentJson, maxLength);
   }
 
   // V2 Page Content (WYSIWYG HTML)
