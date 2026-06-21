@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DiscountProvider, DiscountType } from "@prisma/client";
 import { formatCents, parseEuroToCents } from "@/lib/utils/money";
 import { format } from "date-fns";
@@ -58,12 +58,7 @@ export default function DiscountsAdmin() {
     restrictToVideoCourseId: "",
   });
 
-  useEffect(() => {
-    fetchDiscounts();
-    fetchVideoCourses();
-  }, []);
-
-  const fetchDiscounts = async () => {
+  const fetchDiscounts = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/discounts");
       if (!response.ok) throw new Error("Fehler beim Laden der Rabattcodes");
@@ -74,9 +69,9 @@ export default function DiscountsAdmin() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchVideoCourses = async () => {
+  const fetchVideoCourses = useCallback(async () => {
     try {
       const response = await fetch("/api/video-courses");
       if (response.ok) {
@@ -86,7 +81,13 @@ export default function DiscountsAdmin() {
     } catch (err) {
       console.error("Fehler beim Laden der Videokurse:", err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await Promise.all([fetchDiscounts(), fetchVideoCourses()]);
+    })();
+  }, [fetchDiscounts, fetchVideoCourses]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

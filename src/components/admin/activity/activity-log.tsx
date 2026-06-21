@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface AuditLog {
@@ -55,11 +55,7 @@ export default function ActivityLog() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  useEffect(() => {
-    loadLogs();
-  }, []);
-
-  const loadLogs = async () => {
+  const loadLogs = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -83,7 +79,15 @@ export default function ActivityLog() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [entityType, action, search, fromDate, toDate]);
+
+  useEffect(() => {
+    // Nur beim Mount initial laden; Filter werden bewusst über den Button angewandt.
+    void (async () => {
+      await loadLogs();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
