@@ -74,7 +74,10 @@ export default function PageBuilderShell({
 
   // Update isPublished when additionalFields.published changes
   useEffect(() => {
+    // Synchronisiert isPublished aus den Props; der Wert wird zusätzlich von
+    // handlePublish/handleUnpublish gesetzt (gemischter State).
     if (additionalFields?.published !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsPublished(additionalFields.published);
     }
   }, [additionalFields?.published]);
@@ -110,9 +113,11 @@ export default function PageBuilderShell({
   const [lastSavedAdditionalFields, setLastSavedAdditionalFields] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initial: Setze lastSavedHash beim ersten Laden
+    // Initial: Setze lastSavedHash beim ersten Laden (einmalige Mount-Initialisierung
+    // des Dirty-Trackings).
     if (lastSavedHash === null) {
       const hash = contentHash(initialContent);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLastSavedHash(hash);
       setLastSavedAt(new Date());
       // Speichere auch initial additionalFields Hash
@@ -126,8 +131,10 @@ export default function PageBuilderShell({
 
   // Update additionalFields hash when they change (for initial load)
   useEffect(() => {
+    // Einmalige Initialisierung des additionalFields-Hashes für das Dirty-Tracking.
     if (additionalFields && lastSavedAdditionalFields === null) {
       const fieldsHash = JSON.stringify(additionalFields);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLastSavedAdditionalFields(fieldsHash);
     }
   }, [additionalFields, lastSavedAdditionalFields]);
@@ -304,9 +311,13 @@ export default function PageBuilderShell({
   const [showValidationPanel, setShowValidationPanel] = useState(false);
 
   useEffect(() => {
+    // Leitet Validierungswarnungen/-fehler aus dem aktuellen Content ab.
+    // validationResult/-Errors werden zusätzlich in handleSaveDraft/handlePublish
+    // gesetzt (gemischter State), daher Synchronisation per Effect statt useMemo.
     const warnings = validateContentForWarnings(content);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setValidationWarnings(warnings);
-    
+
     // Validiere Content für aktuelle Anzeige
     const result = validateContent(content, { mode: "draft" });
     setValidationResult(result);

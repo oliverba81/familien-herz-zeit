@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface PaymentSettingsState {
   stripeEnabled: boolean;
@@ -55,11 +55,7 @@ export default function PaymentSettingsForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/admin/payment-settings");
@@ -78,7 +74,13 @@ export default function PaymentSettingsForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await load();
+    })();
+  }, [load]);
 
   const set = <K extends keyof PaymentSettingsState>(
     key: K,

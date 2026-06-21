@@ -16,6 +16,10 @@ function PaypalBookingSuccessContent() {
 
   useEffect(() => {
     if (!orderId || !courseId) {
+      // Synchroner Early-Exit bei fehlenden URL-Parametern. Eine async-Umstrukturierung
+      // ist hier nicht anwendbar; der restliche Effect setzt State ausschließlich in
+      // asynchronen Callbacks (captureOrder).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Fehlende Parameter");
       setLoading(false);
       return;

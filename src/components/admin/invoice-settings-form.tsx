@@ -239,7 +239,7 @@ export default function InvoiceSettingsForm({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Optionales Prefix für Rechnungsnummern (z.B. "RE" für "RE20240001")
+                Optionales Prefix für Rechnungsnummern (z.B. &quot;RE&quot; für &quot;RE20240001&quot;)
               </p>
             </div>
 
@@ -254,7 +254,7 @@ export default function InvoiceSettingsForm({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Optionales Suffix für Rechnungsnummern (z.B. "INV" für "RE20240001INV")
+                Optionales Suffix für Rechnungsnummern (z.B. &quot;INV&quot; für &quot;RE20240001INV&quot;)
               </p>
             </div>
 
@@ -273,7 +273,7 @@ export default function InvoiceSettingsForm({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Die Nummer, ab der die Rechnungsnummern starten sollen (z.B. 1 für "0001")
+                Die Nummer, ab der die Rechnungsnummern starten sollen (z.B. 1 für &quot;0001&quot;)
               </p>
               {errors.invoiceNumberStart && (
                 <p className="mt-1 text-sm text-red-600">{errors.invoiceNumberStart.message}</p>

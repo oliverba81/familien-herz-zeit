@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { courseSchema } from "@/lib/validations/courses";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
-import { revalidateTag } from "next/cache";
+import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagCourse, tagCourses } from "@/lib/seo/tags";
 import { dateTimeToUtcDate } from "@/lib/utils/datetime-convert";
 
@@ -123,7 +123,6 @@ export async function POST(request: NextRequest) {
     });
 
     // Revalidation
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagCourses());
 
     return NextResponse.json(course, { status: 201 });

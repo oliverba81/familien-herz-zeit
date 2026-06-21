@@ -60,18 +60,27 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [mounted, setMounted] = useState(false);
 
+  // Pfad-Wechsel: passendes Untermenü öffnen. Bewusst "adjust state during
+  // render" statt useEffect/useMemo, weil openSubmenu zusätzlich per Klick
+  // (toggleSubmenu) gesetzt wird (gemischter State) — useMemo würde den
+  // manuellen Toggle überschreiben/brechen.
+  const [trackedPathname, setTrackedPathname] = useState(pathname);
+  if (pathname !== trackedPathname) {
+    setTrackedPathname(pathname);
+    setOpenSubmenu(getActiveSubmenu());
+  }
+
   useEffect(() => {
+    // Mount-Hydration: collapsed-Zustand aus localStorage übernehmen. Kein
+    // verhaltensgleicher Ersatz ohne useSyncExternalStore; bewusst belassen.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setMounted(true);
-    // Lade collapsed state aus localStorage nach dem Mount
     const saved = localStorage.getItem("admin-sidebar-collapsed");
     if (saved === "true") {
       setCollapsed(true);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
-
-  useEffect(() => {
-    setOpenSubmenu(getActiveSubmenu());
-  }, [pathname]);
 
   useEffect(() => {
     // Speichere nur nach dem Mount, um Hydration-Mismatch zu vermeiden

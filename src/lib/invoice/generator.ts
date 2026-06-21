@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
 import { formatCents } from "@/lib/utils/money";
+import { computeInvoiceTax } from "@/lib/invoice/tax";
 import { join } from "path";
 import { readFileSync } from "fs";
 
@@ -215,12 +216,15 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         doc.y = secondY + 15;
         doc.moveDown(1);
       } else {
-        // Normale Rechnung mit MwSt
-        const netAmount = data.purchase.amountCents / (1 + data.settings.taxRate / 100);
-        const taxAmount = data.purchase.amountCents - netAmount;
+        // Normale Rechnung mit MwSt (pure, getestet in tax.test.ts)
+        const { netCents, taxCents } = computeInvoiceTax(
+          data.purchase.amountCents,
+          data.settings.taxRate,
+          false
+        );
 
         doc.text("Nettobetrag:", 350, summaryY, { width: 100, align: "right" });
-        doc.text(formatCents(Math.round(netAmount)), 480, summaryY, {
+        doc.text(formatCents(netCents), 480, summaryY, {
           width: 70,
           align: "right",
         });
@@ -231,7 +235,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
           summaryY + 20,
           { width: 100, align: "right" }
         );
-        doc.text(formatCents(Math.round(taxAmount)), 480, summaryY + 20, {
+        doc.text(formatCents(taxCents), 480, summaryY + 20, {
           width: 70,
           align: "right",
         });

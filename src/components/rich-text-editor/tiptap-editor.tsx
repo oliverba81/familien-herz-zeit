@@ -161,6 +161,9 @@ export default function TipTapEditor({
   const isUpdatingFromExternalRef = useRef(false);
 
   useEffect(() => {
+    // Mount-Flag (immediatelyRender: false), damit der TipTap-Editor erst
+    // clientseitig nach dem Mount gerendert wird (SSR-Sicherheit).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
   }, []);
 
@@ -218,6 +221,9 @@ export default function TipTapEditor({
       if (normalizedContent !== normalizedCurrent) {
         isUpdatingFromExternalRef.current = true;
         editor.commands.setContent(content, { emitUpdate: false }); // nicht emit onUpdate
+        // Synchronisiert den lokalen HTML-Spiegel mit dem extern (per Prop) und
+        // imperativ in die Editor-Instanz gesetzten Inhalt.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHtmlContent(content);
         // Stelle sicher, dass der Editor sofort aktualisiert wird
         requestAnimationFrame(() => {

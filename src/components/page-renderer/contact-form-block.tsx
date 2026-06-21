@@ -54,13 +54,19 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
 
   // Lade reCAPTCHA wenn aktiviert
   useEffect(() => {
+    // Synchronisation mit dem extern geladenen reCAPTCHA-Script (Drittanbieter):
+    // markiert das Widget als ladebereit, sobald window.grecaptcha verfügbar ist.
     if (enableRecaptcha && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaLoaded(true);
     }
   }, [enableRecaptcha, siteKey]);
 
   // Render reCAPTCHA Widget
   useEffect(() => {
+    // Imperatives Initialisieren des reCAPTCHA-Widgets (Drittanbieter-API). Die
+    // zurückgegebene Widget-ID wird für späteres reset() benötigt und muss daher
+    // im State gehalten werden.
     if (recaptchaLoaded && enableRecaptcha && siteKey && typeof window !== "undefined" && window.grecaptcha) {
       const widgetId = window.grecaptcha.render("recaptcha-container", {
         sitekey: siteKey,
@@ -71,6 +77,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
           setRecaptchaToken(null);
         },
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaWidgetId(widgetId);
     }
   }, [recaptchaLoaded, enableRecaptcha, siteKey]);

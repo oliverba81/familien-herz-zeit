@@ -3,12 +3,14 @@ import { requireRole } from "@/lib/auth/require-role";
 import { db } from "@/lib/db";
 import { logger } from "@/lib/logging/logger";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
-import { AuditAction } from "@prisma/client";
+import { AuditAction, Prisma } from "@prisma/client";
 import { z } from "zod";
 
+// PageContentV1 oder einzelner Block — frei-form, aber zwingend ein Objekt
+// (kein null/Primitive/undefined), damit kein ungültiger Inhalt gespeichert wird.
 const createReusableBlockSchema = z.object({
   name: z.string().min(1),
-  contentJson: z.any(), // PageContentV1 oder einzelner Block
+  contentJson: z.record(z.string(), z.unknown()),
 });
 
 // GET /api/reusable-blocks - Liste aller Reusable Blocks
@@ -61,7 +63,8 @@ export async function POST(request: NextRequest) {
     const reusableBlock = await db.reusableBlock.create({
       data: {
         name: validatedData.name,
-        contentJson: validatedData.contentJson,
+        // Validiert als Objekt; Cast auf den Prisma-JSON-Eingabetyp.
+        contentJson: validatedData.contentJson as Prisma.InputJsonValue,
       },
     });
 

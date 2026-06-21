@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 
 interface EnvVars {
@@ -29,11 +29,7 @@ export default function EnvForm() {
     formState: { errors },
   } = useForm<EnvVars>();
 
-  useEffect(() => {
-    loadEnvVars();
-  }, []);
-
-  const loadEnvVars = async () => {
+  const loadEnvVars = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch("/api/admin/env");
@@ -42,7 +38,7 @@ export default function EnvForm() {
       }
       const data = await response.json();
       setEnvVars(data);
-      
+
       // Setze Werte im Formular
       Object.keys(data).forEach((key) => {
         setValue(key as keyof EnvVars, data[key]);
@@ -52,7 +48,13 @@ export default function EnvForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [setValue]);
+
+  useEffect(() => {
+    void (async () => {
+      await loadEnvVars();
+    })();
+  }, [loadEnvVars]);
 
   const onSubmit = async (data: EnvVars) => {
     try {

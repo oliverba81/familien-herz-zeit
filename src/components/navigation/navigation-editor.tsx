@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import NavigationItemForm from "./navigation-item-form";
 
@@ -27,11 +27,7 @@ export default function NavigationEditor() {
   const [formParentId, setFormParentId] = useState<string | undefined>(undefined);
   const [formInitialData, setFormInitialData] = useState<{ label: string; href: string | null } | undefined>(undefined);
 
-  useEffect(() => {
-    loadNavigation();
-  }, []);
-
-  const loadNavigation = async () => {
+  const loadNavigation = useCallback(async () => {
     try {
       const [headerRes, footerRes] = await Promise.all([
         fetch("/api/navigation?location=HEADER"),
@@ -48,7 +44,13 @@ export default function NavigationEditor() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await loadNavigation();
+    })();
+  }, [loadNavigation]);
 
   const handleAdd = (location: "HEADER" | "FOOTER", parentId?: string) => {
     setFormMode("create");

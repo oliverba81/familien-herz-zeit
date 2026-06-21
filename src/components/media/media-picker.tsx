@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { getVideoDisplayUrl } from "@/lib/video/url-helper";
 import { isImageTooLargeForWeb } from "@/lib/image-web-optimization";
 import ImageOptimizePromptModal from "./image-optimize-prompt-modal";
@@ -40,16 +40,7 @@ export default function MediaPicker({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const showUploadRef = useRef(false);
 
-  useEffect(() => {
-    if (open) {
-      loadMedia();
-      // Reset showUpload when dialog opens
-      showUploadRef.current = false;
-      setShowUpload(false);
-    }
-  }, [open, type]);
-
-  const loadMedia = async () => {
+  const loadMedia = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -82,7 +73,21 @@ export default function MediaPicker({
     } finally {
       setLoading(false);
     }
-  };
+  }, [type]);
+
+  useEffect(() => {
+    if (open) {
+      void (async () => {
+        await loadMedia();
+      })();
+      // Reset showUpload when dialog opens
+      showUploadRef.current = false;
+      // Bewusster Reset des Upload-Panels beim Öffnen des Dialogs (open-Transition);
+      // nicht aus Props ableitbar, da showUpload zusätzlich per Button gesetzt wird.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShowUpload(false);
+    }
+  }, [open, loadMedia]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();

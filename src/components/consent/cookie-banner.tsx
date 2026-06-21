@@ -17,6 +17,9 @@ export default function CookieBanner() {
   const [catalogLoaded, setCatalogLoaded] = useState(false);
 
   useEffect(() => {
+    // Mount-Flag + Banner-Sichtbarkeit aus Cookie (Client-only API) muss nach dem Mount
+    // erfolgen, um SSR-Hydration-Mismatch zu vermeiden; nicht aus Props/State ableitbar.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     // Banner nur zeigen, wenn kein Consent-Cookie vorhanden ist
     const cookieConsent = getConsentFromCookie();

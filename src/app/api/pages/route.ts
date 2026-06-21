@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { logger } from "@/lib/logging/logger";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
-import { revalidateTag } from "next/cache";
+import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
 
 // GET /api/pages - Liste aller Seiten
@@ -166,9 +166,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Revalidate Cache
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagPage(page.slug));
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagPages());
 
     return NextResponse.json(page, { status: 201 });
