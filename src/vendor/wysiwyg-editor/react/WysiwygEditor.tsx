@@ -120,7 +120,7 @@ function WysiwygEditorInner(props: InnerProps) {
         }
       },
     }),
-    [editorReady]
+    []
   );
 
   useEffect(() => {
