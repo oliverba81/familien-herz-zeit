@@ -48,21 +48,24 @@ function MatomoScript() {
   const matomoUrl = process.env.NEXT_PUBLIC_MATOMO_URL;
   const matomoSiteId = process.env.NEXT_PUBLIC_MATOMO_SITE_ID;
 
-  if (!matomoUrl || !matomoSiteId) {
-    console.warn("Matomo URL oder Site ID nicht konfiguriert");
-    return null;
-  }
-
+  // Hook muss vor jedem early-return stehen (rules-of-hooks). Die Konfig-Prüfung
+  // wandert in den Effect-Body — verhaltensgleich (env-Werte sind konstant).
   useEffect(() => {
+    if (!matomoUrl || !matomoSiteId) return;
     // Initialisiere _paq Array
     if (typeof window !== "undefined") {
       window._paq = window._paq || [];
-      
+
       // Matomo Konfiguration
       window._paq.push(["trackPageView"]);
       window._paq.push(["enableLinkTracking"]);
     }
-  }, []);
+  }, [matomoUrl, matomoSiteId]);
+
+  if (!matomoUrl || !matomoSiteId) {
+    console.warn("Matomo URL oder Site ID nicht konfiguriert");
+    return null;
+  }
 
   return (
     <>

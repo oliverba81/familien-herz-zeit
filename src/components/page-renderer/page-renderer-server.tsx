@@ -54,67 +54,78 @@ export default function PageRendererServer({ content }: PageRendererServerProps)
   );
 }
 
+// JSX-Konstruktion ausgelagert: enthält die eigentlichen Block-Switch-Returns.
+// Wird von BlockRenderer im try aufgerufen, damit der try keine JSX-Literale enthält.
+function renderBlockContent(block: Block) {
+  switch (block.type) {
+    case "hero":
+      return <HeroBlock data={block.data as HeroBlockData} />;
+    case "text":
+      return <TextBlock data={block.data as TextBlockData} />;
+    case "richText":
+      return <RichTextBlock data={block.data as RichTextBlockData} />;
+    case "image":
+      return <ImageBlock data={block.data as ImageBlockData} />;
+    case "video":
+      return <VideoBlock data={block.data as VideoBlockData} />;
+    case "features":
+      return <FeaturesBlock data={block.data as FeaturesBlockData} />;
+    case "testimonials":
+      return <TestimonialsBlock data={block.data as TestimonialsBlockData} />;
+    case "cta":
+      return <CTABlock data={block.data as CTABlockData} />;
+    case "spacer":
+      return <SpacerBlock data={block.data as SpacerBlockData} />;
+    case "table":
+      return <TableBlock data={block.data as TableBlockData} />;
+    case "section":
+      return <SectionBlock data={block.data as SectionBlockData} />;
+    case "reusable":
+      // Server Component: Kann Reusable Blocks aus DB laden
+      return <ReusableBlockRenderer data={block.data as ReusableBlockData} />;
+    case "courses":
+      return <CoursesBlock data={block.data as CoursesBlockData} />;
+    case "current-appointments":
+      return <CurrentAppointmentsBlock data={block.data as CurrentAppointmentsBlockData} />;
+    case "herzzeit-story":
+      return <HerzZeitStoryBlock data={block.data as HerzZeitStoryBlockData} />;
+    case "contactForm":
+      return <ContactFormBlock data={block.data as ContactFormBlockData} />;
+    default:
+      return (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            Unbekannter Block-Typ: {block.type}
+          </p>
+          <p className="text-xs text-yellow-600 mt-1">ID: {block.id}</p>
+        </div>
+      );
+  }
+}
+
+// Ausgelagerter Fehler-Fallback (Modulebene), damit der catch-Block keine JSX-Literale konstruiert.
+function BlockRenderError({ block, error }: { block: Block; error: unknown }) {
+  return (
+    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p className="text-sm font-medium text-red-900">
+        Block konnte nicht gerendert werden
+      </p>
+      <p className="text-xs text-red-700 mt-1">
+        Typ: {block.type} | ID: {block.id}
+      </p>
+      {error instanceof Error && (
+        <p className="text-xs text-red-600 mt-1">{error.message}</p>
+      )}
+    </div>
+  );
+}
+
 function BlockRenderer({ block }: { block: Block }) {
   try {
-    switch (block.type) {
-      case "hero":
-        return <HeroBlock data={block.data as HeroBlockData} />;
-      case "text":
-        return <TextBlock data={block.data as TextBlockData} />;
-      case "richText":
-        return <RichTextBlock data={block.data as RichTextBlockData} />;
-      case "image":
-        return <ImageBlock data={block.data as ImageBlockData} />;
-      case "video":
-        return <VideoBlock data={block.data as VideoBlockData} />;
-      case "features":
-        return <FeaturesBlock data={block.data as FeaturesBlockData} />;
-      case "testimonials":
-        return <TestimonialsBlock data={block.data as TestimonialsBlockData} />;
-      case "cta":
-        return <CTABlock data={block.data as CTABlockData} />;
-      case "spacer":
-        return <SpacerBlock data={block.data as SpacerBlockData} />;
-      case "table":
-        return <TableBlock data={block.data as TableBlockData} />;
-      case "section":
-        return <SectionBlock data={block.data as SectionBlockData} />;
-      case "reusable":
-        // Server Component: Kann Reusable Blocks aus DB laden
-        return <ReusableBlockRenderer data={block.data as ReusableBlockData} />;
-      case "courses":
-        return <CoursesBlock data={block.data as CoursesBlockData} />;
-      case "current-appointments":
-        return <CurrentAppointmentsBlock data={block.data as CurrentAppointmentsBlockData} />;
-      case "herzzeit-story":
-        return <HerzZeitStoryBlock data={block.data as HerzZeitStoryBlockData} />;
-      case "contactForm":
-        return <ContactFormBlock data={block.data as ContactFormBlockData} />;
-      default:
-        return (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              Unbekannter Block-Typ: {block.type}
-            </p>
-            <p className="text-xs text-yellow-600 mt-1">ID: {block.id}</p>
-          </div>
-        );
-    }
+    return renderBlockContent(block);
   } catch (error) {
     console.error("Error rendering block:", error, block);
-    return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-sm font-medium text-red-900">
-          Block konnte nicht gerendert werden
-        </p>
-        <p className="text-xs text-red-700 mt-1">
-          Typ: {block.type} | ID: {block.id}
-        </p>
-        {error instanceof Error && (
-          <p className="text-xs text-red-600 mt-1">{error.message}</p>
-        )}
-      </div>
-    );
+    return <BlockRenderError block={block} error={error} />;
   }
 }
 

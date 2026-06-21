@@ -224,7 +224,7 @@ export default function PageForm({ initialData, mode }: PageFormProps) {
         />
         {initialData?.slug === "home" && (
           <p className="mt-1 text-xs text-gray-500">
-            Der Slug "home" ist für die Startseite reserviert und kann nicht geändert werden.
+            Der Slug &quot;home&quot; ist für die Startseite reserviert und kann nicht geändert werden.
           </p>
         )}
         {errors.slug && (

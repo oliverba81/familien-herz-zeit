@@ -19,6 +19,9 @@ export default function RootLayout({
         <meta charSet="utf-8" />
       </head>
       <body className="flex flex-col min-h-screen">
+        {/* Muss als URL-Stylesheet geladen werden (kein JS-Import möglich): der
+            TinyMCE-Editor referenziert dieselbe Datei via content_css. */}
+        {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/page-builder-v2-presets.css" />
         <Providers>
           <AnalyticsGate />

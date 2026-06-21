@@ -1,15 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { paypalFetch } from "@/lib/paypal/client";
+import { parseEuroToCents } from "@/lib/utils/money";
+import { getChildAgeMonths } from "@/lib/utils/age";
 import { z } from "zod";
 import { logger } from "@/lib/logging/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Buchungsdaten vom Frontend (aus sessionStorage). Pflichtfelder werden
+// validiert, statt `z.any()` blind zu übernehmen.
+const bookingDataSchema = z.object({
+  courseId: z.string().min(1),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  street: z.string().min(1),
+  zipCode: z.string().min(1),
+  city: z.string().min(1),
+  email: z.string().email(),
+  phone: z.string().min(1),
+  hasAokVoucher: z.boolean().optional(),
+  childFirstName: z.string().min(1),
+  childLastName: z.string().min(1),
+  childBirthDate: z.string().min(1),
+  childNotes: z.string().optional().nullable(),
+  howDidYouHear: z.string().optional().nullable(),
+  privacyAccepted: z.boolean().optional(),
+  termsAccepted: z.boolean().optional(),
+});
+
 const captureSchema = z.object({
   orderId: z.string().min(1),
-  bookingData: z.any(), // Booking data from frontend
+  // Das Frontend sendet bookingData ggf. als null (success/page.tsx). Daher
+  // nullable: null passiert die Validierung und wird vom vorhandenen Guard
+  // (siehe unten) mit einer freundlichen Meldung abgefangen — Verhalten wie
+  // bisher. Ist bookingData vorhanden, wird die Struktur strikt validiert.
+  bookingData: bookingDataSchema.nullable(),
 });
 
 /**
@@ -113,15 +140,12 @@ export async function POST(request: NextRequest) {
       (s) => new Date(s.startAt) >= now
     );
 
-    // 7. Berechne Alter in Monaten
+    // 7. Berechne Alter in Monaten (zentrale, getestete Funktion)
     const birthDate = new Date(bookingData.childBirthDate);
-    const today = new Date();
-    const monthsDiff = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
-    const childAgeMonths = monthsDiff >= 0 ? monthsDiff : 0;
+    const childAgeMonths = getChildAgeMonths(birthDate);
 
-    // 8. Hole amount aus capture
-    const amountValue = capture?.amount?.value || (course.priceCents / 100).toFixed(2);
-    const amountCents = Math.round(parseFloat(amountValue) * 100);
+    // 8. Hole amount aus capture (sicher geparst, Fallback auf Kurspreis)
+    const amountCents = parseEuroToCents(capture?.amount?.value) ?? course.priceCents;
 
     // 9. Erstelle Booking
     const booking = await db.booking.create({

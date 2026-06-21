@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { DiscountCode, DiscountType } from "@prisma/client";
+import { DiscountCode } from "@prisma/client";
+import { computeDiscountedPrice } from "./pricing";
 
 interface ValidateDiscountParams {
   code: string;
@@ -63,16 +64,12 @@ export async function validateDiscount({
     return { ok: false, reason: "NOT_APPLICABLE" };
   }
 
-  // Berechne Discount
-  let discountCents = 0;
-
-  if (discount.type === DiscountType.PERCENT && discount.percentOff) {
-    discountCents = Math.floor(priceCents * discount.percentOff / 100);
-  } else if (discount.type === DiscountType.AMOUNT && discount.amountOffCents) {
-    discountCents = Math.min(discount.amountOffCents, priceCents);
-  }
-
-  const newPriceCents = Math.max(0, priceCents - discountCents);
+  // Berechne Discount (pure, getestet in pricing.test.ts)
+  const { discountCents, newPriceCents } = computeDiscountedPrice(
+    priceCents,
+    discount.type,
+    { percentOff: discount.percentOff, amountOffCents: discount.amountOffCents }
+  );
 
   return {
     ok: true,

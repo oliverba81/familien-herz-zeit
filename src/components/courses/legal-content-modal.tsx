@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import PageRenderer from "@/components/page-renderer/page-renderer";
 import LegalHtmlContent from "@/components/page-renderer/legal-html-content";
@@ -38,11 +38,34 @@ export default function LegalContentModal({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Mount-Flag für createPortal (document.body nur clientseitig verfügbar);
+    // muss nach dem Mount gesetzt werden, nicht aus Props/State ableitbar.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
+  const loadContent = useCallback(
+    async (isCancelled: () => boolean) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/pages/public/${encodeURIComponent(slug)}`);
+        if (!res.ok) {
+          throw new Error("Inhalt konnte nicht geladen werden.");
+        }
+        const result: PageContentResponse = await res.json();
+        if (!isCancelled()) setData(result);
+      } catch (err) {
+        if (!isCancelled()) setError((err as Error).message);
+      } finally {
+        if (!isCancelled()) setIsLoading(false);
+      }
+    },
+    [slug]
+  );
+
   // Inhalt laden, sobald das Popup geöffnet wird.
-  // WICHTIG: Nur von [open, slug] abhängig. isLoading/data dürfen NICHT in den
+  // WICHTIG: Nur von [open, loadContent] abhängig. isLoading/data dürfen NICHT in den
   // Dependencies stehen – sonst löst setIsLoading(true) sofort die Cleanup aus
   // (cancelled=true), bevor der fetch zurückkommt, und der Inhalt wird nie
   // gesetzt ("Wird geladen …" bleibt für immer stehen).
@@ -50,30 +73,14 @@ export default function LegalContentModal({
     if (!open) return;
 
     let cancelled = false;
-    setIsLoading(true);
-    setError(null);
-
-    fetch(`/api/pages/public/${encodeURIComponent(slug)}`)
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error("Inhalt konnte nicht geladen werden.");
-        }
-        return res.json();
-      })
-      .then((result: PageContentResponse) => {
-        if (!cancelled) setData(result);
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
+    void (async () => {
+      await loadContent(() => cancelled);
+    })();
 
     return () => {
       cancelled = true;
     };
-  }, [open, slug]);
+  }, [open, loadContent]);
 
   // ESC-Taste schließt das Popup + Body-Scroll sperren, solange offen
   useEffect(() => {

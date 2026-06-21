@@ -31,6 +31,10 @@ export default function ImageOptimizePromptModal({
 
   useEffect(() => {
     if (!open || !file) {
+      // Synchroner Reset des Vorschau-States beim Schließen / Entfernen der Datei.
+      // preview/error/loading werden zusätzlich asynchron aus getOptimizationPreview
+      // gesetzt, daher nicht als abgeleiteter Wert (useMemo) darstellbar.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPreview(null);
       setError(null);
       setLoading(false);

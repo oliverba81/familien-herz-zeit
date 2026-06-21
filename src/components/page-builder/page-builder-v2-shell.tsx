@@ -151,7 +151,9 @@ export default function PageBuilderV2Shell({
 
   // Im Create-Modus: Parent-Formular mit aktuellem Inhalt synchron halten (nur von html abhängig, um Loops zu vermeiden)
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
   useEffect(() => {
     if (createMode) {
       onChangeRef.current?.({ version: 2, html });
@@ -159,7 +161,10 @@ export default function PageBuilderV2Shell({
   }, [createMode, html]);
 
   useEffect(() => {
+    // Synchronisiert isPublished aus den Props; der Wert wird zusätzlich von
+    // handlePublish gesetzt (gemischter State).
     if (additionalFields?.published !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsPublished(additionalFields.published);
     }
   }, [additionalFields?.published]);
@@ -173,13 +178,17 @@ export default function PageBuilderV2Shell({
     (lastSavedHtml !== null && lastSavedHtml !== html) || fieldsDirty;
 
   useEffect(() => {
+    // Einmalige Initialisierung des lastSavedHtml für das Dirty-Tracking.
     if (lastSavedHtml === null && initialHtml !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLastSavedHtml(initialHtml);
     }
   }, [initialHtml, lastSavedHtml]);
 
   useEffect(() => {
+    // Einmalige Initialisierung des additionalFields-Hashes für das Dirty-Tracking.
     if (additionalFields && lastSavedHtml !== null && lastSavedAdditionalFields === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLastSavedAdditionalFields(JSON.stringify(additionalFields));
     }
   }, [additionalFields, lastSavedHtml, lastSavedAdditionalFields]);

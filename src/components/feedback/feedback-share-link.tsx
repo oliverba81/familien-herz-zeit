@@ -11,6 +11,9 @@ export default function FeedbackShareLink({ shareToken }: Props) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    // window.location.origin ist nur clientseitig verfügbar; muss nach dem Mount
+    // gesetzt werden, um SSR-Hydration-Mismatch zu vermeiden.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUrl(`${window.location.origin}/feedback/${shareToken}`);
   }, [shareToken]);
 

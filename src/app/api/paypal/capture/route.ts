@@ -5,6 +5,7 @@ import { generateToken } from "@/lib/utils/token";
 import { sendEmail } from "@/lib/email/mailer";
 import { renderVideoAccessEmail } from "@/lib/email/templates/videoAccess";
 import { createInvoiceForPurchase } from "@/lib/invoice/create-invoice";
+import { parseEuroToCents } from "@/lib/utils/money";
 import { z } from "zod";
 import { logger } from "@/lib/logging/logger";
 
@@ -84,9 +85,10 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Hole amount aus capture (kann durch Discount reduziert sein)
-      const amountValue = capture?.amount?.value || (course.priceCents / 100).toFixed(2);
-      const amountCents = Math.round(parseFloat(amountValue) * 100);
+      // Hole amount aus capture (kann durch Discount reduziert sein).
+      // Bei fehlendem/ungültigem Wert sicher auf den Kurspreis zurückfallen,
+      // statt NaN weiterzuverarbeiten.
+      const amountCents = parseEuroToCents(capture?.amount?.value) ?? course.priceCents;
 
       purchase = await db.videoPurchase.create({
         data: {

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DiscountProvider, DiscountType } from "@prisma/client";
-import { formatCents } from "@/lib/utils/money";
+import { formatCents, parseEuroToCents } from "@/lib/utils/money";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 
@@ -58,12 +58,7 @@ export default function DiscountsAdmin() {
     restrictToVideoCourseId: "",
   });
 
-  useEffect(() => {
-    fetchDiscounts();
-    fetchVideoCourses();
-  }, []);
-
-  const fetchDiscounts = async () => {
+  const fetchDiscounts = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/discounts");
       if (!response.ok) throw new Error("Fehler beim Laden der Rabattcodes");
@@ -74,9 +69,9 @@ export default function DiscountsAdmin() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchVideoCourses = async () => {
+  const fetchVideoCourses = useCallback(async () => {
     try {
       const response = await fetch("/api/video-courses");
       if (response.ok) {
@@ -86,7 +81,13 @@ export default function DiscountsAdmin() {
     } catch (err) {
       console.error("Fehler beim Laden der Videokurse:", err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await Promise.all([fetchDiscounts(), fetchVideoCourses()]);
+    })();
+  }, [fetchDiscounts, fetchVideoCourses]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,9 +104,21 @@ export default function DiscountsAdmin() {
       };
 
       if (formData.type === "PERCENT") {
-        payload.percentOff = parseInt(formData.percentOff);
+        const percent = parseInt(formData.percentOff, 10);
+        if (Number.isNaN(percent) || percent <= 0 || percent > 100) {
+          setError("Bitte einen gültigen Prozentwert zwischen 1 und 100 eingeben.");
+          setCreating(false);
+          return;
+        }
+        payload.percentOff = percent;
       } else {
-        payload.amountOffCents = Math.round(parseFloat(formData.amountOffCents) * 100);
+        const amountOffCents = parseEuroToCents(formData.amountOffCents);
+        if (amountOffCents === null || amountOffCents <= 0) {
+          setError("Bitte einen gültigen Rabattbetrag eingeben.");
+          setCreating(false);
+          return;
+        }
+        payload.amountOffCents = amountOffCents;
       }
 
       if (formData.startsAt) payload.startsAt = new Date(formData.startsAt).toISOString();

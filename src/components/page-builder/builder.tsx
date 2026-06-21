@@ -34,8 +34,11 @@ export default function Builder({ value, onChange }: BuilderProps) {
     if (currentLength < prevLength && selectedBlockId) {
       const blockExists = value.blocks.some((b) => b.id === selectedBlockId);
       if (!blockExists) {
-        // Block wurde gelöscht, wähle ersten verfügbaren Block
+        // Block wurde gelöscht, wähle ersten verfügbaren Block.
+        // Synchronisation der Auswahl mit der von außen gesteuerten Blockliste
+        // (gemischter State, ref-basiertes Tracking der vorherigen Länge).
         if (value.blocks.length > 0) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setSelectedBlockId(value.blocks[0].id);
         } else {
           setSelectedBlockId(null);

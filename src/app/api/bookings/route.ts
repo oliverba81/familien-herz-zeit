@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentConfig } from "@/lib/payment/config";
+import { getChildAgeMonths } from "@/lib/utils/age";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -242,11 +243,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Berechne Alter in Monaten aus Geburtsdatum (für Backward Compatibility)
+    // Berechne Alter in Monaten aus Geburtsdatum (zentrale, getestete Funktion)
     const birthDate = new Date(validatedData.childBirthDate);
-    const today = new Date();
-    const monthsDiff = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
-    const childAgeMonths = monthsDiff >= 0 ? monthsDiff : 0;
+    const childAgeMonths = getChildAgeMonths(birthDate);
 
     // Erstelle Buchung
     let booking;

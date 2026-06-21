@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { formatBerlinDateTime } from "@/lib/utils/datetime";
 
 interface Booking {
@@ -39,7 +39,7 @@ export default function CourseViewParticipants({ courseId }: CourseViewParticipa
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/admin/bookings?courseId=${courseId}`, {
@@ -78,11 +78,13 @@ export default function CourseViewParticipants({ courseId }: CourseViewParticipa
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
 
   useEffect(() => {
-    loadBookings();
-  }, [courseId]);
+    void (async () => {
+      await loadBookings();
+    })();
+  }, [loadBookings]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {

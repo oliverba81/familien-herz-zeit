@@ -29,6 +29,10 @@ export default function MainNavigationClient({ items }: MainNavigationClientProp
   const hoverTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   useEffect(() => {
+    // Mount-Flag zur Vermeidung von Hydration-Mismatches (Server rendert null).
+    // Reines Mount-Synchronisations-Pattern; die folgende fetch-Logik setzt State
+    // ausschließlich in asynchronen Callbacks.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     // Lade Settings beim Mount
     fetch("/api/settings")

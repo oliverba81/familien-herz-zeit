@@ -62,7 +62,7 @@ export default function HtmlEditor({
         <p className="font-semibold mb-1">💡 Hinweis:</p>
         <ul className="list-disc list-inside space-y-1 text-xs">
           <li>Verwende HTML-Tags wie &lt;div&gt;, &lt;nav&gt;, &lt;header&gt;, etc.</li>
-          <li>Tailwind CSS-Klassen können verwendet werden (z.B. className="bg-white")</li>
+          <li>Tailwind CSS-Klassen können verwendet werden (z.B. className=&quot;bg-white&quot;)</li>
           <li>Für dynamische Inhalte (Navigation, Logo) werden die Standard-Komponenten verwendet, wenn kein HTML gesetzt ist</li>
           <li>Wenn HTML gesetzt ist, wird es anstelle der Standard-Komponenten gerendert</li>
         </ul>
