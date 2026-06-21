@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useConsent } from "./consent-provider";
 import { Consent } from "@/lib/consent/types";
 import { getConsentFromCookie } from "@/lib/consent/storage";
-import { CookieCatalogItem, parseCookieCatalog } from "@/lib/consent/catalog";
+import { CookieCatalogItem, mergeWithDefaultCatalog, parseCookieCatalog } from "@/lib/consent/catalog";
 
 export default function CookieBanner() {
   const pathname = usePathname();
@@ -34,15 +34,22 @@ export default function CookieBanner() {
       try {
         const response = await fetch("/api/settings");
         if (!response.ok) {
+          // Auch ohne gepflegten Katalog: bekannte Default-Cookies anzeigen
+          if (!cancelled) {
+            setCatalog(mergeWithDefaultCatalog([]));
+          }
           return;
         }
         const data = await response.json();
         const items = parseCookieCatalog(data?.cookie_catalog);
         if (!cancelled) {
-          setCatalog(items);
+          setCatalog(mergeWithDefaultCatalog(items));
         }
       } catch {
-        // Ignorieren: Banner funktioniert auch ohne Katalog
+        // Banner funktioniert auch ohne Katalog – bekannte Defaults anzeigen
+        if (!cancelled) {
+          setCatalog(mergeWithDefaultCatalog([]));
+        }
       } finally {
         if (!cancelled) {
           setCatalogLoaded(true);
@@ -55,6 +62,33 @@ export default function CookieBanner() {
       cancelled = true;
     };
   }, [mounted]);
+
+  // Widerruf / nachträgliche Änderung: Banner-Einstellungen erneut öffnen.
+  // Auslöser: ein Klick auf einen beliebigen Link mit href "#cookie-einstellungen"
+  // bzw. ein Element mit [data-cookie-settings] (funktioniert auch im
+  // selbst gepflegten HTML-Footer), oder das Event "open-cookie-settings".
+  useEffect(() => {
+    const openSettings = () => {
+      setShowSettings(true);
+      setShowBanner(true);
+    };
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const trigger = target?.closest(
+        'a[href$="#cookie-einstellungen"], [data-cookie-settings]'
+      );
+      if (trigger) {
+        event.preventDefault();
+        openSettings();
+      }
+    };
+    window.addEventListener("open-cookie-settings", openSettings);
+    document.addEventListener("click", handleClick);
+    return () => {
+      window.removeEventListener("open-cookie-settings", openSettings);
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
 
   // Admin-Bereich: kein Banner
   if (pathname?.startsWith("/admin")) {
@@ -140,23 +174,26 @@ export default function CookieBanner() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                {/* Ablehnen muss genauso einfach und gleich prominent sein wie
+                    Akzeptieren (DSK / EuGH). Daher gleicher gefüllter Stil und
+                    gleiche Größe – nur "Einstellungen" bleibt sekundär. */}
                 <button
                   onClick={handleRejectAll}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   Nur notwendige
-                </button>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Einstellungen
                 </button>
                 <button
                   onClick={handleAcceptAll}
                   className="px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors"
                 >
                   Alle akzeptieren
+                </button>
+                <button
+                  onClick={() => setShowSettings(true)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-transparent underline underline-offset-2 hover:text-gray-800 transition-colors"
+                >
+                  Einstellungen
                 </button>
               </div>
             </div>
