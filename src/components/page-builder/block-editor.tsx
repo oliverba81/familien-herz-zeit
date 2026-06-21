@@ -3207,7 +3207,10 @@ function RichTextCellEditor({ block, onUpdate }: RichTextCellEditorProps) {
     }
   };
 
-  // Initialisiere HTML beim ersten Render
+  // Initialisiere HTML beim ersten Render bzw. beim Wechsel des Blocks.
+  // Bewusst NUR von block.id abhängig: `block.data.html` als Dep würde den
+  // Editor bei jeder Tasteneingabe neu befüllen und Nutzereingaben/Cursor
+  // überschreiben (Updates fließen über handleInput direkt ins DOM).
   useEffect(() => {
     if (editorRef.current) {
       const currentHtml = editorRef.current.innerHTML.trim();
@@ -3218,6 +3221,7 @@ function RichTextCellEditor({ block, onUpdate }: RichTextCellEditorProps) {
         editorRef.current.innerHTML = blockHtml;
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [block.id]);
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {

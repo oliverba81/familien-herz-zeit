@@ -617,6 +617,10 @@ export function useBuilderState(initialContent: PageContentV1) {
         clearTimeout(commitTimeoutRef.current);
       }
     };
+    // Bewusst nur von state.content abhängig: der Commit soll durch INHALTS-
+    // änderungen ausgelöst werden, nicht durch reine Block-Auswahl.
+    // state.selectedBlockId wird zum Commit-Zeitpunkt aktuell mitgelesen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.content, commit]);
 
   const selectBlock = useCallback(

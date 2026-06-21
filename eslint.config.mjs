@@ -15,6 +15,19 @@ const eslintConfig = [
     ],
   },
   ...nextCoreWebVitals,
+  {
+    // Bewusst deaktivierte Advisory-Regeln (kein Korrektheits-/Laufzeitproblem):
+    rules: {
+      // Diese App rendert durchweg dynamische CMS-/Nutzer-Medien (Upload-URLs,
+      // Logo, Story-Bilder) mit unbekannten Dimensionen, per CSS skaliert. Hier
+      // ist <img> die korrekte Wahl; eine next/image-Konvertierung brächte
+      // Layout-Risiken ohne realen Nutzen. (Perf-Advisory, keine Korrektheit.)
+      "@next/next/no-img-element": "off",
+      // React-Compiler-Advisory für react-hook-form (useForm): die Bibliothek
+      // funktioniert zur Laufzeit einwandfrei, ist nur nicht compiler-memoisierbar.
+      "react-hooks/incompatible-library": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

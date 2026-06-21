@@ -175,7 +175,9 @@ export default function FeedbackFillForm({
             )}
 
             {q.type === "SINGLE_CHOICE" && (
-              <div className="space-y-2">
+              // aria-required gehört auf die Radiogroup, nicht auf die einzelnen
+              // Radios (die ARIA-Rolle "radio" unterstützt es nicht).
+              <div className="space-y-2" role="radiogroup" aria-required={q.required}>
                 {q.options.map((opt) => (
                   <label
                     key={opt.id}
@@ -187,7 +189,6 @@ export default function FeedbackFillForm({
                       value={opt.id}
                       checked={answers[q.id] === opt.id}
                       onChange={() => setAnswer(q.id, opt.id)}
-                      aria-required={q.required}
                       className="h-4 w-4 text-rose-500 focus:ring-rose-500"
                     />
                     <span className="text-gray-800">{opt.label}</span>
