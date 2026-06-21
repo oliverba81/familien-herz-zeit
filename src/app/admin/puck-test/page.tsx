@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import PuckPageEditor from "@/components/page-builder/puck-page-editor";
+import dynamic from "next/dynamic";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
+
+// Puck ist client-only → ohne SSR laden (vermeidet Hydration-/SSR-Probleme).
+const PuckPageEditor = dynamic(
+  () => import("@/components/page-builder/puck-page-editor"),
+  { ssr: false, loading: () => <div className="p-8 text-gray-500">Editor lädt …</div> }
+);
 
 /**
  * Test-Harness für den Puck-Visual-Builder (Admin-only, zur visuellen Verifikation).
