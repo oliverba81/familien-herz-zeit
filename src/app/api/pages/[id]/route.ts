@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { logger } from "@/lib/logging/logger";
 import { logAudit, getActorFromSession, getChangedFields } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
-import { revalidateTag } from "next/cache";
+import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
 import { parsePageContent, pageContentSchemaV1, isPageContentV2, pageContentSchemaV2 } from "@/lib/page-builder/schema";
 
@@ -291,9 +291,7 @@ export async function PUT(
 
     // Cache invalidierten, wenn Seite veröffentlicht ist
     if (page.published === true) {
-      // @ts-ignore - TypeScript type issue with revalidateTag
       revalidateTag(tagPage(page.slug));
-      // @ts-ignore - TypeScript type issue with revalidateTag
       revalidateTag(tagPages());
     }
 
@@ -407,9 +405,7 @@ export async function DELETE(
     });
 
     // Revalidate Cache
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagPage(existingPage.slug));
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagPages());
 
     return NextResponse.json({ success: true });

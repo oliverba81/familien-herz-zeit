@@ -75,7 +75,7 @@ export default function BookingsPageClient({ courses }: BookingsPageClientProps)
         </div>
         <div className="mt-4 pt-4 border-t border-blue-200">
           <p className="text-xs text-gray-600">
-            <strong>Buchung bestätigen:</strong> Wähle in der Spalte "Aktion" den Status "Bestätigt" aus dem Dropdown-Menü.
+            <strong>Buchung bestätigen:</strong> Wähle in der Spalte &quot;Aktion&quot; den Status &quot;Bestätigt&quot; aus dem Dropdown-Menü.
           </p>
         </div>
       </div>

@@ -227,7 +227,7 @@ export default function CourseForm({ initialData, mode, prefilledStartAt, onSave
         </h3>
         <p className="text-xs text-gray-600 mb-4">
           Wenn noch kein genaues Startdatum bekannt ist, kannst du hier Monat und Jahr angeben.
-          Im Frontend wird dann z.B. "ab Mai 2026" angezeigt.
+          Im Frontend wird dann z.B. &quot;ab Mai 2026&quot; angezeigt.
         </p>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -465,8 +465,8 @@ export default function CourseForm({ initialData, mode, prefilledStartAt, onSave
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500"
         >
           <option value="AUTO">Automatisch (basierend auf Anzahl Termine)</option>
-          <option value="COURSE">Immer als "Babyzeichenkurse" anzeigen</option>
-          <option value="TOPIC">Immer als "Themenstunden" anzeigen</option>
+          <option value="COURSE">Immer als &quot;Babyzeichenkurse&quot; anzeigen</option>
+          <option value="TOPIC">Immer als &quot;Themenstunden&quot; anzeigen</option>
         </select>
         {errors.category && (
           <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>

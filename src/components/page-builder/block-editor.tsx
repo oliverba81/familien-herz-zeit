@@ -375,7 +375,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
                 placeholder="z.B. 300px oder 50vh"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Optional: Feste Höhe für das Bild (z.B. "300px", "50vh", "20rem"). Leer lassen für automatische Höhe.
+                Optional: Feste Höhe für das Bild (z.B. &quot;300px&quot;, &quot;50vh&quot;, &quot;20rem&quot;). Leer lassen für automatische Höhe.
               </p>
             </div>
 
@@ -711,7 +711,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
               />
             )}
             <p className="mt-1 text-xs text-gray-500">
-              Breite des Blocks. Benutzerdefiniert: z.B. "800px", "90%", "1200px".
+              Breite des Blocks. Benutzerdefiniert: z.B. &quot;800px&quot;, &quot;90%&quot;, &quot;1200px&quot;.
             </p>
           </div>
 
@@ -1449,8 +1449,8 @@ function FeaturesEditor({ block, onChange }: BlockEditorProps) {
 }
 
 function HerzZeitStoryEditor({ block, onChange }: BlockEditorProps) {
-  if (!block) return null;
-  const stories = block.data.stories || [];
+  // Hinweis: Hooks müssen vor jedem early-return stehen (rules-of-hooks).
+  // Der `if (!block)`-Guard steht daher unten, direkt vor dem JSX-Return.
   const [audioUploading, setAudioUploading] = useState<string | null>(null);
   const [audioUploadError, setAudioUploadError] = useState<string | null>(null);
   const audioFileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
@@ -1571,6 +1571,9 @@ function HerzZeitStoryEditor({ block, onChange }: BlockEditorProps) {
       }
     }
   };
+
+  if (!block) return null;
+  const stories = block.data.stories || [];
 
   return (
     <div className="space-y-4">
@@ -2645,7 +2648,10 @@ function CellBlockEditor({ block, onUpdate, onRemove }: CellBlockEditorProps) {
   const [textModalAutoOpened, setTextModalAutoOpened] = useState(false);
   const [richTextModalAutoOpened, setRichTextModalAutoOpened] = useState(false);
 
-  // Öffne Modal automatisch, wenn Text- oder RichText-Block in Tabellenzelle erweitert wird (nur einmal)
+  // Öffne Modal automatisch, wenn Text- oder RichText-Block in Tabellenzelle erweitert wird (nur einmal).
+  // Sync auf die isExpanded-Prop bei gleichzeitig user-gesteuertem Modal-State
+  // (gemischt) — kein verhaltensgleicher Ersatz ohne Effect; bewusst belassen.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (block.type === "text" && isExpanded && !textModalOpen && !textModalAutoOpened) {
       setTextModalOpen(true);
@@ -2661,6 +2667,7 @@ function CellBlockEditor({ block, onUpdate, onRemove }: CellBlockEditorProps) {
       setRichTextModalAutoOpened(false);
     }
   }, [block.type, isExpanded, textModalOpen, richTextModalOpen, textModalAutoOpened, richTextModalAutoOpened]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const updateData = (updates: Record<string, any>) => {
     const updatedBlock = {
@@ -3200,7 +3207,10 @@ function RichTextCellEditor({ block, onUpdate }: RichTextCellEditorProps) {
     }
   };
 
-  // Initialisiere HTML beim ersten Render
+  // Initialisiere HTML beim ersten Render bzw. beim Wechsel des Blocks.
+  // Bewusst NUR von block.id abhängig: `block.data.html` als Dep würde den
+  // Editor bei jeder Tasteneingabe neu befüllen und Nutzereingaben/Cursor
+  // überschreiben (Updates fließen über handleInput direkt ins DOM).
   useEffect(() => {
     if (editorRef.current) {
       const currentHtml = editorRef.current.innerHTML.trim();
@@ -3211,6 +3221,7 @@ function RichTextCellEditor({ block, onUpdate }: RichTextCellEditorProps) {
         editorRef.current.innerHTML = blockHtml;
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [block.id]);
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
@@ -3684,9 +3695,12 @@ function RichTextEditorModal({ block, onChange, onClose }: RichTextEditorModalPr
   const [optimizeError, setOptimizeError] = useState<string | null>(null);
   const [localHtml, setLocalHtml] = useState<string | null>(null);
 
-  // Initialisiere localHtml mit dem Block-HTML
+  // Initialisiere localHtml mit dem Block-HTML (einmalige Initialwert-Synchro-
+  // nisierung). Bewusst als Effect belassen, um das bisherige Render-/Null-
+  // Verhalten exakt zu erhalten.
   useEffect(() => {
     if (localHtml === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocalHtml(block?.data.html || "<p></p>");
     }
   }, [block?.data.html, localHtml]);
@@ -3864,8 +3878,10 @@ function CellBlocksList({
   const [mounted, setMounted] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Verhindere Hydration-Mismatch durch Client-Only Rendering
+  // Verhindere Hydration-Mismatch durch Client-Only Rendering (Mount-Flag,
+  // kein verhaltensgleicher Ersatz ohne useSyncExternalStore).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

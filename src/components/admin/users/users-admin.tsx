@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
 interface User {
@@ -34,11 +34,7 @@ export default function UsersAdmin() {
   const [newPassword, setNewPassword] = useState("");
   const [isSettingPassword, setIsSettingPassword] = useState(false);
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -53,7 +49,13 @@ export default function UsersAdmin() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await loadUsers();
+    })();
+  }, [loadUsers]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();

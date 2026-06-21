@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { getPlaceholdersForTemplate } from "@/lib/email/template-placeholders";
 import TinyMCEEmailEditor from "@/components/admin/tinymce-email-editor";
@@ -30,11 +30,7 @@ export default function EmailTemplatesForm() {
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadTemplates();
-  }, []);
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch("/api/admin/email-templates");
@@ -43,15 +39,23 @@ export default function EmailTemplatesForm() {
       }
       const data: EmailTemplatesData = await response.json();
       setTemplates(data.templates);
-      if (data.templates.length > 0 && !activeTab) {
-        setActiveTab(data.templates[0].type);
+      if (data.templates.length > 0) {
+        // Ersten Tab nur setzen, wenn noch keiner aktiv ist. Über den
+        // funktionalen Setter, damit loadTemplates nicht von activeTab abhängt.
+        setActiveTab((prev) => prev ?? data.templates[0].type);
       }
     } catch (err: any) {
       setError(err.message || "Fehler beim Laden");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await loadTemplates();
+    })();
+  }, [loadTemplates]);
 
   const saveTemplate = async (template: EmailTemplate) => {
     try {

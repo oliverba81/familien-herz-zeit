@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { formatBerlinDateTime } from "@/lib/utils/datetime";
 
 interface Booking {
@@ -31,7 +31,7 @@ export default function CourseBookingsList({ courseId }: CourseBookingsListProps
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/admin/bookings?courseId=${courseId}`, {
@@ -59,11 +59,13 @@ export default function CourseBookingsList({ courseId }: CourseBookingsListProps
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
 
   useEffect(() => {
-    loadBookings();
-  }, [courseId]);
+    void (async () => {
+      await loadBookings();
+    })();
+  }, [loadBookings]);
 
   const handleStatusChange = async (bookingId: string, newStatus: string) => {
     setUpdating(bookingId);

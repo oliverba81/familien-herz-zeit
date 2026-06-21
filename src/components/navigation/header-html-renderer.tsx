@@ -12,6 +12,9 @@ export default function HeaderHtmlRenderer({ html }: HeaderHtmlRendererProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Mount-Flag zur Vermeidung von Hydration-Mismatches (Server rendert null,
+    // Client entscheidet pathname-abhängig). Reines Mount-Synchronisations-Pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

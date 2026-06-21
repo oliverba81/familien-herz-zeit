@@ -30,7 +30,7 @@ export default async function NewPagePage({ searchParams }: NewPagePageProps) {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800">
               <strong>Hinweis:</strong> Diese Seite wird als Startseite (/) angezeigt. 
-              Der Slug wird automatisch auf "home" gesetzt.
+              Der Slug wird automatisch auf &quot;home&quot; gesetzt.
             </p>
           </div>
         )}

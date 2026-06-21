@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/auth/require-role";
 import { db } from "@/lib/db";
 import AdminContainer from "@/components/admin/admin-container";
@@ -204,12 +205,12 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
                 </button>
 
                 {level || category || search || userId ? (
-                  <a
+                  <Link
                     href="/admin/logs"
                     className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                   >
                     Zurücksetzen
-                  </a>
+                  </Link>
                 ) : null}
               </div>
             </div>

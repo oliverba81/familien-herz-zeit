@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface Page {
   id: string;
@@ -36,18 +36,45 @@ export default function NavigationItemForm({
   const [pages, setPages] = useState<Page[]>([]);
   const [loadingPages, setLoadingPages] = useState(false);
 
-  useEffect(() => {
-    if (open) {
-      setLabel(initialData?.label || "");
-      loadPages();
+  const loadPages = useCallback(async () => {
+    setLoadingPages(true);
+    try {
+      const response = await fetch("/api/pages");
+      if (response.ok) {
+        const data = await response.json();
+        setPages(data);
+      }
+    } catch (error) {
+      console.error("Fehler beim Laden der Seiten:", error);
+    } finally {
+      setLoadingPages(false);
     }
-  }, [open]);
+  }, []);
 
   useEffect(() => {
+    if (open) {
+      // Synchronisiere das Label aus den Prop-Daten beim Öffnen des Dialogs und
+      // lade die verfügbaren Seiten. setLabel synchronisiert hier Prop -> State;
+      // das Feld ist danach vom Nutzer editierbar.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLabel(initialData?.label || "");
+      void (async () => {
+        await loadPages();
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, loadPages]);
+
+  useEffect(() => {
+    // Leitet linkType/selectedPageId/manualHref aus den geladenen Seiten und den
+    // Prop-Daten ab, sobald der Dialog geöffnet ist. Die Werte werden anschließend
+    // auch durch Nutzereingaben gesetzt (gemischter State), daher synchronisieren
+    // wir sie hier bewusst per Effect statt per useMemo.
     if (open && pages.length > 0 && initialData?.href) {
       // Prüfe ob href zu einer Seite gehört
       const matchingPage = pages.find((p) => `/${p.slug}` === initialData.href);
       if (matchingPage) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLinkType("page");
         setSelectedPageId(matchingPage.id);
         setManualHref("");
@@ -62,21 +89,6 @@ export default function NavigationItemForm({
       setSelectedPageId("");
     }
   }, [open, pages, initialData]);
-
-  const loadPages = async () => {
-    setLoadingPages(true);
-    try {
-      const response = await fetch("/api/pages");
-      if (response.ok) {
-        const data = await response.json();
-        setPages(data);
-      }
-    } catch (error) {
-      console.error("Fehler beim Laden der Seiten:", error);
-    } finally {
-      setLoadingPages(false);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

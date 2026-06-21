@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { formatBerlinDateTime } from "@/lib/utils/datetime";
 
@@ -38,7 +38,7 @@ export default function WaitlistTable({ filters }: WaitlistTableProps) {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const loadEntries = async () => {
+  const loadEntries = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -61,12 +61,13 @@ export default function WaitlistTable({ filters }: WaitlistTableProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.courseId, filters.q]);
 
   useEffect(() => {
-    loadEntries();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.courseId, filters.q]);
+    void (async () => {
+      await loadEntries();
+    })();
+  }, [loadEntries]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Diesen Eintrag wirklich löschen?")) {

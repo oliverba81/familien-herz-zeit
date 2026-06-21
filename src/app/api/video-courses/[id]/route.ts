@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { videoCourseSchema, prepareVideoCourseData } from "@/lib/validations/video-courses";
 import { logAudit, getActorFromSession } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
+import { revalidateTag } from "@/lib/cache/revalidate";
+import { tagVideoCourse, tagVideoCourses } from "@/lib/seo/tags";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -181,9 +183,7 @@ export async function DELETE(
     });
 
     // Revalidate Cache
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagVideoCourse(course.id));
-    // @ts-ignore - TypeScript type issue with revalidateTag
     revalidateTag(tagVideoCourses());
 
     // Lösche Videokurs

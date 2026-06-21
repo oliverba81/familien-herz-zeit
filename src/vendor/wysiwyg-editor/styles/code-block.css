@@ -1,0 +1,14 @@
+.wysiwyg-editor-area pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  padding: 2px 6px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  color: var(--wysiwyg-placeholder-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
