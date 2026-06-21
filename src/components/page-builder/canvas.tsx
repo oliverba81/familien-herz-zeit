@@ -54,8 +54,11 @@ export default function Canvas({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [hoveredDropIndex, setHoveredDropIndex] = useState<number | null>(null);
 
-  // Verhindere Hydration-Mismatch durch Client-Only Rendering
+  // Verhindere Hydration-Mismatch durch Client-Only Rendering.
+  // setMounted MUSS nach dem ersten Client-Render laufen (Mount-Flag), daher ist
+  // ein synchroner setState im Effect hier beabsichtigt und verhaltensgleich.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -424,20 +427,30 @@ const SortableBlockItem = memo(function SortableBlockItem({
   );
 });
 
+// JSX-Konstruktion ausgelagert, damit der try in BlockPreview keine JSX-Literale enthält.
+function renderBlockPreviewContent(block: Block) {
+  const entry = getBlockRegistryEntry(block.type);
+  const CanvasComponent = entry.CanvasComponent;
+  return (
+    <div className="bg-white rounded-lg border-2 border-rose-500 p-4 shadow-lg">
+      <CanvasComponent block={block} />
+    </div>
+  );
+}
+
+// Ausgelagerter Fallback (Modulebene), damit der catch-Block keine JSX-Literale konstruiert.
+function BlockPreviewError({ block }: { block: Block }) {
+  return (
+    <div className="p-4 bg-gray-100 border border-gray-300 rounded">
+      <p className="text-sm text-gray-600">Block: {block.type}</p>
+    </div>
+  );
+}
+
 const BlockPreview = memo(function BlockPreview({ block }: { block: Block }) {
   try {
-    const entry = getBlockRegistryEntry(block.type);
-    const CanvasComponent = entry.CanvasComponent;
-    return (
-      <div className="bg-white rounded-lg border-2 border-rose-500 p-4 shadow-lg">
-        <CanvasComponent block={block} />
-      </div>
-    );
+    return renderBlockPreviewContent(block);
   } catch (error) {
-    return (
-      <div className="p-4 bg-gray-100 border border-gray-300 rounded">
-        <p className="text-sm text-gray-600">Block: {block.type}</p>
-      </div>
-    );
+    return <BlockPreviewError block={block} />;
   }
 });
