@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import CourseForm from "@/components/courses/course-form";
 
@@ -14,37 +14,41 @@ export default function CourseEditModal({ courseId, onClose, onSaved }: CourseEd
   const [courseData, setCourseData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const loadCourse = useCallback(async () => {
     if (!courseId) {
       setCourseData(null);
       return;
     }
 
     setLoading(true);
-    fetch(`/api/courses/${courseId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setCourseData({
-          id: data.id,
-          title: data.title,
-          description: data.description,
-          priceCents: data.priceCents,
-          maxParticipants: data.maxParticipants,
-          location: data.location,
-          status: data.status,
-          sessions: data.sessions?.map((s: any) => ({
-            startAt: new Date(s.startAt),
-            durationMinutes: s.durationMinutes || 60,
-          })) || [],
-        });
-      })
-      .catch((err) => {
-        console.error("Fehler beim Laden des Kurses:", err);
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const res = await fetch(`/api/courses/${courseId}`);
+      const data = await res.json();
+      setCourseData({
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        priceCents: data.priceCents,
+        maxParticipants: data.maxParticipants,
+        location: data.location,
+        status: data.status,
+        sessions: data.sessions?.map((s: any) => ({
+          startAt: new Date(s.startAt),
+          durationMinutes: s.durationMinutes || 60,
+        })) || [],
       });
+    } catch (err) {
+      console.error("Fehler beim Laden des Kurses:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [courseId]);
+
+  useEffect(() => {
+    void (async () => {
+      await loadCourse();
+    })();
+  }, [loadCourse]);
 
   if (!courseId) return null;
 

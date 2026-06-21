@@ -29,6 +29,9 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Mount-Flag + Laden aus Cookie (Client-only API) muss nach dem Mount erfolgen,
+    // um SSR-Hydration-Mismatch zu vermeiden; nicht aus Props/State ableitbar.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     // Lade Consent aus Cookie beim Mount
     const cookieConsent = getConsentFromCookie();

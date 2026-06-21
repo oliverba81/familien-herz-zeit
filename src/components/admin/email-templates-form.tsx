@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { getPlaceholdersForTemplate } from "@/lib/email/template-placeholders";
 import TinyMCEEmailEditor from "@/components/admin/tinymce-email-editor";
@@ -30,11 +30,7 @@ export default function EmailTemplatesForm() {
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadTemplates();
-  }, []);
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch("/api/admin/email-templates");
@@ -51,7 +47,14 @@ export default function EmailTemplatesForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    void (async () => {
+      await loadTemplates();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const saveTemplate = async (template: EmailTemplate) => {
     try {

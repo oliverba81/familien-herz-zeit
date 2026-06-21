@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { formatBerlinDateTime } from "@/lib/utils/datetime";
 
 interface Course {
@@ -40,7 +40,7 @@ export default function BookingsTable({ filters }: BookingsTableProps) {
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -64,11 +64,13 @@ export default function BookingsTable({ filters }: BookingsTableProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.status, filters.courseId, filters.q]);
 
   useEffect(() => {
-    loadBookings();
-  }, [filters.status, filters.courseId, filters.q]);
+    void (async () => {
+      await loadBookings();
+    })();
+  }, [loadBookings]);
 
   const handleStatusChange = async (bookingId: string, newStatus: string) => {
     setUpdating(bookingId);

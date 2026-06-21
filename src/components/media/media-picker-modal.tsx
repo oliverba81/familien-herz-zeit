@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Search, Image as ImageIcon, Video } from "lucide-react";
 
 interface Media {
@@ -32,13 +32,7 @@ export default function MediaPickerModal({
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    if (open) {
-      loadMedia();
-    }
-  }, [open, type]);
-
-  const loadMedia = async () => {
+  const loadMedia = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -59,7 +53,15 @@ export default function MediaPickerModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [type]);
+
+  useEffect(() => {
+    if (open) {
+      void (async () => {
+        await loadMedia();
+      })();
+    }
+  }, [open, loadMedia]);
 
   const handleSelect = (item: Media) => {
     onSelect({

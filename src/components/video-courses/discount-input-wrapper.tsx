@@ -17,6 +17,21 @@ interface DiscountInputWrapperProps {
   enabledMethods?: { stripe: boolean; paypal: boolean; bankTransfer: boolean };
 }
 
+// Statische, prop-lose Trenn-Komponente — auf Modulebene (nicht im Render
+// definieren), damit React sie nicht bei jedem Render neu erstellt.
+function Divider() {
+  return (
+    <div className="relative">
+      <div className="absolute inset-0 flex items-center">
+        <div className="w-full border-t border-gray-300"></div>
+      </div>
+      <div className="relative flex justify-center text-sm">
+        <span className="px-2 bg-white text-gray-500">oder</span>
+      </div>
+    </div>
+  );
+}
+
 export default function DiscountInputWrapper({
   videoCourseId,
   priceCents,
@@ -99,17 +114,6 @@ export default function DiscountInputWrapper({
   const showDividerBeforePaypal = enabledMethods.stripe && enabledMethods.paypal;
   const showDividerBeforeBank =
     (enabledMethods.stripe || enabledMethods.paypal) && enabledMethods.bankTransfer;
-
-  const Divider = () => (
-    <div className="relative">
-      <div className="absolute inset-0 flex items-center">
-        <div className="w-full border-t border-gray-300"></div>
-      </div>
-      <div className="relative flex justify-center text-sm">
-        <span className="px-2 bg-white text-gray-500">oder</span>
-      </div>
-    </div>
-  );
 
   return (
     <div className="space-y-3">

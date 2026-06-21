@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -30,12 +30,7 @@ export default function SignsAdmin() {
   const [tagFilter, setTagFilter] = useState<string>("");
   const [allTags, setAllTags] = useState<Tag[]>([]);
 
-  useEffect(() => {
-    loadSigns();
-    loadTags();
-  }, [searchQuery, statusFilter, tagFilter]);
-
-  const loadSigns = async () => {
+  const loadSigns = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -52,9 +47,9 @@ export default function SignsAdmin() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, statusFilter, tagFilter]);
 
-  const loadTags = async () => {
+  const loadTags = useCallback(async () => {
     try {
       // Lade alle Tags aus den Signs
       const response = await fetch("/api/signs");
@@ -72,7 +67,14 @@ export default function SignsAdmin() {
     } catch (error) {
       console.error("Error loading tags:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      await loadSigns();
+      await loadTags();
+    })();
+  }, [loadSigns, loadTags]);
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Möchtest du das Zeichen "${title}" wirklich löschen?`)) {
