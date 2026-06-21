@@ -81,6 +81,15 @@ export default function WiderrufPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Zurück zur Eingabe: reCAPTCHA-Widget verwerfen, damit es bei erneutem
+  // Erreichen der Bestätigungsstufe frisch gerendert wird (das Container-Div
+  // wird beim Verlassen von "confirm" aus dem DOM entfernt).
+  const goBackToForm = () => {
+    setRecaptchaWidgetId(null);
+    setRecaptchaToken(null);
+    setStep("form");
+  };
+
   // Stufe 1: Widerruf einleiten
   const handleInitiate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -313,7 +322,7 @@ export default function WiderrufPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
-              onClick={() => setStep("form")}
+              onClick={goBackToForm}
               disabled={isLoading}
               className="sm:w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-6 py-3 rounded-lg transition-colors disabled:opacity-50"
             >
