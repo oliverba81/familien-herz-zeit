@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { Metadata } from "next";
@@ -149,12 +150,12 @@ export default async function SignDetailPage({ params }: PageProps) {
 
         {/* Back Link */}
         <div className="mt-8">
-          <a
+          <Link
             href="/zeichen"
             className="text-rose-500 hover:text-rose-600 font-medium"
           >
             ← Zurück zum Lexikon
-          </a>
+          </Link>
         </div>
       </div>
     </div>

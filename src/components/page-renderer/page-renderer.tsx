@@ -701,7 +701,7 @@ function TestimonialsBlock({ data }: { data: TestimonialsBlockData }) {
           key={index}
           className="p-6 bg-rose-50 rounded-lg border-l-4 border-rose-500"
         >
-          <p className="text-gray-700 mb-4 italic">"{item.text}"</p>
+          <p className="text-gray-700 mb-4 italic">&quot;{item.text}&quot;</p>
           <p className="text-sm font-semibold text-gray-900">— {item.name}</p>
         </div>
       ))}

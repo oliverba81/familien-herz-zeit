@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -615,9 +616,9 @@ export default function BookingForm({
               ) : (
                 <>
                   Derzeit ist keine Zahlung verfügbar. Bitte{" "}
-                  <a href="/kontakt" className="text-rose-600 underline hover:text-rose-700">
+                  <Link href="/kontakt" className="text-rose-600 underline hover:text-rose-700">
                     kontaktiere uns
-                  </a>
+                  </Link>
                   .
                 </>
               )}

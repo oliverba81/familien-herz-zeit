@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import PurchaseButton from "./purchase-button";
 import PaypalButton from "./paypal-button";
@@ -116,9 +117,9 @@ export default function DiscountInputWrapper({
       {noMethods && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
           Derzeit ist keine Zahlung verfügbar. Bitte{" "}
-          <a href="/kontakt" className="underline hover:text-yellow-900">
+          <Link href="/kontakt" className="underline hover:text-yellow-900">
             kontaktiere uns
-          </a>
+          </Link>
           .
         </div>
       )}

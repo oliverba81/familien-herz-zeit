@@ -375,7 +375,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
                 placeholder="z.B. 300px oder 50vh"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Optional: Feste Höhe für das Bild (z.B. "300px", "50vh", "20rem"). Leer lassen für automatische Höhe.
+                Optional: Feste Höhe für das Bild (z.B. &quot;300px&quot;, &quot;50vh&quot;, &quot;20rem&quot;). Leer lassen für automatische Höhe.
               </p>
             </div>
 
@@ -711,7 +711,7 @@ export default function BlockEditor({ block, onChange }: BlockEditorProps) {
               />
             )}
             <p className="mt-1 text-xs text-gray-500">
-              Breite des Blocks. Benutzerdefiniert: z.B. "800px", "90%", "1200px".
+              Breite des Blocks. Benutzerdefiniert: z.B. &quot;800px&quot;, &quot;90%&quot;, &quot;1200px&quot;.
             </p>
           </div>
 
