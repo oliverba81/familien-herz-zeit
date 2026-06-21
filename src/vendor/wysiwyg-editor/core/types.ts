@@ -84,6 +84,10 @@ export interface EditorOptions {
   historyLimit?: number;
   /** Milliseconds before `onChange` fires after edits. `0` = synchronous (no timer). Default 300. */
   onChangeDebounceMs?: number;
+  /** Zusätzliche CSS-Klasse(n) für den editierbaren Inhaltsbereich (zusätzlich zu `wysiwyg-editor-area`).
+   *  Wird genutzt, um im WYSIWYG-Builder dieselbe Darstellung wie auf der veröffentlichten Seite
+   *  zu erhalten (z. B. `tinymce-preview-content`). */
+  editorClass?: string;
 }
 
 export interface ToolbarItemConfig {

@@ -89,7 +89,9 @@ export class Editor extends EventEmitter<EventMap> {
     this.toolbarEl.setAttribute('aria-label', 'Text Formatting');
 
     this.editorEl = document.createElement('div');
-    this.editorEl.className = 'wysiwyg-editor-area';
+    this.editorEl.className = this.options.editorClass
+      ? `wysiwyg-editor-area ${this.options.editorClass}`
+      : 'wysiwyg-editor-area';
     this.editorEl.contentEditable = 'true';
     this.editorEl.setAttribute('role', 'textbox');
     this.editorEl.setAttribute('aria-multiline', 'true');
