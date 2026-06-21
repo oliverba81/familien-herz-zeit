@@ -108,7 +108,7 @@ export function getV2EmbedPlaceholderHtml(
     data != null
       ? ` data-fhz-block-data="${escapeEmbedDataForAttribute(data)}"`
       : "";
-  return `<div data-fhz-block="${blockType}" data-fhz-block-id="${id}" class="fhz-embed fhz-embed-${blockType}" contenteditable="false"${dataAttr}>${icon} ${label}</div>`;
+  return `<div data-fhz-block="${blockType}" data-fhz-block-id="${id}" class="fhz-embed fhz-embed-${blockType}" contenteditable="false"${dataAttr}><span class="fhz-embed-label">${icon} ${label}</span></div>`;
 }
 
 const DATA_ATTR_REGEX = /\s*data-fhz-block-data="(?:[^"]|&quot;|&amp;|&lt;|&gt;)*"/;

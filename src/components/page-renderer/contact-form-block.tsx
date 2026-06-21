@@ -12,9 +12,11 @@ declare global {
 
 interface ContactFormBlockProps {
   data: ContactFormBlockData;
+  /** Vorschau im WYSIWYG-Builder: kein Mailversand, kein reCAPTCHA. */
+  preview?: boolean;
 }
 
-export default function ContactFormBlock({ data }: ContactFormBlockProps) {
+export default function ContactFormBlock({ data, preview = false }: ContactFormBlockProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -52,22 +54,25 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
   // reCAPTCHA Site Key aus ENV oder Block-Einstellungen
   const siteKey = recaptchaSiteKey || process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
+  // In der Editor-Vorschau kein reCAPTCHA laden/rendern.
+  const recaptchaActive = enableRecaptcha && !preview;
+
   // Lade reCAPTCHA wenn aktiviert
   useEffect(() => {
     // Synchronisation mit dem extern geladenen reCAPTCHA-Script (Drittanbieter):
     // markiert das Widget als ladebereit, sobald window.grecaptcha verfügbar ist.
-    if (enableRecaptcha && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+    if (recaptchaActive && siteKey && typeof window !== "undefined" && window.grecaptcha) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaLoaded(true);
     }
-  }, [enableRecaptcha, siteKey]);
+  }, [recaptchaActive, siteKey]);
 
   // Render reCAPTCHA Widget
   useEffect(() => {
     // Imperatives Initialisieren des reCAPTCHA-Widgets (Drittanbieter-API). Die
     // zurückgegebene Widget-ID wird für späteres reset() benötigt und muss daher
     // im State gehalten werden.
-    if (recaptchaLoaded && enableRecaptcha && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+    if (recaptchaLoaded && recaptchaActive && siteKey && typeof window !== "undefined" && window.grecaptcha) {
       const widgetId = window.grecaptcha.render("recaptcha-container", {
         sitekey: siteKey,
         callback: (token: string) => {
@@ -80,15 +85,22 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaWidgetId(widgetId);
     }
-  }, [recaptchaLoaded, enableRecaptcha, siteKey]);
+  }, [recaptchaLoaded, recaptchaActive, siteKey]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
+    // Vorschau im Editor: Erfolgsmeldung zeigen, aber nichts versenden.
+    if (preview) {
+      setSuccess(true);
+      e.currentTarget.reset();
+      return;
+    }
+
     // Prüfe reCAPTCHA wenn aktiviert
-    if (enableRecaptcha && !recaptchaToken) {
+    if (recaptchaActive && !recaptchaToken) {
       setError("Bitte bestätige, dass du kein Roboter bist.");
       return;
     }
@@ -102,7 +114,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
     });
 
     // Füge reCAPTCHA Token hinzu
-    if (enableRecaptcha && recaptchaToken) {
+    if (recaptchaActive && recaptchaToken) {
       formObject.recaptchaToken = recaptchaToken;
     }
 
@@ -140,7 +152,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
 
   return (
     <>
-      {enableRecaptcha && siteKey && (
+      {recaptchaActive && siteKey && (
         <Script
           src={`https://www.google.com/recaptcha/api.js?render=explicit`}
           strategy="lazyOnload"
@@ -609,7 +621,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
                 <input type="text" name="website" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
 
                 {/* reCAPTCHA */}
-                {enableRecaptcha && siteKey && (
+                {recaptchaActive && siteKey && (
                   <div className="fhz-contactForm01__captcha" aria-label="Captcha">
                     <div id="recaptcha-container"></div>
                   </div>

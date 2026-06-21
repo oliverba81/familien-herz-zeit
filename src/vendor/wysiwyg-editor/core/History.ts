@@ -14,17 +14,21 @@ export class History {
   private _paused = false;
   private _limit: number;
   private _onChange: (canUndo: boolean, canRedo: boolean) => void;
+  /** Optionaler Serializer, damit Snapshots laufzeit-only DOM (z. B. [data-fhz-live]) auslassen. */
+  private _serialize?: () => string;
 
   debouncedSnapshot: () => void;
 
   constructor(
     editorEl: HTMLElement,
     limit: number,
-    onChange: (canUndo: boolean, canRedo: boolean) => void
+    onChange: (canUndo: boolean, canRedo: boolean) => void,
+    serialize?: () => string
   ) {
     this._editorEl = editorEl;
     this._limit = limit;
     this._onChange = onChange;
+    this._serialize = serialize;
     this._observer = new MutationObserver(() => {
       if (!this._paused) this.debouncedSnapshot();
     });
@@ -40,8 +44,27 @@ export class History {
     });
   }
 
+  /** Pausiert das Aufzeichnen von Mutationen (für programmatische DOM-Eingriffe). */
+  pause(): void {
+    if (this._paused) return;
+    this._paused = true;
+    this._observer.disconnect();
+  }
+
+  /** Nimmt das Aufzeichnen wieder auf, ohne die zwischenzeitlichen Mutationen zu snapshotten. */
+  resume(): void {
+    if (!this._paused) return;
+    this._paused = false;
+    this._observer.observe(this._editorEl, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+    });
+  }
+
   snapshot(): void {
-    const html = this._editorEl.innerHTML;
+    const html = this._serialize ? this._serialize() : this._editorEl.innerHTML;
     if (this._index >= 0 && this._snapshots[this._index].html === html) return;
 
     this._snapshots = this._snapshots.slice(0, this._index + 1);
