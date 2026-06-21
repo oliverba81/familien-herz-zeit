@@ -53,6 +53,10 @@ export async function ReusableBlockRenderer({
     );
   }
 
+  // `!content` ist in der Praxis unerreichbar, wenn der Block gefunden wurde
+  // (parsePageContent liefert immer ein PageContentV1, nie null). Der Check
+  // bleibt als defensiver Guard UND zur Typ-Verengung von `content` auf
+  // non-null für den finalen Render erhalten.
   if (notFound || !content) {
     return (
       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center text-yellow-600">

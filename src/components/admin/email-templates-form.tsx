@@ -39,22 +39,23 @@ export default function EmailTemplatesForm() {
       }
       const data: EmailTemplatesData = await response.json();
       setTemplates(data.templates);
-      if (data.templates.length > 0 && !activeTab) {
-        setActiveTab(data.templates[0].type);
+      if (data.templates.length > 0) {
+        // Ersten Tab nur setzen, wenn noch keiner aktiv ist. Über den
+        // funktionalen Setter, damit loadTemplates nicht von activeTab abhängt.
+        setActiveTab((prev) => prev ?? data.templates[0].type);
       }
     } catch (err: any) {
       setError(err.message || "Fehler beim Laden");
     } finally {
       setLoading(false);
     }
-  }, [activeTab]);
+  }, []);
 
   useEffect(() => {
     void (async () => {
       await loadTemplates();
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadTemplates]);
 
   const saveTemplate = async (template: EmailTemplate) => {
     try {
