@@ -4,8 +4,8 @@ import { render, screen } from "@testing-library/react";
 
 // Schwergewichtige Browser-/Kind-Abhängigkeiten stubben.
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
-vi.mock("@tinymce/tinymce-react", () => ({
-  Editor: () => <div data-testid="tinymce-editor" />,
+vi.mock("@/vendor/wysiwyg-editor/react", () => ({
+  WysiwygEditor: () => <div data-testid="wysiwyg-editor" />,
 }));
 vi.mock("@/components/media/media-picker-modal", () => ({ default: () => null }));
 vi.mock("@/components/page-builder/block-editor", () => ({ default: () => null }));

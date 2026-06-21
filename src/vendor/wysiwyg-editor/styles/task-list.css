@@ -1,0 +1,24 @@
+.wysiwyg-editor-area .wysiwyg-task-list {
+  list-style: none;
+  padding-left: 0.5em;
+}
+
+.wysiwyg-editor-area .wysiwyg-task-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.wysiwyg-editor-area .wysiwyg-task-list input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.wysiwyg-editor-area .wysiwyg-task-list li[data-checked="true"] > span {
+  text-decoration: line-through;
+  opacity: 0.6;
+}

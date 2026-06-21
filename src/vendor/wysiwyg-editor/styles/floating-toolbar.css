@@ -1,0 +1,33 @@
+.wysiwyg-floating-toolbar {
+  position: absolute;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  background: #1f2937;
+  border-radius: 6px;
+  box-shadow: var(--wysiwyg-shadow);
+  z-index: var(--wysiwyg-z-floating-toolbar);
+  pointer-events: auto;
+}
+
+.wysiwyg-floating-toolbar::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1f2937;
+  border-bottom: none;
+}
+
+.wysiwyg-floating-toolbar .wysiwyg-btn {
+  color: #f9fafb;
+  width: 28px;
+  height: 26px;
+}
+
+.wysiwyg-floating-toolbar .wysiwyg-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
