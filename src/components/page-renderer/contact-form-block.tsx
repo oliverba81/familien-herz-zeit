@@ -87,7 +87,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaWidgetId(widgetId);
     }
-  }, [recaptchaLoaded, recaptchaAllowed]);
+  }, [recaptchaLoaded, recaptchaAllowed, siteKey]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
