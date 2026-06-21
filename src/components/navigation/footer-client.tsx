@@ -104,6 +104,14 @@ export default function FooterClient({ items }: FooterClientProps) {
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
           <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Familien Herz Zeit. Alle Rechte vorbehalten.</p>
+          <p className="mt-2">
+            <a
+              href="#cookie-einstellungen"
+              className="text-gray-400 hover:text-white underline underline-offset-2 transition-colors"
+            >
+              Cookie-Einstellungen
+            </a>
+          </p>
         </div>
       </div>
     </footer>

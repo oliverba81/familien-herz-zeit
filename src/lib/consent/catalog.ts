@@ -15,6 +15,87 @@ export interface CookieCatalogItem {
 
 const DEFAULT_CATEGORY: CookieCategory = "unknown";
 
+/**
+ * Bekannte Cookies, die diese Anwendung selbst (bzw. eingebundene Dienste)
+ * setzen kann. Sie werden im Banner immer angezeigt, auch wenn sie noch nicht
+ * über den Cookie-Scanner im Admin-Bereich erfasst wurden. Einträge aus dem
+ * gepflegten Katalog (DB) haben Vorrang und überschreiben diese Defaults.
+ */
+export const DEFAULT_COOKIE_CATALOG: CookieCatalogItem[] = [
+  {
+    name: "fhz_consent",
+    category: "necessary",
+    purpose: "Speichert deine Cookie-Einwilligung (notwendig/Statistik/Marketing).",
+    provider: "Familien-Herz-Zeit",
+    duration: "180 Tage",
+    source: "manual",
+  },
+  {
+    name: "__Secure-next-auth.session-token",
+    category: "necessary",
+    purpose: "Hält die angemeldete Sitzung im geschützten Bereich aufrecht.",
+    provider: "Familien-Herz-Zeit (NextAuth)",
+    duration: "30 Tage",
+    source: "manual",
+  },
+  {
+    name: "__Host-next-auth.csrf-token",
+    category: "necessary",
+    purpose: "Schützt Anmeldeformulare vor Cross-Site-Request-Forgery (CSRF).",
+    provider: "Familien-Herz-Zeit (NextAuth)",
+    duration: "Sitzung",
+    source: "manual",
+  },
+  {
+    name: "__Secure-next-auth.callback-url",
+    category: "necessary",
+    purpose: "Speichert die Zielseite nach erfolgreicher Anmeldung im Adminbereich.",
+    provider: "Familien-Herz-Zeit (NextAuth)",
+    duration: "Sitzung",
+    source: "manual",
+  },
+  {
+    name: "nextauth.message",
+    category: "necessary",
+    purpose: "Synchronisiert den Anmeldestatus zwischen Browser-Tabs im Adminbereich.",
+    provider: "Familien-Herz-Zeit (NextAuth)",
+    duration: "Sitzung",
+    source: "manual",
+  },
+  {
+    name: "paypal_booking_*",
+    category: "necessary",
+    purpose: "Überträgt Buchungsdaten temporär über die PayPal-Weiterleitung.",
+    provider: "Familien-Herz-Zeit",
+    duration: "1 Stunde",
+    source: "manual",
+  },
+  {
+    name: "_GRECAPTCHA",
+    category: "marketing",
+    purpose: "Spam-/Bot-Schutz im Kontaktformular (nur bei aktiviertem reCAPTCHA).",
+    provider: "Google reCAPTCHA",
+    duration: "6 Monate",
+    source: "manual",
+  },
+];
+
+/**
+ * Verbindet die im Admin gepflegten Katalog-Einträge mit den bekannten
+ * Default-Cookies. Gepflegte Einträge (DB) überschreiben gleichnamige Defaults.
+ */
+export function mergeWithDefaultCatalog(items: CookieCatalogItem[]): CookieCatalogItem[] {
+  const byName = new Map<string, CookieCatalogItem>(
+    DEFAULT_COOKIE_CATALOG.map((item) => [item.name, item])
+  );
+
+  items.forEach((item) => {
+    byName.set(item.name, item);
+  });
+
+  return Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+
 function isValidCategory(value: unknown): value is CookieCategory {
   return value === "necessary" || value === "statistics" || value === "marketing" || value === "unknown";
 }

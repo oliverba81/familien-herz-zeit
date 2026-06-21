@@ -27,7 +27,7 @@ import {
   type V2EmbedBlockType,
 } from "@/lib/page-builder/v2-embed-defaults";
 import type { Block } from "@/lib/page-builder/types";
-import { Copy, Send, X } from "lucide-react";
+import { Copy, Eye, Send, X } from "lucide-react";
 import MediaPickerModal from "@/components/media/media-picker-modal";
 import BlockEditor from "@/components/page-builder/block-editor";
 import EmbedLiveLayer from "@/components/page-builder/embed-live/embed-live-layer";
@@ -501,6 +501,20 @@ export default function PageBuilderV2Shell({
                   </button>
                 )}
               </>
+            )}
+            {!createMode && pageSlug && (
+              <button
+                type="button"
+                title="Öffnet die Seite originalgetreu in einem neuen Tab. Tipp: vorher speichern, damit die letzten Änderungen sichtbar sind."
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.open(`/preview/${pageSlug}`, "_blank", "noopener,noreferrer");
+                }}
+                className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-800 font-semibold rounded-lg border border-gray-300 transition-colors flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" /> Vorschau
+              </button>
             )}
             <button
               type="button"

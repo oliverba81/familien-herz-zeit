@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ContactFormBlockData } from "@/lib/page-builder/types";
 import Script from "next/script";
+import { useConsent } from "@/components/consent/consent-provider";
 
 declare global {
   interface Window {
@@ -54,25 +55,30 @@ export default function ContactFormBlock({ data, preview = false }: ContactFormB
   // reCAPTCHA Site Key aus ENV oder Block-Einstellungen
   const siteKey = recaptchaSiteKey || process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-  // In der Editor-Vorschau kein reCAPTCHA laden/rendern.
-  const recaptchaActive = enableRecaptcha && !preview;
+  // reCAPTCHA (Google) setzt das Cookie _GRECAPTCHA und ueberträgt Daten an
+  // Google – darf nach § 25 TDDDG erst nach Einwilligung (Marketing) geladen
+  // werden. Ohne Einwilligung schuetzt weiterhin das Honeypot-Feld vor Bots.
+  // In der Editor-Vorschau (`preview`) wird reCAPTCHA grundsätzlich nicht geladen.
+  const { consent } = useConsent();
+  const recaptchaAllowed =
+    enableRecaptcha && !!siteKey && consent.marketing === true && !preview;
 
-  // Lade reCAPTCHA wenn aktiviert
+  // Lade reCAPTCHA wenn aktiviert und eingewilligt
   useEffect(() => {
     // Synchronisation mit dem extern geladenen reCAPTCHA-Script (Drittanbieter):
     // markiert das Widget als ladebereit, sobald window.grecaptcha verfügbar ist.
-    if (recaptchaActive && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+    if (recaptchaAllowed && typeof window !== "undefined" && window.grecaptcha) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaLoaded(true);
     }
-  }, [recaptchaActive, siteKey]);
+  }, [recaptchaAllowed]);
 
   // Render reCAPTCHA Widget
   useEffect(() => {
     // Imperatives Initialisieren des reCAPTCHA-Widgets (Drittanbieter-API). Die
     // zurückgegebene Widget-ID wird für späteres reset() benötigt und muss daher
     // im State gehalten werden.
-    if (recaptchaLoaded && recaptchaActive && siteKey && typeof window !== "undefined" && window.grecaptcha) {
+    if (recaptchaLoaded && recaptchaAllowed && typeof window !== "undefined" && window.grecaptcha) {
       const widgetId = window.grecaptcha.render("recaptcha-container", {
         sitekey: siteKey,
         callback: (token: string) => {
@@ -85,7 +91,7 @@ export default function ContactFormBlock({ data, preview = false }: ContactFormB
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecaptchaWidgetId(widgetId);
     }
-  }, [recaptchaLoaded, recaptchaActive, siteKey]);
+  }, [recaptchaLoaded, recaptchaAllowed, siteKey]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,8 +105,8 @@ export default function ContactFormBlock({ data, preview = false }: ContactFormB
       return;
     }
 
-    // Prüfe reCAPTCHA wenn aktiviert
-    if (recaptchaActive && !recaptchaToken) {
+    // Prüfe reCAPTCHA nur, wenn es geladen werden durfte (Einwilligung erteilt)
+    if (recaptchaAllowed && !recaptchaToken) {
       setError("Bitte bestätige, dass du kein Roboter bist.");
       return;
     }
@@ -114,7 +120,7 @@ export default function ContactFormBlock({ data, preview = false }: ContactFormB
     });
 
     // Füge reCAPTCHA Token hinzu
-    if (recaptchaActive && recaptchaToken) {
+    if (recaptchaAllowed && recaptchaToken) {
       formObject.recaptchaToken = recaptchaToken;
     }
 
@@ -152,7 +158,7 @@ export default function ContactFormBlock({ data, preview = false }: ContactFormB
 
   return (
     <>
-      {recaptchaActive && siteKey && (
+      {recaptchaAllowed && (
         <Script
           src={`https://www.google.com/recaptcha/api.js?render=explicit`}
           strategy="lazyOnload"
@@ -620,8 +626,8 @@ export default function ContactFormBlock({ data, preview = false }: ContactFormB
                 {/* Honeypot */}
                 <input type="text" name="website" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
 
-                {/* reCAPTCHA */}
-                {recaptchaActive && siteKey && (
+                {/* reCAPTCHA – nur nach Einwilligung (Marketing-Cookies) */}
+                {recaptchaAllowed && (
                   <div className="fhz-contactForm01__captcha" aria-label="Captcha">
                     <div id="recaptcha-container"></div>
                   </div>
