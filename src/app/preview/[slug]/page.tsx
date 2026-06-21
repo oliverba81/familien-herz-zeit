@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth/require-role";
-import PageRendererServer from "@/components/page-renderer/page-renderer-server";
-import PageRendererHtml from "@/components/page-renderer/page-renderer-html";
-import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
+import RenderPageContent from "@/components/page-renderer/render-page-content";
 import type { Metadata } from "next";
 import { absoluteUrl, buildOpenGraph, extractTextFromContent } from "@/lib/seo/meta";
 
@@ -112,9 +110,6 @@ export default async function PreviewPage({
     notFound();
   }
 
-  const isV2 = isPageContentV2(draftContent);
-  const normalizedContent = isV2 ? null : parsePageContent(draftContent);
-
   const containerWidthClass = {
     full: "",
     wide: "max-w-7xl",
@@ -157,11 +152,7 @@ export default async function PreviewPage({
                   {page.title}
                 </h1>
               )}
-              {isV2 ? (
-                <PageRendererHtml html={(draftContent as { html: string }).html} />
-              ) : (
-                <PageRendererServer content={normalizedContent!} />
-              )}
+              <RenderPageContent content={draftContent} />
             </article>
           </div>
         </div>

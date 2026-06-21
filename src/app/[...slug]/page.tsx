@@ -1,8 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import { db } from "@/lib/db";
-import PageRendererServer from "@/components/page-renderer/page-renderer-server";
-import PageRendererHtml from "@/components/page-renderer/page-renderer-html";
-import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
+import RenderPageContent from "@/components/page-renderer/render-page-content";
 import type { Metadata } from "next";
 import { cachedPageBySlug, cachedHomepageSlug } from "@/lib/cache/prisma-cache";
 import { absoluteUrl, buildOpenGraph, extractTextFromContent, truncateAtWordBoundary } from "@/lib/seo/meta";
@@ -92,9 +90,6 @@ export default async function SlugPage({ params }: PageProps) {
     notFound();
   }
 
-  const isV2 = isPageContentV2(contentToRender);
-  const normalizedContent = isV2 ? null : parsePageContent(contentToRender);
-
   const containerWidthClass = {
     full: "",
     wide: "max-w-7xl",
@@ -116,11 +111,7 @@ export default async function SlugPage({ params }: PageProps) {
                   {page.title}
                 </h1>
               )}
-              {isV2 ? (
-                <PageRendererHtml html={(contentToRender as { html: string }).html} />
-              ) : (
-                <PageRendererServer content={normalizedContent!} />
-              )}
+              <RenderPageContent content={contentToRender} />
             </article>
           </div>
         </div>
