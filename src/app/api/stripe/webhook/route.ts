@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
             howDidYouHear: bookingData.howDidYouHear || null,
             privacyAccepted: bookingData.privacyAccepted || false,
             termsAccepted: bookingData.termsAccepted || false,
+            earlyStartConsent: bookingData.earlyStartConsent || false,
             parentName: `${bookingData.firstName} ${bookingData.lastName}`,
             childName: `${bookingData.childFirstName} ${bookingData.childLastName}`,
             childAgeMonths: childAgeMonths,
@@ -258,6 +259,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true });
       }
 
+      // § 356 Abs. 5 BGB: Zustimmung zum sofortigen Beginn aus Metadata
+      const withdrawalConsent = session.metadata?.withdrawalConsent === "true";
+
       // Finde oder erstelle Purchase
       let purchase = await db.videoPurchase.findUnique({
         where: { stripeSessionId: session.id },
@@ -289,6 +293,7 @@ export async function POST(request: NextRequest) {
             amountCents: amountTotal,
             appliedDiscountCode: appliedDiscountCode || undefined,
             currency: session.currency || "eur",
+            withdrawalConsent,
             stripeSessionId: session.id,
             stripePaymentIntentId: session.payment_intent as string | null,
             paidAt: new Date(),
@@ -326,6 +331,8 @@ export async function POST(request: NextRequest) {
             email,
             amountCents: amountTotal,
             appliedDiscountCode: appliedDiscountCode || undefined,
+            // Falls die PENDING-Purchase die Zustimmung noch nicht trug, aus Metadata nachziehen
+            ...(withdrawalConsent ? { withdrawalConsent: true } : {}),
             stripePaymentIntentId: session.payment_intent as string | null,
             paidAt: new Date(),
           },
@@ -367,6 +374,7 @@ export async function POST(request: NextRequest) {
           courseTitle: purchase.videoCourse.title,
           watchUrl,
           expiresAt,
+          withdrawalConsent: purchase.withdrawalConsent,
         });
 
         await sendEmail({

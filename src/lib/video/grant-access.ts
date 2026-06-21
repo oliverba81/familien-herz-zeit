@@ -106,6 +106,7 @@ export async function grantVideoAccess(
       courseTitle: purchase.videoCourse.title,
       watchUrl,
       expiresAt,
+      withdrawalConsent: purchase.withdrawalConsent,
     });
     await sendEmail({
       to: purchase.email,

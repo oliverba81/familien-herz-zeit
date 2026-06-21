@@ -215,6 +215,21 @@ npx prisma db seed
 - Email: `admin@familienherzzeit.local`
 - Passwort: `Admin123!`
 
+> **Hinweis – Rechtsseiten (AGB & Widerrufsbelehrung):**
+> Der Seed legt auch die Seiten `/agb` und `/widerrufsbelehrung` aus den
+> Vorlagen `docs/agb-vorlage.html` und `docs/widerrufsbelehrung-vorlage.html`
+> an (Slugs `agb` und `widerrufsbelehrung`, V2-Format `{ version: 2, html }`).
+> Der Seed läuft **nicht** automatisch im Deploy – führe ihn nach dem Deploy
+> einmalig manuell aus:
+> ```bash
+> npx prisma db push   # legt u. a. die neuen Felder withdrawalConsent / earlyStartConsent an
+> npx prisma db seed   # legt die Rechtsseiten an (idempotent, überschreibt vorhandene NICHT)
+> ```
+> Danach die App **neu starten/neu deployen**, damit die Seiten im Cache
+> erscheinen (ein Standalone-Seed löst `revalidateTag` nicht aus). Die Texte
+> lassen sich anschließend jederzeit über die Admin-UI redaktionell anpassen;
+> ein erneuter Seed-Lauf überschreibt sie dann nicht.
+
 ---
 
 ## Schritt 4: NextAuth Setup

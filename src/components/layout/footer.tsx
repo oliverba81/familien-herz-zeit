@@ -93,6 +93,21 @@ export default function Footer() {
                   Datenschutzerklärung
                 </Link>
               </li>
+              <li>
+                <Link href="/agb" className="text-gray-400 hover:text-white">
+                  AGB
+                </Link>
+              </li>
+              <li>
+                <Link href="/widerrufsbelehrung" className="text-gray-400 hover:text-white">
+                  Widerrufsbelehrung
+                </Link>
+              </li>
+              <li>
+                <Link href="/widerruf" className="text-gray-400 hover:text-white">
+                  Vertrag widerrufen
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

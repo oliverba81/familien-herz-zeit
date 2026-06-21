@@ -28,6 +28,7 @@ const bookingDataSchema = z.object({
   howDidYouHear: z.string().optional().nullable(),
   privacyAccepted: z.boolean().optional(),
   termsAccepted: z.boolean().optional(),
+  earlyStartConsent: z.boolean().optional(),
 });
 
 const captureSchema = z.object({
@@ -167,6 +168,7 @@ export async function POST(request: NextRequest) {
         howDidYouHear: bookingData.howDidYouHear || null,
         privacyAccepted: bookingData.privacyAccepted || false,
         termsAccepted: bookingData.termsAccepted || false,
+        earlyStartConsent: bookingData.earlyStartConsent || false,
         parentName: `${bookingData.firstName} ${bookingData.lastName}`,
         childName: `${bookingData.childFirstName} ${bookingData.childLastName}`,
         childAgeMonths: childAgeMonths,

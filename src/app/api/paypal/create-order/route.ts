@@ -15,6 +15,8 @@ export const dynamic = "force-dynamic";
 const createOrderSchema = z.object({
   videoCourseId: z.string().min(1),
   discountCode: z.string().optional(),
+  // § 356 Abs. 5 BGB: Zustimmung zum sofortigen Beginn digitaler Inhalte
+  withdrawalConsent: z.boolean().optional(),
 });
 
 /**
@@ -190,6 +192,7 @@ export async function POST(request: NextRequest) {
           amountCents: finalPriceCents,
           currency: "eur",
           appliedDiscountCode: appliedDiscountCode,
+          withdrawalConsent: validatedData.withdrawalConsent ?? false,
           paypalOrderId: order.id,
         },
       });

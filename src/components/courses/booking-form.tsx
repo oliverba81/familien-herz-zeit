@@ -39,7 +39,9 @@ export default function BookingForm({
   const [acceptsAokVoucher, setAcceptsAokVoucher] = useState(false);
   const [coursePriceCents, setCoursePriceCents] = useState<number>(0);
   const [loadingCourse, setLoadingCourse] = useState(true);
-  const [legalModal, setLegalModal] = useState<"privacy" | "terms" | null>(null);
+  const [legalModal, setLegalModal] = useState<
+    "privacy" | "terms" | "withdrawal" | null
+  >(null);
 
   // Lade Kurs-Daten, um zu prüfen, ob AOK-Gutscheine akzeptiert werden und den Preis zu laden
   useEffect(() => {
@@ -85,6 +87,7 @@ export default function BookingForm({
       howDidYouHear: "",
       privacyAccepted: false,
       termsAccepted: false,
+      earlyStartConsent: false,
       website: "", // Honeypot
     },
   });
@@ -596,14 +599,34 @@ export default function BookingForm({
               onClick={() => setLegalModal("terms")}
               className="text-rose-500 hover:text-rose-600 underline"
             >
-              Kursbedingungen
+              AGB
             </button>
-            {" "}zur Kenntnis genommen und erkenne sie hiermit an. *
+            {" "}sowie die{" "}
+            <button
+              type="button"
+              onClick={() => setLegalModal("withdrawal")}
+              className="text-rose-500 hover:text-rose-600 underline"
+            >
+              Widerrufsbelehrung
+            </button>
+            {" "}zur Kenntnis genommen und erkenne die AGB hiermit an. *
           </label>
         </div>
         {errors.termsAccepted && (
           <p className="text-sm text-red-600">{errors.termsAccepted.message}</p>
         )}
+
+        <div className="flex items-start">
+          <input
+            {...register("earlyStartConsent")}
+            type="checkbox"
+            id="earlyStartConsent"
+            className="mt-1 h-4 w-4 text-rose-500 focus:ring-rose-500 border-gray-300 rounded"
+          />
+          <label htmlFor="earlyStartConsent" className="ml-2 text-sm text-gray-700">
+            Ich verlange ausdrücklich, dass vor Ablauf der 14-tägigen Widerrufsfrist mit dem Kurs begonnen wird. Mir ist bekannt, dass ich bei einem Widerruf nach Kursbeginn anteiligen Wertersatz für bereits erbrachte Leistungen schulde. (optional)
+          </label>
+        </div>
       </div>
 
       {requiresPayment ? (
@@ -712,9 +735,15 @@ export default function BookingForm({
         onClose={() => setLegalModal(null)}
       />
       <LegalContentModal
-        slug="kursbedingungen"
-        title="Kursbedingungen"
+        slug="agb"
+        title="AGB"
         open={legalModal === "terms"}
+        onClose={() => setLegalModal(null)}
+      />
+      <LegalContentModal
+        slug="widerrufsbelehrung"
+        title="Widerrufsbelehrung"
+        open={legalModal === "withdrawal"}
         onClose={() => setLegalModal(null)}
       />
     </form>

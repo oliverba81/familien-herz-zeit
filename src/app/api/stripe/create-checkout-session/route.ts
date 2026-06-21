@@ -15,6 +15,9 @@ export const dynamic = "force-dynamic";
 const createCheckoutSchema = z.object({
   videoCourseId: z.string().min(1),
   discountCode: z.string().optional(),
+  // § 356 Abs. 5 BGB: Zustimmung zum sofortigen Beginn + Kenntnis des
+  // Erlöschens des Widerrufsrechts (Pflicht für den Kauf digitaler Inhalte).
+  withdrawalConsent: z.boolean().optional(),
 });
 
 /**
@@ -168,6 +171,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         videoCourseId: course.id,
         appliedDiscountCode: appliedDiscountCode || "",
+        withdrawalConsent: validatedData.withdrawalConsent ? "true" : "false",
       },
     });
 
@@ -183,6 +187,7 @@ export async function POST(request: NextRequest) {
           amountCents: finalPriceCents,
           currency: course.currency.toLowerCase(),
           appliedDiscountCode: appliedDiscountCode,
+          withdrawalConsent: validatedData.withdrawalConsent ?? false,
           stripeSessionId: checkoutSession.id,
         },
       });

@@ -262,6 +262,9 @@ model Booking {
   howDidYouHear   String? // Wie aufmerksam geworden
   privacyAccepted Boolean        @default(false)
   termsAccepted   Boolean        @default(false)
+  // § 357a Abs. 2 BGB: ausdrückliches Verlangen des vorzeitigen Leistungsbeginns
+  // (Voraussetzung für Wertersatzanspruch bei Widerruf nach Kursbeginn)
+  earlyStartConsent Boolean      @default(false)
   // Legacy-Felder (für Backward Compatibility)
   parentName      String? // Wird aus firstName + lastName zusammengesetzt
   childName       String? // Wird aus childFirstName + childLastName zusammengesetzt
@@ -325,6 +328,9 @@ model VideoPurchase {
   amountCents           Int
   currency              String          @default("eur")
   appliedDiscountCode   String?
+  // § 356 Abs. 5 BGB: ausdrückliche Zustimmung zum sofortigen Beginn + Kenntnis
+  // des Erlöschens des Widerrufsrechts (digitale Inhalte)
+  withdrawalConsent     Boolean         @default(false)
   stripeSessionId       String?         @unique
   stripePaymentIntentId String?
   paypalOrderId         String?         @unique

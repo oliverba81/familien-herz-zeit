@@ -182,6 +182,7 @@ export async function POST(request: NextRequest) {
         courseTitle: purchase.videoCourse.title,
         watchUrl,
         expiresAt,
+        withdrawalConsent: purchase.withdrawalConsent,
       });
 
       await sendEmail({
