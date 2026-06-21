@@ -47,6 +47,22 @@ export const DEFAULT_COOKIE_CATALOG: CookieCatalogItem[] = [
     source: "manual",
   },
   {
+    name: "__Secure-next-auth.callback-url",
+    category: "necessary",
+    purpose: "Speichert die Zielseite nach erfolgreicher Anmeldung im Adminbereich.",
+    provider: "Familien-Herz-Zeit (NextAuth)",
+    duration: "Sitzung",
+    source: "manual",
+  },
+  {
+    name: "nextauth.message",
+    category: "necessary",
+    purpose: "Synchronisiert den Anmeldestatus zwischen Browser-Tabs im Adminbereich.",
+    provider: "Familien-Herz-Zeit (NextAuth)",
+    duration: "Sitzung",
+    source: "manual",
+  },
+  {
     name: "paypal_booking_*",
     category: "necessary",
     purpose: "Überträgt Buchungsdaten temporär über die PayPal-Weiterleitung.",
