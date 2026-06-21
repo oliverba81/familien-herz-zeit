@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.5.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.3...v0.5.0) (2026-06-21)
+
+
+### Features
+
+* **admin:** Button 'Bekannte Cookies einfuegen' im Cookie-Scanner ([27b8eb8](https://github.com/oliverba81/familien-herz-zeit/commit/27b8eb8b507fc8cd7d48d82cd66b33f2af0daaa9))
+* **consent:** bekannte Cookies als Default-Katalog im Banner anzeigen ([4c26124](https://github.com/oliverba81/familien-herz-zeit/commit/4c26124f027e332c72bed98549627b59b50000ee))
+* **consent:** reCAPTCHA erst nach Einwilligung laden + Banner-Buttons gleichwertig ([dd31c3f](https://github.com/oliverba81/familien-herz-zeit/commit/dd31c3ff6931fcda476889f2a9d5c06a7a656f9b))
+* **consent:** Widerruf-Link 'Cookie-Einstellungen' + richText-Block-Vorlage ([4a3ee55](https://github.com/oliverba81/familien-herz-zeit/commit/4a3ee5596dac88249019609a0775dcb3048796f6))
+* **consent:** zusaetzliche NextAuth-Cookies im Default-Katalog ([7a572be](https://github.com/oliverba81/familien-herz-zeit/commit/7a572befd8d4d2c035ccf59a24c112a0cbbc3d30))
+* **editor:** Vorschau-Button oeffnet originalgetreue /preview/[slug] ([8dd7be2](https://github.com/oliverba81/familien-herz-zeit/commit/8dd7be27dbae2797a99e14a6d9c103bd6f4937a6))
+* **page-builder:** Embed-Blöcke live im WYSIWYG-Builder rendern ([d2346d3](https://github.com/oliverba81/familien-herz-zeit/commit/d2346d3198d977cbe10a06512f655af7cf17820e))
+* **page-builder:** Embed-Blöcke live im WYSIWYG-Builder rendern ([85a13e7](https://github.com/oliverba81/familien-herz-zeit/commit/85a13e797ba9a1d91209d4676622ff199436fa47))
+* **wysiwyg:** Editor zeigt Inhalt 1:1 wie die veröffentlichte Seite ([fc2f61c](https://github.com/oliverba81/familien-herz-zeit/commit/fc2f61cf4fbdea5a5d1561a503b27ad71fe7f419))
+
+
+### Bug Fixes
+
+* AOK-Gutschein-Hinweis kürzen ([ffd1c66](https://github.com/oliverba81/familien-herz-zeit/commit/ffd1c66091136fc4f6e255d2bd6f4c3e616132d3))
+* Bug-Fixes, Test-Driven-Design und CI-Regressions-Gate ([7ea8a31](https://github.com/oliverba81/familien-herz-zeit/commit/7ea8a31946a254c56569f8a131daa2956640aa1d))
+* **consent:** siteKey in reCAPTCHA-Effekt-Deps ergaenzen (Lint) ([f7a9989](https://github.com/oliverba81/familien-herz-zeit/commit/f7a99893adb1038180b20290d3fe4a1d580f38f5))
+* unnötige editorReady-Dependency in WysiwygEditor useImperativeHandle entfernt ([5e68f23](https://github.com/oliverba81/familien-herz-zeit/commit/5e68f235aea4a99afac4ec292c6d91edddcfd953))
+* **wysiwyg:** &lt;style&gt;-Blöcke im Seiteninhalt erhalten statt entfernen ([87f13e5](https://github.com/oliverba81/familien-herz-zeit/commit/87f13e51e02c1b9377f3ca11d179be1e8eac91c3))
+* **wysiwyg:** &lt;style&gt;-Blöcke im Seiteninhalt erhalten statt entfernen ([cf604f1](https://github.com/oliverba81/familien-herz-zeit/commit/cf604f1d4d451897e5f6dfa62baf2c4acd5f464a))
+
 ## [0.4.3](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.2...v0.4.3) (2026-06-20)
 
 
