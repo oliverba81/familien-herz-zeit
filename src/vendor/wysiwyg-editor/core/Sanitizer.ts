@@ -104,6 +104,22 @@ function sanitizeStyle(styleStr: string): string {
   return result.join('; ');
 }
 
+/**
+ * Scrubbt den Textinhalt eines `<style>`-Blocks. Anders als Inline-Styles wird
+ * hier keine Property-Allowlist erzwungen (seiten-spezifisches CSS nutzt @media,
+ * @keyframes, Pseudo-Klassen etc.), sondern nur bekannte gefährliche Konstrukte
+ * neutralisiert. Der WYSIWYG-Editor ist ausschließlich für ADMIN/EDITOR; derselbe
+ * CSS-Inhalt wird auf der veröffentlichten Seite ohnehin gerendert.
+ */
+function sanitizeCssText(css: string): string {
+  return css
+    .replace(/expression\s*\(/gi, 'void(')
+    .replace(/-moz-binding/gi, 'xmozbinding')
+    .replace(/url\(\s*['"]?\s*(?:javascript|vbscript|data:text\/html)[^)]*\)/gi, 'url(#)')
+    // Verhindert ein vorzeitiges Schließen des <style>-Kontexts beim Serialisieren.
+    .replace(/<\/style/gi, '<\\/style');
+}
+
 function sanitizeElement(el: Element): boolean {
   const tag = el.tagName.toLowerCase();
   if (!ALLOWED_TAGS.has(tag)) return false;
@@ -154,8 +170,18 @@ export class Sanitizer {
       if (child.nodeType === Node.ELEMENT_NODE) {
         const el = child as Element;
         const tag = el.tagName.toLowerCase();
-        if (tag === 'script' || tag === 'style' || tag === 'template' || tag === 'meta' || tag === 'link') {
+        if (tag === 'script' || tag === 'template' || tag === 'meta' || tag === 'link') {
           node.removeChild(child);
+          continue;
+        }
+        if (tag === 'style') {
+          // Seiten-spezifische <style>-Blöcke im Inhalt erhalten (sonst geht das
+          // CSS beim Laden/Speichern im WYSIWYG-Builder verloren). CSS-Text wird
+          // defensiv gescrubbt; keine Rekursion (Inhalt ist Text, kein HTML).
+          el.textContent = sanitizeCssText(el.textContent ?? '');
+          for (const attr of Array.from(el.attributes)) {
+            if (/^on/.test(attr.name.toLowerCase())) el.removeAttribute(attr.name);
+          }
           continue;
         }
         if (!sanitizeElement(el)) {

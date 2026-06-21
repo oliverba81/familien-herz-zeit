@@ -79,3 +79,42 @@ describe("Sanitizer – Präsentations-Styles (WYSIWYG 1:1 zur Seite)", () => {
     expect(out).toContain('data-fhz-block-id="abc"');
   });
 });
+
+describe("Sanitizer – <style>-Blöcke im Inhalt (seiten-spezifisches CSS)", () => {
+  it("erhält einen <style>-Block samt CSS-Regeln", () => {
+    const html =
+      '<style>:root{--brand:#c0363b}.fhz-hero{min-height:70vh;background-size:cover}.fhz-btn:hover{transform:translateY(-3px)}</style><div class="fhz-hero">x</div>';
+    const out = s.sanitize(html);
+    expect(out).toContain("<style>");
+    expect(out).toContain("--brand:#c0363b");
+    expect(out).toContain(".fhz-hero");
+    expect(out).toContain(".fhz-btn:hover");
+    expect(out).toContain("transform:translateY(-3px)");
+  });
+
+  it("erhält @media- und @keyframes-Regeln im <style>-Block", () => {
+    const html =
+      "<style>@media (max-width:768px){.fhz-hero{min-height:45vh}}@keyframes spin{to{transform:rotate(360deg)}}</style>";
+    const out = s.sanitize(html);
+    expect(out).toContain("@media");
+    expect(out).toContain("@keyframes");
+  });
+
+  it("neutralisiert gefährliche Konstrukte im <style>-Block", () => {
+    const html =
+      '<style>.x{background:url(javascript:alert(1))}.y{width:expression(alert(1))}.z{behavior:url(#default#-moz-binding)}</style>';
+    const out = s.sanitize(html);
+    expect(out).toContain("<style>");
+    expect(out.toLowerCase()).not.toContain("url(javascript:");
+    expect(out.toLowerCase()).not.toContain("expression(");
+    expect(out.toLowerCase()).not.toContain("-moz-binding");
+  });
+
+  it("entfernt weiterhin <script>, behält aber <style>", () => {
+    const html = '<style>.a{color:red}</style><script>alert(1)</script><p>ok</p>';
+    const out = s.sanitize(html);
+    expect(out).toContain("<style>");
+    expect(out).not.toContain("<script");
+    expect(out).toContain("<p>ok</p>");
+  });
+});
