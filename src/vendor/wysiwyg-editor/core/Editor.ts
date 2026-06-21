@@ -141,7 +141,8 @@ export class Editor extends EventEmitter<EventMap> {
       (canUndo, canRedo) => {
         this.selection?.setHistoryState(canUndo, canRedo);
         this.emit('historyChange', { canUndo, canRedo });
-      }
+      },
+      () => this.getHTML()
     );
     this._history.attach();
   }
@@ -376,7 +377,23 @@ export class Editor extends EventEmitter<EventMap> {
 
   // Public API
   getHTML(): string {
-    return this.editorEl.innerHTML;
+    // Laufzeit-only Live-Embeds (page-builder) werden nie serialisiert/gespeichert.
+    if (!this.editorEl.querySelector('[data-fhz-live]')) {
+      return this.editorEl.innerHTML;
+    }
+    const clone = this.editorEl.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll('[data-fhz-live]').forEach((el) => el.remove());
+    return clone.innerHTML;
+  }
+
+  /** Pausiert die Undo/Redo-Aufzeichnung (für programmatische DOM-Eingriffe, z. B. Live-Embeds). */
+  pauseHistory(): void {
+    this._history.pause();
+  }
+
+  /** Nimmt die Undo/Redo-Aufzeichnung wieder auf. */
+  resumeHistory(): void {
+    this._history.resume();
   }
 
   setHTML(html: string): void {

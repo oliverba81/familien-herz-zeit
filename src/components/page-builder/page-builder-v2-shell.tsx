@@ -23,12 +23,14 @@ import {
   getV2EmbedDefaultData,
   parseEmbedDataFromAttribute,
   updateEmbedDataInHtml,
+  escapeEmbedDataForAttribute,
   type V2EmbedBlockType,
 } from "@/lib/page-builder/v2-embed-defaults";
 import type { Block } from "@/lib/page-builder/types";
 import { Copy, Eye, Send, X } from "lucide-react";
 import MediaPickerModal from "@/components/media/media-picker-modal";
 import BlockEditor from "@/components/page-builder/block-editor";
+import EmbedLiveLayer from "@/components/page-builder/embed-live/embed-live-layer";
 
 interface PageBuilderV2ShellProps {
   /** Bei neuen Seiten (Create) nicht gesetzt; dann wird nur der Editor angezeigt, Speichern erfolgt über das Formular. */
@@ -116,6 +118,8 @@ export default function PageBuilderV2Shell({
       : "";
 
   const [html, setHtml] = useState(initialHtml);
+  /** Core-Editor-Instanz (für die Live-Embed-Portals), gesetzt sobald der Editor bereit ist. */
+  const [liveEditor, setLiveEditor] = useState<WysiwygCore | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -148,6 +152,13 @@ export default function PageBuilderV2Shell({
       };
     }
   }, [currentHtmlRef, html]);
+
+  // Aktuellen html-State in einer Ref spiegeln, damit Callbacks stabil bleiben
+  // (z. B. handleEmbedBlockChange-Fallback) und nicht bei jedem Tastendruck neu entstehen.
+  const htmlRef = useRef(html);
+  useEffect(() => {
+    htmlRef.current = html;
+  }, [html]);
 
   // Im Create-Modus: Parent-Formular mit aktuellem Inhalt synchron halten (nur von html abhängig, um Loops zu vermeiden)
   const onChangeRef = useRef(onChange);
@@ -271,7 +282,34 @@ export default function PageBuilderV2Shell({
 
   const handleEmbedBlockChange = useCallback(
     (updatedBlock: Block) => {
-      const newHtml = updateEmbedDataInHtml(html, updatedBlock.id, updatedBlock.data);
+      const e = ed();
+      // Schnellpfad: Attribut direkt am DOM-Knoten setzen → nur das eine Live-Embed
+      // re-rendert (kein voller setHTML-Re-Parse/Flackern). History erfasst die
+      // Attributänderung für Undo; setHtml(getHTML()) hält den value-State synchron,
+      // ohne setHTML auszulösen (value === getHTML()).
+      if (e) {
+        const sel = `[data-fhz-block-id="${
+          typeof CSS !== "undefined" && CSS.escape
+            ? CSS.escape(updatedBlock.id)
+            : updatedBlock.id
+        }"]`;
+        const node = e.editorEl.querySelector<HTMLElement>(sel);
+        if (node) {
+          node.setAttribute(
+            "data-fhz-block-data",
+            escapeEmbedDataForAttribute(updatedBlock.data)
+          );
+          setHtml(e.getHTML());
+          setSelectedEmbed((prev) =>
+            prev && prev.blockId === updatedBlock.id
+              ? { ...prev, data: updatedBlock.data }
+              : prev
+          );
+          return;
+        }
+      }
+      // Fallback: String-basierte Aktualisierung (Editor noch nicht bereit).
+      const newHtml = updateEmbedDataInHtml(htmlRef.current, updatedBlock.id, updatedBlock.data);
       setHtml(newHtml);
       setSelectedEmbed((prev) =>
         prev && prev.blockId === updatedBlock.id
@@ -279,12 +317,16 @@ export default function PageBuilderV2Shell({
           : prev
       );
     },
-    [html]
+    [ed]
   );
 
   const handleEditorReady = useCallback(() => {
     const e = editorRef.current?.getEditor();
     if (!e) return;
+
+    // Editor-Instanz für die Live-Embed-Portals bereitstellen.
+    setLiveEditor(e);
+    e.on("destroy", () => setLiveEditor(null));
 
     // Custom-Befehl für den statischen Toolbar-Button "fhzMedia".
     if (!e.commands.has("fhzMedia")) {
@@ -513,6 +555,8 @@ export default function PageBuilderV2Shell({
               // Schrift, Überschriften, Links, Tabellen aus globals.css `.tinymce-preview-content`.
               editorClass="tinymce-preview-content prose max-w-none text-md"
             />
+            {/* Live-Vorschau der Embed-Blöcke (Portals in die Platzhalter). */}
+            <EmbedLiveLayer editor={liveEditor} />
           </div>
         </div>
 

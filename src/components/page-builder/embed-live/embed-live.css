@@ -1,0 +1,30 @@
+/*
+ * Live-Embed-Vorschau im WYSIWYG-Builder.
+ * Alles unter `.wysiwyg-editor-area` gescoped → veröffentlichte Seite und
+ * E-Mail-/Block-Editor bleiben unberührt.
+ *
+ * `:has(> [data-fhz-live])` greift auf den laufzeit-only Live-Container, der
+ * von getHTML() gestrippt wird → setzt sich beim Speichern automatisch zurück
+ * (keine HTML-Verschmutzung). Builder ist admin-only → :has() ist ausreichend.
+ */
+
+/* Platzhalter-Pille verschwindet, sobald die Live-Vorschau gemountet ist. */
+.wysiwyg-editor-area .fhz-embed:has(> [data-fhz-live]) {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0.5em 0;
+  background: none;
+  border: 1px dashed rgba(192, 54, 59, 0.35);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Das Text-Label im Platzhalter ausblenden, wenn live gerendert wird. */
+.wysiwyg-editor-area .fhz-embed:has(> [data-fhz-live]) > .fhz-embed-label {
+  display: none;
+}
+
+.wysiwyg-editor-area [data-fhz-live] {
+  display: block;
+}

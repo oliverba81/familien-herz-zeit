@@ -13,9 +13,11 @@ declare global {
 
 interface ContactFormBlockProps {
   data: ContactFormBlockData;
+  /** Vorschau im WYSIWYG-Builder: kein Mailversand, kein reCAPTCHA. */
+  preview?: boolean;
 }
 
-export default function ContactFormBlock({ data }: ContactFormBlockProps) {
+export default function ContactFormBlock({ data, preview = false }: ContactFormBlockProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -56,8 +58,10 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
   // reCAPTCHA (Google) setzt das Cookie _GRECAPTCHA und ueberträgt Daten an
   // Google – darf nach § 25 TDDDG erst nach Einwilligung (Marketing) geladen
   // werden. Ohne Einwilligung schuetzt weiterhin das Honeypot-Feld vor Bots.
+  // In der Editor-Vorschau (`preview`) wird reCAPTCHA grundsätzlich nicht geladen.
   const { consent } = useConsent();
-  const recaptchaAllowed = enableRecaptcha && !!siteKey && consent.marketing === true;
+  const recaptchaAllowed =
+    enableRecaptcha && !!siteKey && consent.marketing === true && !preview;
 
   // Lade reCAPTCHA wenn aktiviert und eingewilligt
   useEffect(() => {
@@ -94,6 +98,13 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
     setError(null);
     setSuccess(false);
 
+    // Vorschau im Editor: Erfolgsmeldung zeigen, aber nichts versenden.
+    if (preview) {
+      setSuccess(true);
+      e.currentTarget.reset();
+      return;
+    }
+
     // Prüfe reCAPTCHA nur, wenn es geladen werden durfte (Einwilligung erteilt)
     if (recaptchaAllowed && !recaptchaToken) {
       setError("Bitte bestätige, dass du kein Roboter bist.");
@@ -109,7 +120,7 @@ export default function ContactFormBlock({ data }: ContactFormBlockProps) {
     });
 
     // Füge reCAPTCHA Token hinzu
-    if (enableRecaptcha && recaptchaToken) {
+    if (recaptchaAllowed && recaptchaToken) {
       formObject.recaptchaToken = recaptchaToken;
     }
 
