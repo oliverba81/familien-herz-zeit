@@ -5,6 +5,7 @@ import {
   CookieCatalogItem,
   CookieCategory,
   CookieSource,
+  mergeWithDefaultCatalog,
   parseCookieCatalog,
   serializeCookieCatalog,
   upsertScanResults,
@@ -70,6 +71,19 @@ export default function AdminCookieScanner() {
     const nowIso = new Date().toISOString();
     setItems((prev) => upsertScanResults(prev, cookieNames, nowIso));
     setNotice(`Scan abgeschlossen: ${cookieNames.length} Cookies gefunden.`);
+  };
+
+  const handleAddKnown = () => {
+    setItems((prev) => {
+      const merged = mergeWithDefaultCatalog(prev);
+      const added = merged.length - prev.length;
+      setNotice(
+        added > 0
+          ? `${added} bekannte Cookie(s) eingefügt. Bitte prüfen und speichern.`
+          : "Alle bekannten Cookies sind bereits im Katalog."
+      );
+      return merged;
+    });
   };
 
   const handleAdd = () => {
@@ -233,8 +247,11 @@ export default function AdminCookieScanner() {
       <div>
         <h2 className="text-xl font-semibold text-gray-900">Cookie-Scanner</h2>
         <p className="text-sm text-gray-600 mt-1">
-          Dieser Scanner liest nur Cookies, die im Browser sichtbar sind. HttpOnly-Cookies werden
-          nicht angezeigt und müssen manuell ergänzt werden.
+          Dieser Scanner liest nur Cookies, die im Browser auf dieser Seite sichtbar sind.
+          HttpOnly-Cookies (z. B. Login) sowie Cookies von Drittdiensten (Stripe, PayPal,
+          reCAPTCHA, Analytics) und anderen Seiten erscheinen hier nicht und müssen manuell
+          ergänzt werden. Nutze dafür „Bekannte Cookies einfügen“, um die im System bekannten
+          Cookies automatisch in den Katalog zu übernehmen.
         </p>
       </div>
 
@@ -251,6 +268,12 @@ export default function AdminCookieScanner() {
           className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
         >
           {enriching ? "Anreichern..." : "Auto-Anreichern"}
+        </button>
+        <button
+          onClick={handleAddKnown}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          Bekannte Cookies einfügen
         </button>
         <button
           onClick={handleAdd}
