@@ -153,6 +153,13 @@ export default function PageBuilderV2Shell({
     }
   }, [currentHtmlRef, html]);
 
+  // Aktuellen html-State in einer Ref spiegeln, damit Callbacks stabil bleiben
+  // (z. B. handleEmbedBlockChange-Fallback) und nicht bei jedem Tastendruck neu entstehen.
+  const htmlRef = useRef(html);
+  useEffect(() => {
+    htmlRef.current = html;
+  }, [html]);
+
   // Im Create-Modus: Parent-Formular mit aktuellem Inhalt synchron halten (nur von html abhängig, um Loops zu vermeiden)
   const onChangeRef = useRef(onChange);
   useEffect(() => {
@@ -302,7 +309,7 @@ export default function PageBuilderV2Shell({
         }
       }
       // Fallback: String-basierte Aktualisierung (Editor noch nicht bereit).
-      const newHtml = updateEmbedDataInHtml(html, updatedBlock.id, updatedBlock.data);
+      const newHtml = updateEmbedDataInHtml(htmlRef.current, updatedBlock.id, updatedBlock.data);
       setHtml(newHtml);
       setSelectedEmbed((prev) =>
         prev && prev.blockId === updatedBlock.id
@@ -310,7 +317,7 @@ export default function PageBuilderV2Shell({
           : prev
       );
     },
-    [html, ed]
+    [ed]
   );
 
   const handleEditorReady = useCallback(() => {
