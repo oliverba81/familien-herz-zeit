@@ -38,6 +38,12 @@ export default async function EditPagePage({ params }: PageProps) {
                 Startseite
               </span>
             )}
+            <Link
+              href={`/admin/pages/${page.id}/puck`}
+              className="text-xs bg-violet-100 text-violet-800 px-3 py-1 rounded font-semibold hover:bg-violet-200"
+            >
+              ✨ Visual-Builder (Beta)
+            </Link>
           </div>
           {page.published ? (
             <Link

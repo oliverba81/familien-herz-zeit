@@ -31,6 +31,7 @@ import { Copy, Eye, Send, X } from "lucide-react";
 import MediaPickerModal from "@/components/media/media-picker-modal";
 import BlockEditor from "@/components/page-builder/block-editor";
 import EmbedLiveLayer from "@/components/page-builder/embed-live/embed-live-layer";
+import { scopeCustomCssForEditor } from "@/lib/page-builder/scope-custom-css";
 
 interface PageBuilderV2ShellProps {
   /** Bei neuen Seiten (Create) nicht gesetzt; dann wird nur der Editor angezeigt, Speichern erfolgt über das Formular. */
@@ -539,6 +540,15 @@ export default function PageBuilderV2Shell({
           onDragOver={handleDragOver}
         >
           <div className="v2-builder-canvas flex-1 overflow-hidden border-r border-gray-200">
+            {/* Seiten-spezifisches Custom CSS in der Editor-Vorschau anwenden –
+                gescoped auf die Editor-Fläche, damit es nicht ins Admin-UI leakt. */}
+            {additionalFields?.customCss?.trim() && (
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: scopeCustomCssForEditor(additionalFields.customCss),
+                }}
+              />
+            )}
             <WysiwygEditor
               ref={editorRef}
               value={html}

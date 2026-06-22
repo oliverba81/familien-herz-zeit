@@ -6,7 +6,7 @@ import { logAudit, getActorFromSession } from "@/lib/audit/log";
 import { AuditAction } from "@prisma/client";
 import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
-import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
+import { parsePageContent, resolveContentKind } from "@/lib/page-builder/schema";
 
 // POST /api/pages/:id/publish - Seite veröffentlichen
 export async function POST(
@@ -43,8 +43,10 @@ export async function POST(
       );
     }
 
-    // Validiere Content (V1 oder V2)
-    if (!isPageContentV2(draftContent)) {
+    // Validiere Content (V1, V2 oder Puck/V3).
+    // P0-c: Puck (V3) und V2 werden verbatim kopiert — NICHT durch parsePageContent
+    // (würde Puck-Daten zu leer migrieren). Nur V1 wird zur Sicherheit geparst.
+    if (resolveContentKind(draftContent) === "v1") {
       try {
         parsePageContent(draftContent);
       } catch (e: any) {

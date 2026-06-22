@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cachedPageBySlug } from "@/lib/cache/prisma-cache";
-import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
+import { parsePageContent, resolveContentKind } from "@/lib/page-builder/schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,15 +30,22 @@ export async function GET(
       return NextResponse.json({ error: "Seite hat keinen Inhalt" }, { status: 404 });
     }
 
-    const isV2 = isPageContentV2(contentToRender);
+    // P0-d: Content-Form über den einzigen Guard bestimmen. Puck-Daten dürfen NICHT
+    // durch parsePageContent laufen (würde leeren Inhalt liefern).
+    const kind = resolveContentKind(contentToRender);
+    const isV2 = kind === "v2";
 
     return NextResponse.json({
       title: page.title,
       showTitle: page.showTitle !== false,
       customCss: page.customCss ?? null,
+      kind,
       isV2,
       html: isV2 ? (contentToRender as { html: string }).html : null,
-      content: isV2 ? null : parsePageContent(contentToRender),
+      // Puck-Daten roh durchreichen (Rendering via renderPuckTree im Consumer, Phase 1);
+      // V1 wird geparst; bei Puck kein parsePageContent.
+      puck: kind === "puck" ? contentToRender : null,
+      content: kind === "v1" ? parsePageContent(contentToRender) : null,
     });
   } catch (error) {
     console.error("Error fetching public page:", error);

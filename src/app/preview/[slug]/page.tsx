@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import PageRendererServer from "@/components/page-renderer/page-renderer-server";
-import PageRendererHtml from "@/components/page-renderer/page-renderer-html";
-import { parsePageContent, isPageContentV2 } from "@/lib/page-builder/schema";
+import { requireRole } from "@/lib/auth/require-role";
+import RenderPageContent from "@/components/page-renderer/render-page-content";
 import type { Metadata } from "next";
 import { absoluteUrl, buildOpenGraph, extractTextFromContent } from "@/lib/seo/meta";
 
@@ -84,34 +83,32 @@ export default async function PreviewPage({
   const { slug } = await params;
   const { token } = await searchParams;
 
-  if (!token) {
-    notFound();
-  }
-
-  // Lade Page mit Token
-  const page = await db.page.findFirst({
-    where: {
-      slug,
-      previewToken: token,
-    },
-  });
-
-  if (!page) {
-    notFound();
-  }
-
-  // Prüfe Token Expiry
-  if (page.previewTokenExpires && new Date() > page.previewTokenExpires) {
-    notFound();
+  let page;
+  if (token) {
+    // Token-Pfad: per Preview-Token teilbar (auch ohne Login).
+    page = await db.page.findFirst({
+      where: { slug, previewToken: token },
+    });
+    if (!page) {
+      notFound();
+    }
+    if (page.previewTokenExpires && new Date() > page.previewTokenExpires) {
+      notFound();
+    }
+  } else {
+    // Kein Token (z. B. „Vorschau"-Button aus dem Builder): nur für eingeloggte
+    // ADMIN/EDITOR. requireRole leitet sonst auf /admin/login um.
+    await requireRole(["ADMIN", "EDITOR"]);
+    page = await db.page.findFirst({ where: { slug } });
+    if (!page) {
+      notFound();
+    }
   }
 
   const draftContent = page.draftContentJson ?? page.contentJson;
   if (!draftContent) {
     notFound();
   }
-
-  const isV2 = isPageContentV2(draftContent);
-  const normalizedContent = isV2 ? null : parsePageContent(draftContent);
 
   const containerWidthClass = {
     full: "",
@@ -155,11 +152,7 @@ export default async function PreviewPage({
                   {page.title}
                 </h1>
               )}
-              {isV2 ? (
-                <PageRendererHtml html={(draftContent as { html: string }).html} />
-              ) : (
-                <PageRendererServer content={normalizedContent!} />
-              )}
+              <RenderPageContent content={draftContent} />
             </article>
           </div>
         </div>

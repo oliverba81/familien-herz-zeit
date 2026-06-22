@@ -1,7 +1,4 @@
-import PageRendererServer from "@/components/page-renderer/page-renderer-server";
-import PageRendererHtml from "@/components/page-renderer/page-renderer-html";
-import { normalizeContent } from "@/lib/page-builder/templates";
-import { isPageContentV2 } from "@/lib/page-builder/schema";
+import RenderPageContent from "@/components/page-renderer/render-page-content";
 import Hero from "@/components/home/hero";
 import { cachedHomepagePage } from "@/lib/cache/prisma-cache";
 
@@ -12,8 +9,6 @@ export default async function Home() {
   // Wenn Homepage existiert, zeige sie an
   if (homepage) {
     const content = homepage.publishedContentJson ?? homepage.contentJson;
-    const isV2 = isPageContentV2(content);
-    const normalizedContent = isV2 ? null : normalizeContent(content);
 
     const containerWidthClass = {
       full: "",
@@ -36,11 +31,7 @@ export default async function Home() {
                     {homepage.title}
                   </h1>
                 )}
-                {isV2 ? (
-                  <PageRendererHtml html={(content as { html: string }).html} />
-                ) : (
-                  <PageRendererServer content={normalizedContent!} />
-                )}
+                <RenderPageContent content={content} />
               </article>
             </div>
           </div>
