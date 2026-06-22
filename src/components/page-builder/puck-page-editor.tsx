@@ -9,6 +9,7 @@ import {
 import { Puck, type Overrides, type Viewports } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { puckConfig } from "@/lib/puck/config";
+import { PuckInsertToolbar } from "./puck-insert-toolbar";
 import { syncIframeStyles } from "@/lib/puck/iframe-style-sync";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
 
@@ -47,7 +48,15 @@ function IframeOverride({
   return <>{children}</>;
 }
 
-const overrides: Partial<Overrides> = { iframe: IframeOverride };
+const overrides: Partial<Overrides> = {
+  iframe: IframeOverride,
+  headerActions: ({ children }) => (
+    <>
+      <PuckInsertToolbar />
+      {children}
+    </>
+  ),
+};
 
 export interface PuckPageEditorProps {
   data: PageContentPuck;
