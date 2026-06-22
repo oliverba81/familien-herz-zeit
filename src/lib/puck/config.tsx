@@ -34,6 +34,18 @@ const appointmentsDefaults = getV2EmbedDefaultData("current-appointments");
 const storyDefaults = getV2EmbedDefaultData("herzzeit-story");
 const contactDefaults = getV2EmbedDefaultData("contactForm");
 
+/** Boolean-Feld als Radio (Puck hat kein natives Checkbox-Feld). */
+function boolField(label: string) {
+  return {
+    type: "radio" as const,
+    label,
+    options: [
+      { label: "An", value: true },
+      { label: "Aus", value: false },
+    ],
+  };
+}
+
 /**
  * Puck-Konfiguration (Must-have-Set v1: RichText, Section, Image + 4 Embeds).
  * Felder bewusst kuratiert/kompakt; volle Feldabdeckung folgt iterativ.
@@ -105,6 +117,10 @@ export const puckConfig: Config<any> = {
         subtitle: { type: "textarea" },
         maxCourses: { type: "number" },
         maxTopics: { type: "number" },
+        showEmptyMessage: boolField("Leer-Hinweis"),
+        contactLinkUrl: { type: "text" },
+        contactLinkLabel: { type: "text" },
+        backgroundImageOpacity: { type: "number" },
       },
       defaultProps: coursesDefaults,
       render: embedEditRender("Courses"),
@@ -114,7 +130,11 @@ export const puckConfig: Config<any> = {
       label: "Aktuelle Termine",
       fields: {
         title: { type: "text" },
+        showCourses: boolField("Kurse zeigen"),
+        showTopics: boolField("Themen zeigen"),
         maxItems: { type: "number" },
+        showEmptyMessage: boolField("Leer-Hinweis"),
+        footerHtml: { type: "textarea" },
       },
       defaultProps: appointmentsDefaults,
       render: embedEditRender("CurrentAppointments"),
@@ -132,6 +152,7 @@ export const puckConfig: Config<any> = {
             { label: "Minimal", value: "minimal" },
           ],
         },
+        backgroundColor: { type: "text" },
       },
       defaultProps: storyDefaults,
       render: embedEditRender("HerzZeitStory"),
@@ -141,8 +162,15 @@ export const puckConfig: Config<any> = {
       label: "Kontaktformular",
       fields: {
         name: { type: "text" },
+        role: { type: "text" },
+        address: { type: "textarea" },
+        phone: { type: "text" },
         email: { type: "text" },
+        showOfficeHours: boolField("Sprechzeiten zeigen"),
+        officeHoursTitle: { type: "text" },
+        officeHoursText: { type: "textarea" },
         submitButtonText: { type: "text" },
+        enableRecaptcha: boolField("reCAPTCHA"),
       },
       defaultProps: contactDefaults,
       render: embedEditRender("ContactForm"),
