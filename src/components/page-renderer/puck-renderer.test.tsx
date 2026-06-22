@@ -169,6 +169,52 @@ describe("PuckRenderer (V3 Tree-Walker)", () => {
     expect(screen.getByText("Drin")).toBeInTheDocument();
   });
 
+  it("rendert Bild mit Verlinkung, Anker-Sektion, Embed, Akkordeon, Tabs und Galerie", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Section",
+            props: { id: "s", anchorId: "kontakt", children: [] },
+          },
+          {
+            type: "Image",
+            props: { id: "img", src: "/foto.jpg", alt: "Foto", href: "/ziel", newTab: true },
+          },
+          { type: "Embed", props: { id: "e", url: "https://youtu.be/dQw4w9WgXcQ" } },
+          {
+            type: "Accordion",
+            props: { id: "acc", items: [{ question: "Wie?", answer: "So." }] },
+          },
+          {
+            type: "Tabs",
+            props: { id: "tab", items: [{ label: "Eins", content: "Inhalt eins" }] },
+          },
+          {
+            type: "Gallery",
+            props: { id: "g", columns: 2, items: [{ src: "/a.jpg", alt: "A" }] },
+          },
+        ])}
+      />
+    );
+    // Anker-ID auf der Sektion
+    expect(container.querySelector("section#kontakt")).not.toBeNull();
+    // Bild verlinkt mit neuem Tab
+    const link = container.querySelector('a[href="/ziel"]') as HTMLAnchorElement;
+    expect(link).not.toBeNull();
+    expect(link.target).toBe("_blank");
+    expect(container.querySelector('img[alt="Foto"]')).not.toBeNull();
+    // Embed → YouTube-iframe
+    expect(container.querySelector('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]')).not.toBeNull();
+    // Akkordeon → <details>
+    expect(container.querySelector("details")).not.toBeNull();
+    expect(screen.getByText("Wie?")).toBeInTheDocument();
+    // Tabs → Reiter-Button
+    expect(screen.getByRole("tab", { name: "Eins" })).toBeInTheDocument();
+    // Galerie → Bild
+    expect(container.querySelector('img[alt="A"]')).not.toBeNull();
+  });
+
   it("zeigt den Unknown-Fallback für unbekannte Typen", () => {
     render(<PuckRenderer data={puck([{ type: "GibtsNicht", props: { id: "x" } }])} />);
     expect(screen.getByText(/Unbekannter Block-Typ/)).toBeInTheDocument();

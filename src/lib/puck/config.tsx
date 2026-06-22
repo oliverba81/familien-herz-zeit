@@ -8,7 +8,17 @@ import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
 import { responsiveFields, responsiveDefaults } from "./responsive";
 import { MediaUrlField, MediaObjectField } from "./image-field";
 import { SPACER_SIZES, SECTION_MAXWIDTH, sectionStyle } from "./blocks";
-import { FeaturesView, TestimonialsView } from "@/components/page-renderer/puck-blocks";
+import {
+  FeaturesView,
+  TestimonialsView,
+  ImageView,
+  ButtonView,
+  EmbedView,
+  AccordionView,
+  GalleryView,
+  columnsContainerStyle,
+} from "@/components/page-renderer/puck-blocks";
+import { TabsView } from "@/components/page-renderer/tabs-view";
 
 /** Puck-Komponentenname → V2-Embed-Blocktyp (für Edit-Preview + spätere Serialisierung). */
 export const PUCK_TO_V2_EMBED: Record<string, string> = {
@@ -103,12 +113,14 @@ export const puckConfig: Config<any> = {
           ],
         },
         className: { type: "text" },
+        anchorId: { type: "text", label: "Anker-ID (für Sprungmarken, z. B. kontakt)" },
         children: { type: "slot" },
       },
-      defaultProps: { background: "", backgroundImage: "", padding: "md", maxWidth: "none", className: "" },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      render: ({ background, backgroundImage, padding, maxWidth, className, children: Children }: any) => (
+      defaultProps: { background: "", backgroundImage: "", padding: "md", maxWidth: "none", className: "", anchorId: "" },
+       
+      render: ({ background, backgroundImage, padding, maxWidth, className, anchorId, children: Children }: any) => (
         <section
+          id={anchorId || undefined}
           className={className || undefined}
           style={sectionStyle({ background, backgroundImage, padding })}
         >
@@ -130,21 +142,52 @@ export const puckConfig: Config<any> = {
         },
         alt: { type: "text" },
         caption: { type: "text" },
+        width: {
+          type: "select",
+          label: "Breite",
+          options: [
+            { label: "Klein", value: "sm" },
+            { label: "Mittel", value: "md" },
+            { label: "Groß", value: "lg" },
+            { label: "Voll", value: "full" },
+          ],
+        },
+        align: {
+          type: "radio",
+          label: "Ausrichtung",
+          options: [
+            { label: "Links", value: "left" },
+            { label: "Mitte", value: "center" },
+            { label: "Rechts", value: "right" },
+          ],
+        },
+        rounded: {
+          type: "select",
+          label: "Ecken",
+          options: [
+            { label: "Eckig", value: "none" },
+            { label: "Leicht rund", value: "sm" },
+            { label: "Stark rund", value: "lg" },
+            { label: "Rund", value: "full" },
+          ],
+        },
+        bordered: boolField("Rahmen"),
+        href: { type: "text", label: "Verlinken auf (URL, optional)" },
+        newTab: boolField("In neuem Tab öffnen"),
       },
-      defaultProps: { src: "", alt: "", caption: "" },
-       
-      render: ({ src, alt, caption }: any) =>
-        src ? (
-          <figure>
-            { }
-            <img src={src} alt={alt || ""} style={{ maxWidth: "100%", height: "auto" }} />
-            {caption ? <figcaption>{caption}</figcaption> : null}
-          </figure>
-        ) : (
-          <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">
-            Kein Bild gewählt
-          </div>
-        ),
+      defaultProps: {
+        src: "",
+        alt: "",
+        caption: "",
+        width: "full",
+        align: "left",
+        rounded: "none",
+        bordered: false,
+        href: "",
+        newTab: false,
+      },
+
+      render: (props: any) => <ImageView {...props} />,
     },
 
     Courses: {
@@ -209,7 +252,7 @@ export const puckConfig: Config<any> = {
         backgroundColor: { type: "text" },
         stories: {
           type: "array",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           getItemSummary: (item: any) => item?.title || "Geschichte",
           arrayFields: {
             title: { type: "text" },
@@ -273,17 +316,35 @@ export const puckConfig: Config<any> = {
             { label: "3 Spalten", value: 3 },
           ],
         },
+        ratio: {
+          type: "select",
+          label: "Verhältnis",
+          options: [
+            { label: "Gleich", value: "" },
+            { label: "2 : 1", value: "2-1" },
+            { label: "1 : 2", value: "1-2" },
+            { label: "3 : 2", value: "3-2" },
+            { label: "2 : 1 : 1", value: "2-1-1" },
+            { label: "1 : 2 : 1", value: "1-2-1" },
+          ],
+        },
+        gap: {
+          type: "select",
+          label: "Abstand",
+          options: [
+            { label: "Klein", value: "sm" },
+            { label: "Mittel", value: "md" },
+            { label: "Groß", value: "lg" },
+          ],
+        },
         col1: { type: "slot" },
         col2: { type: "slot" },
         col3: { type: "slot" },
       },
-      defaultProps: { count: 2 },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      render: ({ count, col1: C1, col2: C2, col3: C3 }: any) => (
-        <div
-          className="fhz-columns"
-          style={{ ["--cols" as string]: String(count ?? 2) }}
-        >
+      defaultProps: { count: 2, ratio: "", gap: "md" },
+       
+      render: ({ count, ratio, gap, col1: C1, col2: C2, col3: C3 }: any) => (
+        <div className="fhz-columns" style={columnsContainerStyle(count, ratio, gap)}>
           <div>{C1 ? <C1 /> : null}</div>
           <div>{C2 ? <C2 /> : null}</div>
           {Number(count) >= 3 ? <div>{C3 ? <C3 /> : null}</div> : null}
@@ -305,7 +366,7 @@ export const puckConfig: Config<any> = {
         },
       },
       defaultProps: { size: "md" },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       render: ({ size }: any) => (
         <div style={{ height: SPACER_SIZES[size as string] ?? SPACER_SIZES.md }} />
       ),
@@ -316,11 +377,21 @@ export const puckConfig: Config<any> = {
       fields: {
         text: { type: "text" },
         href: { type: "text" },
+        icon: { type: "text", label: "Icon (optional, z. B. ➜ oder ✉)" },
         variant: {
           type: "radio",
           options: [
             { label: "Primär", value: "primary" },
             { label: "Sekundär", value: "secondary" },
+          ],
+        },
+        size: {
+          type: "select",
+          label: "Größe",
+          options: [
+            { label: "Klein", value: "sm" },
+            { label: "Mittel", value: "md" },
+            { label: "Groß", value: "lg" },
           ],
         },
         align: {
@@ -331,23 +402,19 @@ export const puckConfig: Config<any> = {
             { label: "Rechts", value: "right" },
           ],
         },
+        newTab: boolField("In neuem Tab öffnen"),
       },
-      defaultProps: { text: "Mehr erfahren", href: "/", variant: "primary", align: "left" },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      render: ({ text, href, variant, align }: any) => (
-        <div style={{ textAlign: align || "left" }}>
-          <a
-            href={href || "#"}
-            className={
-              variant === "secondary"
-                ? "inline-block px-5 py-2.5 rounded-lg border border-rose-500 text-rose-600 font-semibold"
-                : "inline-block px-5 py-2.5 rounded-lg bg-rose-500 text-white font-semibold"
-            }
-          >
-            {text || "Button"}
-          </a>
-        </div>
-      ),
+      defaultProps: {
+        text: "Mehr erfahren",
+        href: "/",
+        icon: "",
+        variant: "primary",
+        size: "md",
+        align: "left",
+        newTab: false,
+      },
+       
+      render: (props: any) => <ButtonView {...props} />,
     },
 
     Video: {
@@ -362,7 +429,7 @@ export const puckConfig: Config<any> = {
         title: { type: "text" },
       },
       defaultProps: { src: "", title: "" },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       render: ({ src, title }: any) =>
         src ? (
           <figure>
@@ -394,7 +461,7 @@ export const puckConfig: Config<any> = {
         },
       },
       defaultProps: { text: "Überschrift", level: 2, align: "left" },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       render: ({ text, level, align }: any) => {
         const Tag = `h${[1, 2, 3, 4, 5, 6].includes(Number(level)) ? level : 2}` as
           | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
@@ -415,7 +482,7 @@ export const puckConfig: Config<any> = {
         title: { type: "text" },
         items: {
           type: "array",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           getItemSummary: (item: any) => item?.title || "Feature",
           arrayFields: {
             title: { type: "text" },
@@ -431,7 +498,7 @@ export const puckConfig: Config<any> = {
           { title: "Feature 3", text: "Beschreibung" },
         ],
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       render: ({ title, items }: any) => <FeaturesView title={title} items={items} />,
     },
 
@@ -441,7 +508,7 @@ export const puckConfig: Config<any> = {
         title: { type: "text" },
         items: {
           type: "array",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           getItemSummary: (item: any) => item?.name || "Stimme",
           arrayFields: {
             name: { type: "text" },
@@ -453,8 +520,97 @@ export const puckConfig: Config<any> = {
         title: "",
         items: [{ name: "Name", text: "Ein nettes Zitat." }],
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       render: ({ title, items }: any) => <TestimonialsView title={title} items={items} />,
+    },
+
+    Embed: {
+      label: "Video/Embed (YouTube, Vimeo …)",
+      fields: {
+        url: { type: "text", label: "URL (YouTube, Vimeo oder iframe-Quelle)" },
+        title: { type: "text", label: "Titel (Barrierefreiheit)" },
+      },
+      defaultProps: { url: "", title: "" },
+       
+      render: ({ url, title }: any) => <EmbedView url={url} title={title} />,
+    },
+
+    Accordion: {
+      label: "Akkordeon / FAQ",
+      fields: {
+        items: {
+          type: "array",
+           
+          getItemSummary: (item: any) => item?.question || "Frage",
+          arrayFields: {
+            question: { type: "text" },
+            answer: { type: "textarea" },
+          },
+        },
+      },
+      defaultProps: {
+        items: [
+          { question: "Erste Frage?", answer: "Antwort …" },
+          { question: "Zweite Frage?", answer: "Antwort …" },
+        ],
+      },
+       
+      render: ({ items }: any) => <AccordionView items={items} />,
+    },
+
+    Tabs: {
+      label: "Reiter (Tabs)",
+      fields: {
+        items: {
+          type: "array",
+           
+          getItemSummary: (item: any) => item?.label || "Reiter",
+          arrayFields: {
+            label: { type: "text" },
+            content: { type: "textarea" },
+          },
+        },
+      },
+      defaultProps: {
+        items: [
+          { label: "Reiter 1", content: "Inhalt …" },
+          { label: "Reiter 2", content: "Inhalt …" },
+        ],
+      },
+       
+      render: ({ items }: any) => <TabsView items={items} />,
+    },
+
+    Gallery: {
+      label: "Galerie",
+      fields: {
+        columns: {
+          type: "select",
+          label: "Spalten",
+          options: [
+            { label: "2", value: 2 },
+            { label: "3", value: 3 },
+            { label: "4", value: 4 },
+          ],
+        },
+        items: {
+          type: "array",
+           
+          getItemSummary: (item: any) => item?.alt || "Bild",
+          arrayFields: {
+            src: {
+              type: "custom",
+              render: ({ value, onChange }) => (
+                <MediaUrlField value={value as string} onChange={onChange} />
+              ),
+            },
+            alt: { type: "text" },
+          },
+        },
+      },
+      defaultProps: { columns: 3, items: [] },
+       
+      render: ({ items, columns }: any) => <GalleryView items={items} columns={columns} />,
     },
 
     Reusable: {
@@ -474,6 +630,38 @@ export const puckConfig: Config<any> = {
           )}
         </div>
       ),
+    },
+  },
+
+  // Gruppierung der Blockliste im Editor (Puck-`categories`).
+  categories: {
+    layout: {
+      title: "Layout",
+      components: ["Section", "Columns", "Spacer", "Divider"],
+    },
+    content: {
+      title: "Inhalt",
+      components: [
+        "Heading",
+        "RichText",
+        "Image",
+        "Gallery",
+        "Button",
+        "Video",
+        "Embed",
+        "Accordion",
+        "Tabs",
+        "Features",
+        "Testimonials",
+      ],
+    },
+    embeds: {
+      title: "Dynamische Inhalte",
+      components: ["Courses", "CurrentAppointments", "HerzZeitStory", "ContactForm"],
+    },
+    advanced: {
+      title: "Erweitert",
+      components: ["Reusable"],
     },
   },
 };

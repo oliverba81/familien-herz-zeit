@@ -105,11 +105,13 @@
   }
 }
 
-/* Spalten-Block (Columns) — responsives Grid, stapelt auf Mobil. */
+/* Spalten-Block (Columns) — responsives Grid, stapelt auf Mobil.
+   Verhältnis & Abstand kommen als Inline-Custom-Properties; die Mobil-Regel
+   überschreibt die konkrete Eigenschaft (schlägt damit die var()-Basis). */
 .fhz-columns {
   display: grid;
-  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: var(--cols-template, repeat(2, minmax(0, 1fr)));
+  gap: var(--cols-gap, 1.5rem);
 }
 @media (max-width: 767px) {
   .fhz-columns {

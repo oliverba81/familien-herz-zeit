@@ -18,6 +18,10 @@ const EXPECTED = [
   "Divider",
   "Features",
   "Testimonials",
+  "Embed",
+  "Accordion",
+  "Tabs",
+  "Gallery",
   "Reusable",
 ];
 
@@ -56,5 +60,21 @@ describe("puckConfig", () => {
     expect(Object.values(PUCK_TO_V2_EMBED).sort()).toEqual(
       ["contactForm", "courses", "current-appointments", "herzzeit-story"].sort()
     );
+  });
+
+  it("jede Komponente liegt in genau einer Kategorie (kein Drift)", () => {
+    const categorized = Object.values(puckConfig.categories ?? {}).flatMap(
+      (c) => (c.components ?? []) as string[]
+    );
+    // Keine Duplikate
+    expect(new Set(categorized).size).toBe(categorized.length);
+    // Jede registrierte Komponente ist genau einmal kategorisiert
+    for (const name of EXPECTED) {
+      expect(categorized).toContain(name);
+    }
+    // Keine Kategorie verweist auf eine unbekannte Komponente
+    for (const name of categorized) {
+      expect(puckConfig.components[name]).toBeTruthy();
+    }
   });
 });
