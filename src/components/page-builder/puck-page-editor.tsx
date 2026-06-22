@@ -32,6 +32,7 @@ const VIEWPORTS: Viewports = [
 ];
 
 const CustomCssContext = createContext<string | null | undefined>(undefined);
+const BackHrefContext = createContext<string | undefined>(undefined);
 
 /** Injiziert Eltern-Stylesheets + customCss in das Preview-iframe (stabile Identität). */
 function IframeOverride({
@@ -49,19 +50,35 @@ function IframeOverride({
   return <>{children}</>;
 }
 
-const overrides: Partial<Overrides> = {
-  iframe: IframeOverride,
-  headerActions: ({ children }) => (
+/** Kopfzeilen-Aktionen: Einfüge-Toolbar links, „Zurück" direkt neben „Publish". */
+function HeaderActions({ children }: { children: ReactNode }) {
+  const backHref = useContext(BackHrefContext);
+  return (
     <>
       <PuckInsertToolbar />
+      {backHref && (
+        <a
+          href={backHref}
+          className="flex items-center gap-1 px-3 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100"
+        >
+          ← Zurück
+        </a>
+      )}
       {children}
     </>
-  ),
+  );
+}
+
+const overrides: Partial<Overrides> = {
+  iframe: IframeOverride,
+  headerActions: HeaderActions,
 };
 
 export interface PuckPageEditorProps {
   data: PageContentPuck;
   customCss?: string | null;
+  /** Ziel des „Zurück"-Buttons in der Kopfzeile (neben „Publish"). */
+  backHref?: string;
   onPublish?: (data: PageContentPuck) => void | Promise<void>;
   onChange?: (data: PageContentPuck) => void;
 }
@@ -69,26 +86,29 @@ export interface PuckPageEditorProps {
 export default function PuckPageEditor({
   data,
   customCss,
+  backHref,
   onPublish,
   onChange,
 }: PuckPageEditorProps) {
   return (
     <CustomCssContext.Provider value={customCss}>
-      <div className="fhz-puck-host">
-        <Puck
+      <BackHrefContext.Provider value={backHref}>
+        <div className="fhz-puck-host">
+          <Puck
 
-          config={puckConfig as any}
+            config={puckConfig as any}
 
-          data={data as any}
-          overrides={overrides}
-          viewports={VIEWPORTS}
-          iframe={{ enabled: true }}
+            data={data as any}
+            overrides={overrides}
+            viewports={VIEWPORTS}
+            iframe={{ enabled: true }}
 
-          onPublish={onPublish as any}
+            onPublish={onPublish as any}
 
-          onChange={onChange as any}
-        />
-      </div>
+            onChange={onChange as any}
+          />
+        </div>
+      </BackHrefContext.Provider>
     </CustomCssContext.Provider>
   );
 }
