@@ -28,8 +28,12 @@ export const bookingSchema = z.object({
     message: "Du musst der Datenschutzerklärung zustimmen",
   }),
   termsAccepted: z.boolean().refine((val) => val === true, {
-    message: "Du musst den Kursbedingungen zustimmen",
+    message: "Du musst den AGB zustimmen",
   }),
+  // § 357a Abs. 2 BGB: optionales, ausdrückliches Verlangen des vorzeitigen
+  // Leistungsbeginns innerhalb der Widerrufsfrist (Voraussetzung für
+  // einen etwaigen Wertersatzanspruch). Kein Pflichtfeld.
+  earlyStartConsent: z.boolean().default(false).optional(),
   website: z.string().optional().nullable(), // Honeypot
 });
 

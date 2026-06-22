@@ -8,6 +8,7 @@ import BankTransferButton, {
   type VideoBankTransferDetails,
 } from "./bank-transfer-button";
 import DiscountInput from "./discount-input";
+import LegalContentModal from "@/components/courses/legal-content-modal";
 import { formatCents } from "@/lib/utils/money";
 
 interface DiscountInputWrapperProps {
@@ -42,6 +43,13 @@ export default function DiscountInputWrapper({
   const [bankDetails, setBankDetails] = useState<VideoBankTransferDetails | null>(
     null
   );
+  // Pflicht-Einwilligungen vor dem Kauf digitaler Inhalte
+  const [agbAccepted, setAgbAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [withdrawalConsent, setWithdrawalConsent] = useState(false);
+  const [legalModal, setLegalModal] = useState<"agb" | "privacy" | null>(null);
+
+  const allConsentsGiven = agbAccepted && privacyAccepted && withdrawalConsent;
 
   const handleCodeChange = (code: string | null) => {
     setDiscountCode(code);
@@ -127,32 +135,120 @@ export default function DiscountInputWrapper({
           .
         </div>
       )}
-      {enabledMethods.stripe && (
-        <PurchaseButton
-          videoCourseId={videoCourseId}
-          priceCents={priceCents}
-          discountCode={discountCode}
-          onError={handlePurchaseError}
-        />
+
+      {!noMethods && (
+        <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="video-agb"
+              checked={agbAccepted}
+              onChange={(e) => setAgbAccepted(e.target.checked)}
+              className="mt-1 h-4 w-4 text-rose-500 focus:ring-rose-500 border-gray-300 rounded"
+            />
+            <label htmlFor="video-agb" className="ml-2 text-sm text-gray-700">
+              Ich habe die{" "}
+              <button
+                type="button"
+                onClick={() => setLegalModal("agb")}
+                className="text-rose-500 hover:text-rose-600 underline"
+              >
+                AGB
+              </button>{" "}
+              zur Kenntnis genommen und erkenne sie an. *
+            </label>
+          </div>
+
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="video-privacy"
+              checked={privacyAccepted}
+              onChange={(e) => setPrivacyAccepted(e.target.checked)}
+              className="mt-1 h-4 w-4 text-rose-500 focus:ring-rose-500 border-gray-300 rounded"
+            />
+            <label htmlFor="video-privacy" className="ml-2 text-sm text-gray-700">
+              Ich habe die{" "}
+              <button
+                type="button"
+                onClick={() => setLegalModal("privacy")}
+                className="text-rose-500 hover:text-rose-600 underline"
+              >
+                Datenschutzerklärung
+              </button>{" "}
+              zur Kenntnis genommen. *
+            </label>
+          </div>
+
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="video-withdrawal"
+              checked={withdrawalConsent}
+              onChange={(e) => setWithdrawalConsent(e.target.checked)}
+              className="mt-1 h-4 w-4 text-rose-500 focus:ring-rose-500 border-gray-300 rounded"
+            />
+            <label htmlFor="video-withdrawal" className="ml-2 text-sm text-gray-700">
+              Ich verlange ausdrücklich, dass mit der Bereitstellung des Videokurses vor Ablauf der
+              Widerrufsfrist begonnen wird. Mir ist bekannt, dass ich dadurch mein Widerrufsrecht
+              verliere. *
+            </label>
+          </div>
+
+          {!allConsentsGiven && (
+            <p className="text-xs text-gray-500">
+              Bitte bestätige alle drei Punkte, um den Kauf abzuschließen.
+            </p>
+          )}
+        </div>
       )}
-      {showDividerBeforePaypal && <Divider />}
-      {enabledMethods.paypal && (
-        <PaypalButton
-          videoCourseId={videoCourseId}
-          priceCents={priceCents}
-          discountCode={discountCode}
-          onError={handlePurchaseError}
-        />
+
+      {allConsentsGiven && (
+        <>
+          {enabledMethods.stripe && (
+            <PurchaseButton
+              videoCourseId={videoCourseId}
+              priceCents={priceCents}
+              discountCode={discountCode}
+              withdrawalConsent={withdrawalConsent}
+              onError={handlePurchaseError}
+            />
+          )}
+          {showDividerBeforePaypal && <Divider />}
+          {enabledMethods.paypal && (
+            <PaypalButton
+              videoCourseId={videoCourseId}
+              priceCents={priceCents}
+              discountCode={discountCode}
+              withdrawalConsent={withdrawalConsent}
+              onError={handlePurchaseError}
+            />
+          )}
+          {showDividerBeforeBank && <Divider />}
+          {enabledMethods.bankTransfer && (
+            <BankTransferButton
+              videoCourseId={videoCourseId}
+              discountCode={discountCode}
+              withdrawalConsent={withdrawalConsent}
+              onError={handlePurchaseError}
+              onSuccess={(details) => setBankDetails(details)}
+            />
+          )}
+        </>
       )}
-      {showDividerBeforeBank && <Divider />}
-      {enabledMethods.bankTransfer && (
-        <BankTransferButton
-          videoCourseId={videoCourseId}
-          discountCode={discountCode}
-          onError={handlePurchaseError}
-          onSuccess={(details) => setBankDetails(details)}
-        />
-      )}
+
+      <LegalContentModal
+        slug="agb"
+        title="AGB"
+        open={legalModal === "agb"}
+        onClose={() => setLegalModal(null)}
+      />
+      <LegalContentModal
+        slug="datenschutzerklaerung"
+        title="Datenschutzerklärung"
+        open={legalModal === "privacy"}
+        onClose={() => setLegalModal(null)}
+      />
     </div>
   );
 }

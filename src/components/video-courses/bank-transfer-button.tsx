@@ -16,6 +16,7 @@ export interface VideoBankTransferDetails {
 interface BankTransferButtonProps {
   videoCourseId: string;
   discountCode?: string | null;
+  withdrawalConsent?: boolean;
   onError?: (error: string) => void;
   onSuccess: (details: VideoBankTransferDetails) => void;
 }
@@ -23,6 +24,7 @@ interface BankTransferButtonProps {
 export default function BankTransferButton({
   videoCourseId,
   discountCode,
+  withdrawalConsent,
   onError,
   onSuccess,
 }: BankTransferButtonProps) {
@@ -37,6 +39,7 @@ export default function BankTransferButton({
         body: JSON.stringify({
           videoCourseId,
           discountCode: discountCode || undefined,
+          withdrawalConsent: withdrawalConsent ?? false,
         }),
       });
 

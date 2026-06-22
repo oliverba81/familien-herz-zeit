@@ -119,7 +119,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Legal Pages (falls vorhanden)
-  const legalPages = ["impressum", "datenschutz", "agb", "widerruf"];
+  const legalPages = [
+    "impressum",
+    "datenschutzerklaerung",
+    "agb",
+    "widerrufsbelehrung",
+    "widerruf",
+  ];
   for (const legalSlug of legalPages) {
     const exists = pages.some((p) => p.slug === legalSlug);
     if (!exists) {

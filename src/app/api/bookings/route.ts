@@ -269,6 +269,7 @@ export async function POST(request: NextRequest) {
           howDidYouHear: validatedData.howDidYouHear || null,
           privacyAccepted: validatedData.privacyAccepted,
           termsAccepted: validatedData.termsAccepted,
+          earlyStartConsent: validatedData.earlyStartConsent ?? false,
           // Legacy-Felder (für Backward Compatibility)
           parentName: `${validatedData.firstName} ${validatedData.lastName}`,
           childName: `${validatedData.childFirstName} ${validatedData.childLastName}`,

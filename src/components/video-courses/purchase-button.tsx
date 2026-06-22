@@ -7,6 +7,7 @@ interface PurchaseButtonProps {
   videoCourseId: string;
   priceCents: number;
   discountCode?: string | null;
+  withdrawalConsent?: boolean;
   onError?: (error: string) => void;
 }
 
@@ -14,6 +15,7 @@ export default function PurchaseButton({
   videoCourseId,
   priceCents,
   discountCode,
+  withdrawalConsent,
   onError,
 }: PurchaseButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +34,7 @@ export default function PurchaseButton({
         body: JSON.stringify({
           videoCourseId,
           discountCode: discountCode || undefined,
+          withdrawalConsent: withdrawalConsent ?? false,
         }),
       });
 

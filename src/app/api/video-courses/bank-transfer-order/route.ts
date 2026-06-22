@@ -12,6 +12,8 @@ export const dynamic = "force-dynamic";
 const schema = z.object({
   videoCourseId: z.string().min(1),
   discountCode: z.string().optional(),
+  // § 356 Abs. 5 BGB: Zustimmung zum sofortigen Beginn digitaler Inhalte
+  withdrawalConsent: z.boolean().optional(),
 });
 
 /**
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { videoCourseId, discountCode } = schema.parse(body);
+    const { videoCourseId, discountCode, withdrawalConsent } = schema.parse(body);
 
     const course = await db.videoCourse.findUnique({
       where: { id: videoCourseId },
@@ -118,6 +120,7 @@ export async function POST(request: NextRequest) {
         amountCents: finalPriceCents,
         currency: course.currency.toLowerCase(),
         appliedDiscountCode,
+        withdrawalConsent: withdrawalConsent ?? false,
       },
     });
 

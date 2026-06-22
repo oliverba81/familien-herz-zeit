@@ -7,6 +7,7 @@ interface PaypalButtonProps {
   videoCourseId: string;
   priceCents: number;
   discountCode?: string | null;
+  withdrawalConsent?: boolean;
   onError?: (error: string) => void;
 }
 
@@ -14,6 +15,7 @@ export default function PaypalButton({
   videoCourseId,
   priceCents,
   discountCode,
+  withdrawalConsent,
   onError,
 }: PaypalButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +34,7 @@ export default function PaypalButton({
         body: JSON.stringify({
           videoCourseId,
           discountCode: discountCode || undefined,
+          withdrawalConsent: withdrawalConsent ?? false,
         }),
       });
 

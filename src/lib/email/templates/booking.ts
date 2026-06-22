@@ -32,6 +32,8 @@ Buchungs-ID: ${bookingId}
 
 Deine Buchung hat den Status "PENDING" (Ausstehend). Wir prüfen deine Anfrage und senden dir eine Bestätigung zu.
 
+Widerrufsrecht: Als Verbraucher:in steht dir ein 14-tägiges Widerrufsrecht zu. Einzelheiten und das Muster-Widerrufsformular findest du in unserer Widerrufsbelehrung (https://www.familien-herz-zeit.de/widerrufsbelehrung). Den Widerruf kannst du auch direkt über https://www.familien-herz-zeit.de/widerruf erklären.
+
 Mit freundlichen Grüßen,
 Familien Herz Zeit
   `.trim();
@@ -69,6 +71,14 @@ Familien Herz Zeit
       <div style="margin: 20px 0; padding: 12px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
         <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
           <strong>Status:</strong> Deine Buchung hat den Status "PENDING" (Ausstehend). Wir prüfen deine Anfrage und senden dir eine Bestätigung zu.
+        </p>
+      </div>
+      <div style="margin: 20px 0; padding: 12px; background-color: #f3f4f6; border-left: 4px solid #9ca3af; border-radius: 4px;">
+        <p style="margin: 0; color: #374151; font-size: 13px; line-height: 1.6;">
+          <strong>Widerrufsrecht:</strong> Als Verbraucher:in steht dir ein 14-tägiges Widerrufsrecht zu. Einzelheiten und das Muster-Widerrufsformular findest du in unserer
+          <a href="https://www.familien-herz-zeit.de/widerrufsbelehrung" style="color: #e11d48;">Widerrufsbelehrung</a>.
+          Den Widerruf kannst du auch direkt über die
+          <a href="https://www.familien-herz-zeit.de/widerruf" style="color: #e11d48;">Online-Widerrufsfunktion</a> erklären.
         </p>
       </div>
       <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
