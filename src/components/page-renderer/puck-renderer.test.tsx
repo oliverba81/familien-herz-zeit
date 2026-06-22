@@ -215,6 +215,21 @@ describe("PuckRenderer (V3 Tree-Walker)", () => {
     expect(container.querySelector('img[alt="A"]')).not.toBeNull();
   });
 
+  it("rendert die Galerie als Slider (layout=slider)", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Gallery",
+            props: { id: "g", columns: 3, layout: "slider", items: [{ src: "/a.jpg", alt: "A" }] },
+          },
+        ])}
+      />
+    );
+    expect(container.querySelector(".fhz-gallery--slider")).not.toBeNull();
+    expect(container.querySelector(".fhz-gallery__img")).not.toBeNull();
+  });
+
   it("zeigt den Unknown-Fallback für unbekannte Typen", () => {
     render(<PuckRenderer data={puck([{ type: "GibtsNicht", props: { id: "x" } }])} />);
     expect(screen.getByText(/Unbekannter Block-Typ/)).toBeInTheDocument();

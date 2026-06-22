@@ -182,6 +182,7 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
         <GalleryView
           items={props.items as { src?: string; alt?: string }[]}
           columns={props.columns as number}
+          layout={props.layout as string}
         />
       );
 
