@@ -121,6 +121,8 @@ export async function PUT(
         id: true,
         published: true,
         slug: true,
+        draftContentJson: true,
+        contentJson: true,
       },
     });
 
@@ -146,17 +148,15 @@ export async function PUT(
       }
     }
 
-    // Parse draftContentJson (oder contentJson für Backward Compatibility)
+    // Inhalt ist OPTIONAL: Einstellungen können ohne Inhalt aktualisiert werden
+    // (Inhalt wird im Visual-Builder separat gespeichert). Nur wenn Inhalt mitkommt,
+    // wird er validiert/geschrieben — sonst bleibt der bestehende Inhalt unangetastet.
+    const contentProvided =
+      (body.draftContentJson !== undefined && body.draftContentJson !== null) ||
+      (body.contentJson !== undefined && body.contentJson !== null);
     let draftContentJson = body.draftContentJson ?? body.contentJson;
-    
-    // Prüfe ob mindestens eines der Content-Felder vorhanden ist
-    if (draftContentJson === undefined || draftContentJson === null) {
-      return NextResponse.json(
-        { error: "Entweder contentJson oder draftContentJson muss vorhanden sein" },
-        { status: 400 }
-      );
-    }
-    
+
+    if (contentProvided) {
     if (typeof draftContentJson === "string") {
       try {
         draftContentJson = JSON.parse(draftContentJson);
@@ -240,19 +240,18 @@ export async function PUT(
       }
       
       return NextResponse.json(
-          { 
-            error: "Ungültiges Content-Format", 
+          {
+            error: "Ungültiges Content-Format",
             message: e?.message || "Content-Validierung fehlgeschlagen",
-            details: e?.message 
+            details: e?.message
           },
           { status: 400 }
         );
       }
     }
+    } // Ende if (contentProvided)
 
     // Aktualisiere Seite
-    // Wenn die Seite veröffentlicht ist (oder gerade veröffentlicht wird), 
-    // aktualisiere auch publishedContentJson, damit die Änderungen sofort im Frontend sichtbar sind
     const updateData: any = {
       title: validatedData.title,
       slug: validatedData.slug,
@@ -263,16 +262,21 @@ export async function PUT(
       metaDescription: validatedData.metaDescription ?? null,
       metaKeywords: validatedData.metaKeywords ?? null,
       ogImageUrl: validatedData.ogImageUrl ?? null,
-      draftContentJson: draftContentJson,
-      // Legacy: contentJson auch setzen für Backward Compatibility
-      contentJson: draftContentJson,
     };
 
-    // Wenn Seite veröffentlicht ist (oder gerade veröffentlicht wird), setze publishedContentJson
+    // Inhalt nur schreiben, wenn mitgeliefert (sonst reines Einstellungen-Update,
+    // der bestehende Inhalt bleibt unangetastet → kein Überschreiben von Puck-Edits).
+    if (contentProvided) {
+      updateData.draftContentJson = draftContentJson;
+      updateData.contentJson = draftContentJson; // Legacy-Spiegel
+    }
+
+    // Beim Veröffentlichen den (neuen oder bestehenden) Entwurf nach publishedContentJson promoten.
     const isPublishing = validatedData.published === true;
     if (isPublishing) {
-      updateData.publishedContentJson = draftContentJson;
-      // Setze publishedAt nur wenn die Seite vorher nicht veröffentlicht war
+      updateData.publishedContentJson = contentProvided
+        ? draftContentJson
+        : (existingPage.draftContentJson ?? existingPage.contentJson);
       if (!existingPage.published) {
         updateData.publishedAt = new Date();
       }
@@ -293,8 +297,8 @@ export async function PUT(
       data: updateData,
     });
 
-    // Versionshistorie: Snapshot nur bei manuellem Speichern (nicht bei Autosave).
-    if (body.createRevision === true) {
+    // Versionshistorie: Snapshot nur bei manuellem Speichern mit Inhalt (nicht bei Autosave/Settings-only).
+    if (body.createRevision === true && contentProvided) {
       try {
         const actor = await getActorFromSession();
         await createPageRevision(id, draftContentJson, {
