@@ -1,0 +1,23 @@
+/* Puck-Layout-Overrides für den Visual-Builder.
+ *
+ * Puck setzt auf seinem Wurzelelement (._PuckLayout_…) hart `height: 100dvh`.
+ * Dadurch füllt der Editor die volle Bildschirmhöhe – ZUSÄTZLICH zu unserer
+ * Kopfleiste (Zurück/Speichern) – und läuft unten über; gleichzeitig rutscht
+ * der Scrollbereich der linken Blockliste unter den sichtbaren Bereich.
+ *
+ * Wir binden die Höhe stattdessen an den umgebenden Flex-Container. Dann bleibt
+ * die Kopfleiste sichtbar und Puck verteilt die verfügbare Höhe per Grid –
+ * linke Blockliste, Canvas und rechter Inspector scrollen jeweils intern.
+ *
+ * Der Selektor `[class*="PuckLayout_"]` trifft gezielt nur das Wurzelelement
+ * (Klassen-Token `_PuckLayout_<hash>`), nicht die Kinder (`_PuckLayout-inner_`,
+ * `_PuckLayout-header_`, …), und bleibt damit gegen Hash-Änderungen robust.
+ */
+.fhz-puck-host {
+  height: 100%;
+  min-height: 0;
+}
+
+.fhz-puck-host [class*="PuckLayout_"] {
+  height: 100%;
+}

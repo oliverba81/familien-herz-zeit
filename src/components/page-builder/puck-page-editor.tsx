@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Puck, type Overrides, type Viewports } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
+import "./puck-overrides.css";
 import { puckConfig } from "@/lib/puck/config";
 import { PuckInsertToolbar } from "./puck-insert-toolbar";
 import { syncIframeStyles } from "@/lib/puck/iframe-style-sync";
@@ -73,19 +74,21 @@ export default function PuckPageEditor({
 }: PuckPageEditorProps) {
   return (
     <CustomCssContext.Provider value={customCss}>
-      <Puck
-         
-        config={puckConfig as any}
-         
-        data={data as any}
-        overrides={overrides}
-        viewports={VIEWPORTS}
-        iframe={{ enabled: true }}
-         
-        onPublish={onPublish as any}
-         
-        onChange={onChange as any}
-      />
+      <div className="fhz-puck-host">
+        <Puck
+
+          config={puckConfig as any}
+
+          data={data as any}
+          overrides={overrides}
+          viewports={VIEWPORTS}
+          iframe={{ enabled: true }}
+
+          onPublish={onPublish as any}
+
+          onChange={onChange as any}
+        />
+      </div>
     </CustomCssContext.Provider>
   );
 }

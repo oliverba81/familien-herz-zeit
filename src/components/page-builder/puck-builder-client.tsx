@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { contentToPuck } from "@/lib/puck/to-puck-data";
 import { analyzePuckA11y, type A11yIssue } from "@/lib/puck/a11y";
 import { useAutosave } from "./use-autosave";
@@ -188,7 +189,7 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
   }, [pageId]);
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 4rem)" }}>
+    <div className="flex flex-col overflow-hidden" style={{ height: "100dvh" }}>
       {recovery && (
         <div className="flex items-center gap-3 px-4 py-2 bg-yellow-50 border-b border-yellow-200 text-sm text-yellow-900">
           <span>
@@ -212,6 +213,12 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
         </div>
       )}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 bg-white">
+        <Link
+          href={`/admin/pages/${pageId}`}
+          className="flex items-center gap-1 px-2 py-1 text-sm rounded-lg text-gray-600 hover:bg-gray-100"
+        >
+          ← Zurück
+        </Link>
         <span className="text-sm font-medium text-gray-700">
           Visual-Builder: {pageFields.title || pageFields.slug}
         </span>
