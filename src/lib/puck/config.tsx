@@ -375,7 +375,7 @@ export const puckConfig: Config<any> = {
     Button: {
       label: "Button",
       fields: {
-        text: { type: "text" },
+        text: { type: "text", contentEditable: true },
         href: { type: "text" },
         icon: { type: "text", label: "Icon (optional, z. B. ➜ oder ✉)" },
         variant: {
@@ -446,7 +446,7 @@ export const puckConfig: Config<any> = {
     Heading: {
       label: "Überschrift",
       fields: {
-        text: { type: "text" },
+        text: { type: "text", contentEditable: true },
         level: {
           type: "select",
           options: [1, 2, 3, 4, 5, 6].map((n) => ({ label: `H${n}`, value: n })),
