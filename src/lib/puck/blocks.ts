@@ -138,3 +138,30 @@ export function toEmbedUrl(url?: string): string | null {
   if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
   return url; // generisches iframe
 }
+
+/* --- Responsive pro Breakpoint (Spalten & Galerie) --- */
+
+/** Optionen für per-Breakpoint-Spaltenzahl (Editor-Select). "auto" = vom Desktop erben. */
+export const RESPONSIVE_COL_OPTIONS = [
+  { label: "Automatisch", value: "auto" },
+  { label: "1 Spalte", value: "1" },
+  { label: "2 Spalten", value: "2" },
+  { label: "3 Spalten", value: "3" },
+  { label: "4 Spalten", value: "4" },
+] as const;
+
+/** "auto"/leer → null (erben); sonst grid-template-columns-Wert (z. B. "repeat(2, minmax(0,1fr))"). */
+export function colsTemplateValue(v?: string): string | null {
+  if (!v || v === "auto") return null;
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < 1 || n > 6) return null;
+  return n === 1 ? "1fr" : `repeat(${n}, minmax(0, 1fr))`;
+}
+
+/** "auto"/leer → null (erben); sonst die Spaltenzahl als String (für number-basierte var()). */
+export function colsNumberValue(v?: string): string | null {
+  if (!v || v === "auto") return null;
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < 1 || n > 6) return null;
+  return String(n);
+}

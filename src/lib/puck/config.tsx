@@ -7,7 +7,7 @@ import { EmbedLivePreview } from "@/components/page-builder/embed-live/embed-liv
 import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
 import { responsiveFields, responsiveDefaults } from "./responsive";
 import { MediaUrlField, MediaObjectField } from "./image-field";
-import { SPACER_SIZES, SECTION_MAXWIDTH, sectionStyle } from "./blocks";
+import { SPACER_SIZES, SECTION_MAXWIDTH, sectionStyle, RESPONSIVE_COL_OPTIONS } from "./blocks";
 import {
   FeaturesView,
   TestimonialsView,
@@ -337,14 +337,27 @@ export const puckConfig: Config<any> = {
             { label: "Groß", value: "lg" },
           ],
         },
+        tabletCols: {
+          type: "select",
+          label: "Spalten auf Tablet",
+          options: [...RESPONSIVE_COL_OPTIONS],
+        },
+        mobileCols: {
+          type: "select",
+          label: "Spalten auf Mobil",
+          options: [...RESPONSIVE_COL_OPTIONS],
+        },
         col1: { type: "slot" },
         col2: { type: "slot" },
         col3: { type: "slot" },
       },
-      defaultProps: { count: 2, ratio: "", gap: "md" },
+      defaultProps: { count: 2, ratio: "", gap: "md", tabletCols: "auto", mobileCols: "auto" },
        
-      render: ({ count, ratio, gap, col1: C1, col2: C2, col3: C3 }: any) => (
-        <div className="fhz-columns" style={columnsContainerStyle(count, ratio, gap)}>
+      render: ({ count, ratio, gap, tabletCols, mobileCols, col1: C1, col2: C2, col3: C3 }: any) => (
+        <div
+          className="fhz-columns"
+          style={columnsContainerStyle(count, ratio, gap, tabletCols, mobileCols)}
+        >
           <div>{C1 ? <C1 /> : null}</div>
           <div>{C2 ? <C2 /> : null}</div>
           {Number(count) >= 3 ? <div>{C3 ? <C3 /> : null}</div> : null}
@@ -584,14 +597,32 @@ export const puckConfig: Config<any> = {
     Gallery: {
       label: "Galerie",
       fields: {
+        layout: {
+          type: "radio",
+          label: "Darstellung",
+          options: [
+            { label: "Raster", value: "grid" },
+            { label: "Slider", value: "slider" },
+          ],
+        },
         columns: {
           type: "select",
-          label: "Spalten",
+          label: "Spalten (Desktop)",
           options: [
             { label: "2", value: 2 },
             { label: "3", value: 3 },
             { label: "4", value: 4 },
           ],
+        },
+        tabletColumns: {
+          type: "select",
+          label: "Spalten auf Tablet",
+          options: [...RESPONSIVE_COL_OPTIONS],
+        },
+        mobileColumns: {
+          type: "select",
+          label: "Spalten auf Mobil",
+          options: [...RESPONSIVE_COL_OPTIONS],
         },
         items: {
           type: "array",
@@ -608,9 +639,17 @@ export const puckConfig: Config<any> = {
           },
         },
       },
-      defaultProps: { columns: 3, items: [] },
+      defaultProps: { layout: "grid", columns: 3, tabletColumns: "auto", mobileColumns: "auto", items: [] },
        
-      render: ({ items, columns }: any) => <GalleryView items={items} columns={columns} />,
+      render: ({ items, columns, layout, tabletColumns, mobileColumns }: any) => (
+        <GalleryView
+          items={items}
+          columns={columns}
+          layout={layout}
+          tabletColumns={tabletColumns}
+          mobileColumns={mobileColumns}
+        />
+      ),
     },
 
     Reusable: {

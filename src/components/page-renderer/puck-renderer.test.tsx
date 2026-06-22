@@ -215,6 +215,77 @@ describe("PuckRenderer (V3 Tree-Walker)", () => {
     expect(container.querySelector('img[alt="A"]')).not.toBeNull();
   });
 
+  it("rendert die Galerie als Slider (layout=slider)", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Gallery",
+            props: { id: "g", columns: 3, layout: "slider", items: [{ src: "/a.jpg", alt: "A" }] },
+          },
+        ])}
+      />
+    );
+    expect(container.querySelector(".fhz-gallery--slider")).not.toBeNull();
+    expect(container.querySelector(".fhz-gallery__img")).not.toBeNull();
+  });
+
+  it("setzt per-Breakpoint-Spalten als Custom-Properties (Columns & Gallery)", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Columns",
+            props: {
+              id: "c",
+              count: 3,
+              ratio: "",
+              gap: "md",
+              tabletCols: "2",
+              mobileCols: "1",
+              col1: [],
+              col2: [],
+              col3: [],
+            },
+          },
+          {
+            type: "Gallery",
+            props: {
+              id: "g",
+              columns: 4,
+              tabletColumns: "2",
+              mobileColumns: "1",
+              items: [{ src: "/a.jpg", alt: "A" }],
+            },
+          },
+        ])}
+      />
+    );
+    const cols = container.querySelector(".fhz-columns") as HTMLElement;
+    expect(cols.style.getPropertyValue("--cols-tablet")).toBe("repeat(2, minmax(0, 1fr))");
+    expect(cols.style.getPropertyValue("--cols-mobile")).toBe("1fr");
+    const gallery = container.querySelector(".fhz-gallery") as HTMLElement;
+    expect(gallery.style.getPropertyValue("--gallery-cols")).toBe("4");
+    expect(gallery.style.getPropertyValue("--gallery-cols-tablet")).toBe("2");
+    expect(gallery.style.getPropertyValue("--gallery-cols-mobile")).toBe("1");
+  });
+
+  it("lässt per-Breakpoint-Properties bei 'auto' weg (erbt Default)", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Columns",
+            props: { id: "c", count: 2, tabletCols: "auto", mobileCols: "auto", col1: [], col2: [] },
+          },
+        ])}
+      />
+    );
+    const cols = container.querySelector(".fhz-columns") as HTMLElement;
+    expect(cols.style.getPropertyValue("--cols-tablet")).toBe("");
+    expect(cols.style.getPropertyValue("--cols-mobile")).toBe("");
+  });
+
   it("zeigt den Unknown-Fallback für unbekannte Typen", () => {
     render(<PuckRenderer data={puck([{ type: "GibtsNicht", props: { id: "x" } }])} />);
     expect(screen.getByText(/Unbekannter Block-Typ/)).toBeInTheDocument();
