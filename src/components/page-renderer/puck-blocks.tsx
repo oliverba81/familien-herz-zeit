@@ -1,9 +1,177 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import {
+  imageStyle,
+  buttonClasses,
+  columnsTemplate,
+  COLUMNS_GAP,
+  toEmbedUrl,
+} from "@/lib/puck/blocks";
 
 /**
  * Geteilte, präsentationale Block-Views (kein DB/Client-State) für Puck.
  * Genutzt im Editor (config render) UND live (renderPuckTree) → identische Ausgabe.
  */
+
+export interface ImageViewProps {
+  src?: string;
+  alt?: string;
+  caption?: string;
+  width?: string;
+  align?: string;
+  rounded?: string;
+  bordered?: boolean;
+  href?: string;
+  newTab?: boolean;
+}
+
+export function ImageView(props: ImageViewProps): ReactNode {
+  const { src, alt, caption, href, newTab } = props;
+  if (!src) {
+    return (
+      <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">Kein Bild gewählt</div>
+    );
+  }
+   
+  const img = <img src={src} alt={alt || ""} style={imageStyle(props)} />;
+  const linked = href ? (
+    <a href={href} target={newTab ? "_blank" : undefined} rel={newTab ? "noopener noreferrer" : undefined}>
+      {img}
+    </a>
+  ) : (
+    img
+  );
+  return (
+    <figure>
+      {linked}
+      {caption ? <figcaption className="text-sm text-gray-500 mt-1">{caption}</figcaption> : null}
+    </figure>
+  );
+}
+
+export interface ButtonViewProps {
+  text?: string;
+  href?: string;
+  variant?: string;
+  align?: string;
+  size?: string;
+  icon?: string;
+  newTab?: boolean;
+}
+
+export function ButtonView(props: ButtonViewProps): ReactNode {
+  const { text, href, variant, align, size, icon, newTab } = props;
+  return (
+    <div style={{ textAlign: (align as CSSProperties["textAlign"]) || "left" }}>
+      <a
+        href={href || "#"}
+        target={newTab ? "_blank" : undefined}
+        rel={newTab ? "noopener noreferrer" : undefined}
+        className={buttonClasses(variant, size)}
+      >
+        {icon ? <span aria-hidden>{icon}</span> : null}
+        {text || "Button"}
+      </a>
+    </div>
+  );
+}
+
+export interface EmbedViewProps {
+  url?: string;
+  title?: string;
+}
+
+export function EmbedView({ url, title }: EmbedViewProps): ReactNode {
+  const embedUrl = toEmbedUrl(url);
+  if (!embedUrl) {
+    return (
+      <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">Keine Embed-URL</div>
+    );
+  }
+  return (
+    <figure>
+      <div style={{ position: "relative", paddingTop: "56.25%" }}>
+        <iframe
+          src={embedUrl}
+          title={title || "Eingebetteter Inhalt"}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+        />
+      </div>
+      {title ? <figcaption className="text-sm text-gray-500 mt-1">{title}</figcaption> : null}
+    </figure>
+  );
+}
+
+export interface AccordionItem {
+  question?: string;
+  answer?: string;
+}
+
+export function AccordionView({ items }: { items?: AccordionItem[] }): ReactNode {
+  const list = items ?? [];
+  return (
+    <div className="divide-y divide-gray-200 border-y border-gray-200">
+      {list.map((item, i) => (
+        <details key={i} className="group py-3">
+          <summary className="cursor-pointer font-semibold text-gray-900 list-none flex justify-between items-center">
+            {item.question || "Frage"}
+            <span className="text-gray-400 group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <p className="mt-2 text-gray-600 whitespace-pre-line">{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  );
+}
+
+export interface GalleryImage {
+  src?: string;
+  alt?: string;
+}
+
+export function GalleryView({
+  items,
+  columns,
+}: {
+  items?: GalleryImage[];
+  columns?: number;
+}): ReactNode {
+  const list = (items ?? []).filter((it) => it.src);
+  const cols = [2, 3, 4].includes(Number(columns)) ? Number(columns) : 3;
+  if (list.length === 0) {
+    return (
+      <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">Keine Bilder</div>
+    );
+  }
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        gap: COLUMNS_GAP.md,
+      }}
+    >
+      {list.map((item, i) => (
+         
+        <img
+          key={i}
+          src={item.src}
+          alt={item.alt || ""}
+          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "0.375rem" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Inline-Style für den Spalten-Container (Verhältnis + Abstand, mobil gestapelt via CSS). */
+export function columnsContainerStyle(count: number, ratio?: string, gap?: string): CSSProperties {
+  return {
+    ["--cols-template" as string]: columnsTemplate(count, ratio),
+    ["--cols-gap" as string]: COLUMNS_GAP[gap ?? "md"] ?? COLUMNS_GAP.md,
+  };
+}
 
 export interface FeatureItem {
   title?: string;

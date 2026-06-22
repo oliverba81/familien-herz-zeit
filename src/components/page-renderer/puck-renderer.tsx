@@ -2,7 +2,19 @@ import type { ReactNode } from "react";
 import { cleanAndConvertHtml } from "@/lib/utils/html-links";
 import { getResponsiveClasses } from "@/lib/puck/responsive";
 import { SPACER_SIZES, SECTION_MAXWIDTH, sectionStyle } from "@/lib/puck/blocks";
-import { FeaturesView, TestimonialsView } from "./puck-blocks";
+import {
+  FeaturesView,
+  TestimonialsView,
+  ImageView,
+  ButtonView,
+  EmbedView,
+  AccordionView,
+  GalleryView,
+  columnsContainerStyle,
+  type ImageViewProps,
+  type ButtonViewProps,
+} from "./puck-blocks";
+import { TabsView } from "./tabs-view";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
 import CoursesBlock from "@/components/courses/courses-block";
 import CurrentAppointmentsBlock from "@/components/courses/current-appointments-block";
@@ -91,6 +103,7 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
       const inner = SECTION_MAXWIDTH[String(props.maxWidth)] || undefined;
       return (
         <section
+          id={(props.anchorId as string) || undefined}
           className={className}
           style={sectionStyle({
             background: props.background as string,
@@ -135,7 +148,10 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
     case "Columns": {
       const count = Number(props.count) >= 3 ? 3 : 2;
       return (
-        <div className="fhz-columns" style={{ ["--cols" as string]: String(count) }}>
+        <div
+          className="fhz-columns"
+          style={columnsContainerStyle(count, props.ratio as string, props.gap as string)}
+        >
           <div>{(resolved.col1 as ReactNode) ?? null}</div>
           <div>{(resolved.col2 as ReactNode) ?? null}</div>
           {count >= 3 ? <div>{(resolved.col3 as ReactNode) ?? null}</div> : null}
@@ -146,28 +162,33 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
     case "Spacer":
       return <div style={{ height: SPACER_SIZES[String(props.size)] ?? SPACER_SIZES.md }} />;
 
-    case "Button": {
-      const variant = props.variant === "secondary" ? "secondary" : "primary";
+    case "Image":
+      return <ImageView {...(props as unknown as ImageViewProps)} />;
+
+    case "Button":
+      return <ButtonView {...(props as unknown as ButtonViewProps)} />;
+
+    case "Embed":
+      return <EmbedView url={props.url as string} title={props.title as string} />;
+
+    case "Accordion":
+      return <AccordionView items={props.items as { question?: string; answer?: string }[]} />;
+
+    case "Tabs":
+      return <TabsView items={props.items as { label?: string; content?: string }[]} />;
+
+    case "Gallery":
       return (
-        <div style={{ textAlign: (props.align as "left" | "center" | "right") || "left" }}>
-          <a
-            href={String(props.href || "#")}
-            className={
-              variant === "secondary"
-                ? "inline-block px-5 py-2.5 rounded-lg border border-rose-500 text-rose-600 font-semibold"
-                : "inline-block px-5 py-2.5 rounded-lg bg-rose-500 text-white font-semibold"
-            }
-          >
-            {String(props.text || "Button")}
-          </a>
-        </div>
+        <GalleryView
+          items={props.items as { src?: string; alt?: string }[]}
+          columns={props.columns as number}
+        />
       );
-    }
 
     case "Video":
       return props.src ? (
         <figure>
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          { }
           <video src={String(props.src)} controls style={{ width: "100%", height: "auto" }} />
           {props.title ? <figcaption>{String(props.title)}</figcaption> : null}
         </figure>

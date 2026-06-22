@@ -41,3 +41,100 @@ export function sectionStyle(props: SectionStyleProps): CSSProperties {
   }
   return style;
 }
+
+/* --- Bild-Block: Größe, Ausrichtung, Rundung, Rahmen --- */
+
+export const IMAGE_WIDTH: Record<string, string> = {
+  sm: "16rem",
+  md: "32rem",
+  lg: "48rem",
+  full: "100%",
+};
+
+export const IMAGE_ROUNDED: Record<string, string> = {
+  none: "0",
+  sm: "0.375rem",
+  lg: "1rem",
+  full: "9999px",
+};
+
+export interface ImageStyleProps {
+  width?: string;
+  align?: string;
+  rounded?: string;
+  bordered?: boolean;
+}
+
+/** Inline-Style für das <img> (Breite, Ausrichtung via auto-Margin, Rundung, Rahmen). */
+export function imageStyle(props: ImageStyleProps): CSSProperties {
+  const maxWidth = IMAGE_WIDTH[props.width ?? "full"] ?? IMAGE_WIDTH.full;
+  const style: CSSProperties = {
+    maxWidth,
+    width: maxWidth === "100%" ? "100%" : undefined,
+    height: "auto",
+    display: "block",
+    borderRadius: IMAGE_ROUNDED[props.rounded ?? "none"] ?? "0",
+  };
+  // Ausrichtung über auto-Margins (greift nur, wenn die Breite < 100% ist).
+  if (props.align === "center") {
+    style.marginLeft = "auto";
+    style.marginRight = "auto";
+  } else if (props.align === "right") {
+    style.marginLeft = "auto";
+  }
+  if (props.bordered) style.border = "1px solid #e5e7eb";
+  return style;
+}
+
+/* --- Button-Block: Variante, Größe --- */
+
+export const BUTTON_SIZE: Record<string, string> = {
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-5 py-2.5",
+  lg: "px-7 py-3.5 text-lg",
+};
+
+/** Tailwind-Klassen für den Button (Variante + Größe). */
+export function buttonClasses(variant?: string, size?: string): string {
+  const sizeCls = BUTTON_SIZE[size ?? "md"] ?? BUTTON_SIZE.md;
+  const variantCls =
+    variant === "secondary"
+      ? "border border-rose-500 text-rose-600"
+      : "bg-rose-500 text-white";
+  return `inline-flex items-center gap-2 rounded-lg font-semibold ${sizeCls} ${variantCls}`;
+}
+
+/* --- Spalten-Block: Verhältnis & Abstand --- */
+
+export const COLUMNS_GAP: Record<string, string> = {
+  sm: "0.75rem",
+  md: "1.5rem",
+  lg: "3rem",
+};
+
+/**
+ * grid-template-columns für den Spalten-Block. `ratio` ist eine Bindestrich-Liste
+ * von Anteilen (z. B. "2-1" → "2fr 1fr"); ohne/ungültig → gleich breite Spalten.
+ */
+export function columnsTemplate(count: number, ratio?: string): string {
+  const cols = Number(count) >= 3 ? 3 : 2;
+  if (ratio && /^\d+(-\d+)+$/.test(ratio)) {
+    const parts = ratio.split("-").slice(0, cols);
+    if (parts.length === cols) return parts.map((n) => `${n}fr`).join(" ");
+  }
+  return `repeat(${cols}, minmax(0, 1fr))`;
+}
+
+/* --- Embed-Block: YouTube / Vimeo / generisches iframe --- */
+
+/** Wandelt eine eingegebene URL in eine einbettbare iframe-URL um. */
+export function toEmbedUrl(url?: string): string | null {
+  if (!url) return null;
+  const yt = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/
+  );
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return url; // generisches iframe
+}
