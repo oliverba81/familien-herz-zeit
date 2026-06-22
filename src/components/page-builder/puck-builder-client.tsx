@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { contentToPuck } from "@/lib/puck/to-puck-data";
+import { analyzePuckA11y, type A11yIssue } from "@/lib/puck/a11y";
 import { useAutosave } from "./use-autosave";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
 
@@ -38,6 +39,7 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [a11y, setA11y] = useState<A11yIssue[]>(() => analyzePuckA11y(initialData));
 
   const save = useCallback(
     async (publish: boolean): Promise<void> => {
@@ -80,6 +82,7 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
   const handleChange = useCallback((d: PageContentPuck) => {
     latest.current = d;
     setDirty(true); // nach erstem Mal No-op (React bail-out)
+    setA11y(analyzePuckA11y(d));
   }, []);
 
   const handlePublish = useCallback(() => {
@@ -94,6 +97,22 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
         </span>
         {dirty && <span className="text-xs text-orange-600">● ungespeichert</span>}
         {status && <span className="text-xs text-gray-600">{status}</span>}
+        {a11y.length > 0 ? (
+          <details className="relative text-xs">
+            <summary className="cursor-pointer list-none px-2 py-1 rounded bg-amber-100 text-amber-800">
+              ♿ {a11y.length} Hinweis{a11y.length === 1 ? "" : "e"}
+            </summary>
+            <ul className="absolute z-10 mt-1 w-72 max-h-60 overflow-auto rounded-lg border border-amber-200 bg-white p-2 shadow-lg">
+              {a11y.map((issue, i) => (
+                <li key={i} className="px-1 py-0.5 text-amber-800">
+                  • {issue.message}
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <span className="text-xs text-green-700">♿ keine A11y-Hinweise</span>
+        )}
         <button
           type="button"
           onClick={saveDraft}
