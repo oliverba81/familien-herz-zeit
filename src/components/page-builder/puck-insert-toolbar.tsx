@@ -15,7 +15,7 @@ import { createBlockId } from "@/lib/page-builder/ids";
  * Alle eingefügten Knoten bekommen frische IDs (keine State-Kollision).
  */
 export function PuckInsertToolbar() {
-  const { dispatch } = usePuck();
+  const { dispatch, selectedItem } = usePuck();
 
   const insertNodes = useCallback(
     (nodes: PuckNode[]) => {
@@ -30,6 +30,31 @@ export function PuckInsertToolbar() {
     },
     [dispatch]
   );
+
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
+  // Aktuell ausgewählten Block als globalen (wiederverwendbaren) Block speichern.
+  const saveSelection = useCallback(async () => {
+    if (!selectedItem) {
+      setSaveStatus("Bitte zuerst einen Block im Canvas auswählen.");
+      window.setTimeout(() => setSaveStatus(null), 3000);
+      return;
+    }
+    const name = window.prompt("Name für den globalen Block:");
+    if (!name) return;
+    try {
+      const contentJson = { version: 3, root: { props: {} }, content: [selectedItem] };
+      const res = await fetch("/api/reusable-blocks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, contentJson }),
+      });
+      setSaveStatus(res.ok ? "✓ Als globaler Block gespeichert" : "Fehler beim Speichern");
+    } catch {
+      setSaveStatus("Fehler beim Speichern");
+    }
+    window.setTimeout(() => setSaveStatus(null), 3000);
+  }, [selectedItem]);
 
   // --- Inline-KI ---
   const [aiPrompt, setAiPrompt] = useState("");
@@ -86,11 +111,12 @@ export function PuckInsertToolbar() {
                 onClick={() => insertNodes(instantiateTemplate(tpl.nodes))}
                 className="w-full flex items-center gap-3 text-left px-2 py-2 rounded hover:bg-gray-100"
               >
-                {tpl.preview && (
-                  <span
-                    className="shrink-0 w-16 h-12 overflow-hidden rounded border border-gray-200 bg-white p-1 text-[8px] leading-tight"
-                    aria-hidden
-                    dangerouslySetInnerHTML={{ __html: tpl.preview }}
+                {tpl.thumbnail && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={tpl.thumbnail}
+                    alt=""
+                    className="shrink-0 w-16 h-12 rounded border border-gray-200 bg-white object-contain"
                   />
                 )}
                 <span className="min-w-0">
@@ -158,6 +184,12 @@ export function PuckInsertToolbar() {
           )}
         </ul>
       </details>
+
+      {/* Auswahl als globalen Block speichern */}
+      <button type="button" onClick={() => void saveSelection()} className={summaryCls}>
+        💾 Auswahl speichern
+      </button>
+      {saveStatus && <span className="text-xs text-gray-600">{saveStatus}</span>}
     </div>
   );
 }

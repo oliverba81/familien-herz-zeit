@@ -95,6 +95,7 @@ export default function AdminSidebar() {
       icon: "📝",
       items: [
         { href: "/admin/pages", label: "Seiten", icon: "📄" },
+        { href: "/admin/reusable-blocks", label: "Globale Blöcke", icon: "🧩" },
         { href: "/admin/media", label: "Medien", icon: "🖼️" },
         { href: "/admin/signs", label: "Zeichen-Lexikon", icon: "👶" },
         { href: "/admin/navigation", label: "Navigation", icon: "🔗" },
