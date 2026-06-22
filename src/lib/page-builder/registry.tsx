@@ -1,17 +1,15 @@
-"use client";
-
-import { ComponentType } from "react";
 import { z } from "zod";
-import { Block, BlockType } from "./types";
+import { BlockType } from "./types";
 import { PageBlock } from "./schema";
 import { createBlockId } from "./ids";
-import PageRenderer from "@/components/page-renderer/page-renderer";
-import BlockEditor from "@/components/page-builder/block-editor";
-import { SectionCanvasComponent, SectionInspectorComponent } from "@/components/page-builder/section-block";
-import { ReusableCanvasComponent, ReusableInspectorComponent } from "@/components/page-builder/reusable-block";
 
 /**
  * Block Registry Entry
+ *
+ * Reine Metadaten-/Schema-Quelle (Label, Icon, Defaults, Validierung). Die
+ * früheren Canvas-/Inspector-UI-Felder (V1-Editor) sind entfernt — der
+ * Visual-Builder läuft über Puck; diese Registry liefert nur noch
+ * Defaults/Schemas für die V2-Embed-Platzhalter.
  */
 export interface BlockRegistryEntry {
   type: BlockType;
@@ -19,37 +17,6 @@ export interface BlockRegistryEntry {
   icon: string;
   defaultData: () => Record<string, any>;
   schema: z.ZodTypeAny; // Validation schema
-  CanvasComponent: ComponentType<{ block: Block }>;
-  InspectorComponent: ComponentType<{ block: Block; onChange: (block: Block) => void }>;
-}
-
-/**
- * Canvas Component Wrapper
- * Rendert einen einzelnen Block über PageRenderer
- */
-function BlockCanvasWrapper({ block }: { block: Block }) {
-  return (
-    <PageRenderer
-      content={{
-        version: 1,
-        blocks: [block],
-      }}
-    />
-  );
-}
-
-/**
- * Inspector Component Wrapper
- * Nutzt existierenden BlockEditor
- */
-function BlockInspectorWrapper({
-  block,
-  onChange,
-}: {
-  block: Block;
-  onChange: (block: Block) => void;
-}) {
-  return <BlockEditor block={block} onChange={onChange} />;
 }
 
 // Block Schemas
@@ -269,8 +236,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       primaryCtaText: undefined,
       primaryCtaHref: undefined,
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   text: {
     type: "text",
@@ -280,8 +245,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
     defaultData: () => ({
       text: "Dein Text hier...",
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   richText: {
     type: "richText",
@@ -291,8 +254,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
     defaultData: () => ({
       html: "<p>Formatierter Text hier...</p>",
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   image: {
     type: "image",
@@ -308,8 +269,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       fullWidth: false,
       fixedHeight: undefined,
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   video: {
     type: "video",
@@ -320,8 +279,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       media: undefined,
       title: undefined,
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   features: {
     type: "features",
@@ -335,8 +292,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
         { title: "Feature 2", text: "Beschreibung" },
       ],
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   testimonials: {
     type: "testimonials",
@@ -347,8 +302,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       title: undefined,
       items: [{ name: "Name", text: "Testimonial Text" }],
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   cta: {
     type: "cta",
@@ -361,8 +314,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       buttonText: "Jetzt starten",
       buttonHref: "/",
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   spacer: {
     type: "spacer",
@@ -372,8 +323,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
     defaultData: () => ({
       size: "md",
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   table: {
     type: "table",
@@ -391,8 +340,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       ],
       columnWidths: ["50%", "50%"],
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   section: {
     type: "section",
@@ -406,8 +353,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       padding: "md",
       children: [],
     }),
-    CanvasComponent: SectionCanvasComponent,
-    InspectorComponent: SectionInspectorComponent,
   },
   reusable: {
     type: "reusable",
@@ -417,8 +362,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
     defaultData: () => ({
       reusableId: "",
     }),
-    CanvasComponent: ReusableCanvasComponent,
-    InspectorComponent: ReusableInspectorComponent,
   },
   courses: {
     type: "courses",
@@ -436,8 +379,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       contactLinkUrl: "/kontakt",
       contactLinkLabel: "Jetzt Kontakt aufnehmen",
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   "current-appointments": {
     type: "current-appointments",
@@ -453,8 +394,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       width: "full",
       footerHtml: undefined,
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   "herzzeit-story": {
     type: "herzzeit-story",
@@ -476,8 +415,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       style: "card",
       backgroundColor: undefined,
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
   contactForm: {
     type: "contactForm",
@@ -510,8 +447,6 @@ export const blockRegistry: Record<BlockType, BlockRegistryEntry> = {
       recaptchaSiteKey: undefined,
       layout: "default",
     }),
-    CanvasComponent: BlockCanvasWrapper,
-    InspectorComponent: BlockInspectorWrapper,
   },
 };
 
