@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { cleanAndConvertHtml } from "@/lib/utils/html-links";
 import { getResponsiveClasses } from "@/lib/puck/responsive";
-import { SPACER_SIZES } from "@/lib/puck/blocks";
+import { SPACER_SIZES, SECTION_MAXWIDTH, sectionStyle } from "@/lib/puck/blocks";
+import { FeaturesView, TestimonialsView } from "./puck-blocks";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
 import CoursesBlock from "@/components/courses/courses-block";
 import CurrentAppointmentsBlock from "@/components/courses/current-appointments-block";
@@ -87,12 +88,49 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
 
     case "Section": {
       const className = typeof resolved.className === "string" ? resolved.className : undefined;
+      const inner = SECTION_MAXWIDTH[String(props.maxWidth)] || undefined;
       return (
-        <section className={className}>
-          {(resolved.children as ReactNode) ?? null}
+        <section
+          className={className}
+          style={sectionStyle({
+            background: props.background as string,
+            backgroundImage: props.backgroundImage as string,
+            padding: props.padding as string,
+          })}
+        >
+          <div className={inner}>{(resolved.children as ReactNode) ?? null}</div>
         </section>
       );
     }
+
+    case "Heading": {
+      const lvl = [1, 2, 3, 4, 5, 6].includes(Number(props.level)) ? Number(props.level) : 2;
+      const Tag = `h${lvl}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+      return (
+        <Tag style={{ textAlign: (props.align as "left" | "center" | "right") || "left" }}>
+          {String(props.text ?? "")}
+        </Tag>
+      );
+    }
+
+    case "Divider":
+      return <hr className="my-6 border-gray-200" />;
+
+    case "Features":
+      return (
+        <FeaturesView
+          title={props.title as string}
+          items={props.items as { title?: string; text?: string }[]}
+        />
+      );
+
+    case "Testimonials":
+      return (
+        <TestimonialsView
+          title={props.title as string}
+          items={props.items as { name?: string; text?: string }[]}
+        />
+      );
 
     case "Columns": {
       const count = Number(props.count) >= 3 ? 3 : 2;

@@ -14,6 +14,10 @@ const EXPECTED = [
   "Spacer",
   "Button",
   "Video",
+  "Heading",
+  "Divider",
+  "Features",
+  "Testimonials",
   "Reusable",
 ];
 

@@ -6,8 +6,9 @@ import { RichTextField } from "./rich-text-field";
 import { EmbedLivePreview } from "@/components/page-builder/embed-live/embed-live-preview";
 import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
 import { responsiveFields, responsiveDefaults } from "./responsive";
-import { MediaUrlField } from "./image-field";
-import { SPACER_SIZES } from "./blocks";
+import { MediaUrlField, MediaObjectField } from "./image-field";
+import { SPACER_SIZES, SECTION_MAXWIDTH, sectionStyle } from "./blocks";
+import { FeaturesView, TestimonialsView } from "@/components/page-renderer/puck-blocks";
 
 /** Puck-Komponentenname → V2-Embed-Blocktyp (für Edit-Preview + spätere Serialisierung). */
 export const PUCK_TO_V2_EMBED: Record<string, string> = {
@@ -77,14 +78,43 @@ export const puckConfig: Config<any> = {
     Section: {
       label: "Sektion",
       fields: {
+        background: { type: "text", label: "Hintergrundfarbe (z. B. #f9fafb)" },
+        backgroundImage: {
+          type: "custom",
+          render: ({ value, onChange }) => (
+            <MediaUrlField value={value as string} onChange={onChange} />
+          ),
+        },
+        padding: {
+          type: "select",
+          options: [
+            { label: "Kein", value: "none" },
+            { label: "Klein", value: "sm" },
+            { label: "Mittel", value: "md" },
+            { label: "Groß", value: "lg" },
+          ],
+        },
+        maxWidth: {
+          type: "select",
+          options: [
+            { label: "Volle Breite", value: "none" },
+            { label: "Schmal", value: "narrow" },
+            { label: "Breit", value: "wide" },
+          ],
+        },
         className: { type: "text" },
         children: { type: "slot" },
       },
-      defaultProps: { className: "" },
-       
-      render: ({ className, children: Children }: any) => (
-        <section className={className || undefined}>
-          {Children ? <Children /> : null}
+      defaultProps: { background: "", backgroundImage: "", padding: "md", maxWidth: "none", className: "" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ background, backgroundImage, padding, maxWidth, className, children: Children }: any) => (
+        <section
+          className={className || undefined}
+          style={sectionStyle({ background, backgroundImage, padding })}
+        >
+          <div className={SECTION_MAXWIDTH[maxWidth as string] || undefined}>
+            {Children ? <Children /> : null}
+          </div>
         </section>
       ),
     },
@@ -127,6 +157,16 @@ export const puckConfig: Config<any> = {
         showEmptyMessage: boolField("Leer-Hinweis"),
         contactLinkUrl: { type: "text" },
         contactLinkLabel: { type: "text" },
+        backgroundImage: {
+          type: "custom",
+          label: "Hintergrundbild",
+          render: ({ value, onChange }) => (
+            <MediaObjectField
+              value={value as { url?: string } | undefined}
+              onChange={onChange}
+            />
+          ),
+        },
         backgroundImageOpacity: { type: "number" },
       },
       defaultProps: coursesDefaults,
@@ -334,6 +374,87 @@ export const puckConfig: Config<any> = {
             Kein Video gewählt
           </div>
         ),
+    },
+
+    Heading: {
+      label: "Überschrift",
+      fields: {
+        text: { type: "text" },
+        level: {
+          type: "select",
+          options: [1, 2, 3, 4, 5, 6].map((n) => ({ label: `H${n}`, value: n })),
+        },
+        align: {
+          type: "radio",
+          options: [
+            { label: "Links", value: "left" },
+            { label: "Mitte", value: "center" },
+            { label: "Rechts", value: "right" },
+          ],
+        },
+      },
+      defaultProps: { text: "Überschrift", level: 2, align: "left" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ text, level, align }: any) => {
+        const Tag = `h${[1, 2, 3, 4, 5, 6].includes(Number(level)) ? level : 2}` as
+          | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+        return <Tag style={{ textAlign: align || "left" }}>{text || ""}</Tag>;
+      },
+    },
+
+    Divider: {
+      label: "Trennlinie",
+      fields: {},
+      defaultProps: {},
+      render: () => <hr className="my-6 border-gray-200" />,
+    },
+
+    Features: {
+      label: "Features",
+      fields: {
+        title: { type: "text" },
+        items: {
+          type: "array",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          getItemSummary: (item: any) => item?.title || "Feature",
+          arrayFields: {
+            title: { type: "text" },
+            text: { type: "textarea" },
+          },
+        },
+      },
+      defaultProps: {
+        title: "",
+        items: [
+          { title: "Feature 1", text: "Beschreibung" },
+          { title: "Feature 2", text: "Beschreibung" },
+          { title: "Feature 3", text: "Beschreibung" },
+        ],
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ title, items }: any) => <FeaturesView title={title} items={items} />,
+    },
+
+    Testimonials: {
+      label: "Testimonials",
+      fields: {
+        title: { type: "text" },
+        items: {
+          type: "array",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          getItemSummary: (item: any) => item?.name || "Stimme",
+          arrayFields: {
+            name: { type: "text" },
+            text: { type: "textarea" },
+          },
+        },
+      },
+      defaultProps: {
+        title: "",
+        items: [{ name: "Name", text: "Ein nettes Zitat." }],
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ title, items }: any) => <TestimonialsView title={title} items={items} />,
     },
 
     Reusable: {

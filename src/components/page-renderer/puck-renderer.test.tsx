@@ -121,6 +121,54 @@ describe("PuckRenderer (V3 Tree-Walker)", () => {
     expect(screen.getByText("Clip")).toBeInTheDocument();
   });
 
+  it("rendert Heading, Divider, Features und Testimonials", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          { type: "Heading", props: { id: "h", text: "Titel", level: 3, align: "center" } },
+          { type: "Divider", props: { id: "d" } },
+          {
+            type: "Features",
+            props: { id: "f", title: "Vorteile", items: [{ title: "Schnell", text: "sehr" }] },
+          },
+          {
+            type: "Testimonials",
+            props: { id: "t", items: [{ name: "Anna", text: "Toll!" }] },
+          },
+        ])}
+      />
+    );
+    expect(container.querySelector("h3")?.textContent).toBe("Titel");
+    expect(container.querySelector("hr")).not.toBeNull();
+    expect(screen.getByText("Vorteile")).toBeInTheDocument();
+    expect(screen.getByText("Schnell")).toBeInTheDocument();
+    expect(screen.getByText("Toll!")).toBeInTheDocument();
+    expect(screen.getByText("— Anna")).toBeInTheDocument();
+  });
+
+  it("wendet Section-Gestaltung an (Hintergrund + maxWidth)", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Section",
+            props: {
+              id: "s",
+              background: "#f9fafb",
+              padding: "lg",
+              maxWidth: "narrow",
+              children: [{ type: "RichText", props: { id: "r", html: "<p>Drin</p>" } }],
+            },
+          },
+        ])}
+      />
+    );
+    const section = container.querySelector("section") as HTMLElement;
+    expect(section.style.backgroundColor).toBeTruthy();
+    expect(container.querySelector(".max-w-2xl")).not.toBeNull();
+    expect(screen.getByText("Drin")).toBeInTheDocument();
+  });
+
   it("zeigt den Unknown-Fallback für unbekannte Typen", () => {
     render(<PuckRenderer data={puck([{ type: "GibtsNicht", props: { id: "x" } }])} />);
     expect(screen.getByText(/Unbekannter Block-Typ/)).toBeInTheDocument();
