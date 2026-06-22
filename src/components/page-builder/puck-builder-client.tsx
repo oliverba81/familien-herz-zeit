@@ -188,7 +188,7 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
   }, [pageId]);
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 4rem)" }}>
+    <div className="flex flex-col overflow-hidden" style={{ height: "100dvh" }}>
       {recovery && (
         <div className="flex items-center gap-3 px-4 py-2 bg-yellow-50 border-b border-yellow-200 text-sm text-yellow-900">
           <span>
@@ -280,6 +280,7 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
           key={editorKey}
           data={editorData}
           customCss={pageFields.customCss}
+          backHref={`/admin/pages/${pageId}`}
           onChange={handleChange}
           onPublish={handlePublish}
         />
