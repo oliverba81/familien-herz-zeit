@@ -133,9 +133,12 @@ export interface GalleryImage {
 export function GalleryView({
   items,
   columns,
+  layout,
 }: {
   items?: GalleryImage[];
   columns?: number;
+  /** "grid" (Raster, responsiv gestapelt) oder "slider" (horizontale Scroll-Snap-Reihe). */
+  layout?: string;
 }): ReactNode {
   const list = (items ?? []).filter((it) => it.src);
   const cols = [2, 3, 4].includes(Number(columns)) ? Number(columns) : 3;
@@ -144,22 +147,14 @@ export function GalleryView({
       <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">Keine Bilder</div>
     );
   }
+  // Responsives Verhalten (Raster stapelt auf Mobil, Slider scrollt) liegt in
+  // public/page-builder-v2-presets.css; nur die Spaltenzahl kommt als Custom-Property.
+  const className = layout === "slider" ? "fhz-gallery fhz-gallery--slider" : "fhz-gallery";
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-        gap: COLUMNS_GAP.md,
-      }}
-    >
+    <div className={className} style={{ ["--gallery-cols" as string]: String(cols) }}>
       {list.map((item, i) => (
          
-        <img
-          key={i}
-          src={item.src}
-          alt={item.alt || ""}
-          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "0.375rem" }}
-        />
+        <img key={i} src={item.src} alt={item.alt || ""} className="fhz-gallery__img" />
       ))}
     </div>
   );

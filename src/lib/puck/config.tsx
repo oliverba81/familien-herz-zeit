@@ -584,6 +584,14 @@ export const puckConfig: Config<any> = {
     Gallery: {
       label: "Galerie",
       fields: {
+        layout: {
+          type: "radio",
+          label: "Darstellung",
+          options: [
+            { label: "Raster", value: "grid" },
+            { label: "Slider", value: "slider" },
+          ],
+        },
         columns: {
           type: "select",
           label: "Spalten",
@@ -608,9 +616,11 @@ export const puckConfig: Config<any> = {
           },
         },
       },
-      defaultProps: { columns: 3, items: [] },
-       
-      render: ({ items, columns }: any) => <GalleryView items={items} columns={columns} />,
+      defaultProps: { layout: "grid", columns: 3, items: [] },
+
+      render: ({ items, columns, layout }: any) => (
+        <GalleryView items={items} columns={columns} layout={layout} />
+      ),
     },
 
     Reusable: {
