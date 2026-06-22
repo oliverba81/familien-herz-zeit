@@ -6,6 +6,7 @@ import { RichTextField } from "./rich-text-field";
 import { EmbedLivePreview } from "@/components/page-builder/embed-live/embed-live-preview";
 import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
 import { responsiveFields, responsiveDefaults } from "./responsive";
+import { MediaUrlField } from "./image-field";
 
 /** Puck-Komponentenname → V2-Embed-Blocktyp (für Edit-Preview + spätere Serialisierung). */
 export const PUCK_TO_V2_EMBED: Record<string, string> = {
@@ -90,7 +91,12 @@ export const puckConfig: Config<any> = {
     Image: {
       label: "Bild",
       fields: {
-        src: { type: "text" },
+        src: {
+          type: "custom",
+          render: ({ value, onChange }) => (
+            <MediaUrlField value={value as string} onChange={onChange} />
+          ),
+        },
         alt: { type: "text" },
         caption: { type: "text" },
       },
