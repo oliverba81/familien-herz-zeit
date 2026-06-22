@@ -104,6 +104,11 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
     case "ContactForm":
       return <ContactFormBlock data={props as unknown as ContactFormBlockData} />;
 
+    case "Reusable":
+      // Sollte live bereits via resolveReusableTree expandiert sein; falls nicht,
+      // nichts rendern (kein roher Platzhalter auf der veröffentlichten Seite).
+      return null;
+
     default:
       // Unbekannter Typ → kein Crash, sichtbarer Hinweis (konsistent zu page-renderer-server).
       return (

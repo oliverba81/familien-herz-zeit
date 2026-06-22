@@ -147,6 +147,25 @@ export const puckConfig: Config<any> = {
       defaultProps: contactDefaults,
       render: embedEditRender("ContactForm"),
     },
+
+    Reusable: {
+      label: "Wiederverwendbarer Block",
+      fields: {
+        reusableId: { type: "text" },
+      },
+      defaultProps: { reusableId: "" },
+       
+      render: ({ reusableId }: any) => (
+        <div className="p-4 rounded-lg border-2 border-dashed border-violet-300 bg-violet-50 text-center text-sm text-violet-800">
+          🔄 Wiederverwendbarer Block
+          {reusableId ? (
+            <span className="block text-xs text-violet-500 mt-1">ID: {reusableId}</span>
+          ) : (
+            <span className="block text-xs text-violet-500 mt-1">Keine Referenz gewählt</span>
+          )}
+        </div>
+      ),
+    },
   },
 };
 
