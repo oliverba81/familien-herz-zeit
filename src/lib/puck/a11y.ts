@@ -4,8 +4,9 @@ import type { PageContentPuck } from "@/lib/page-builder/schema";
  * Accessibility-Prüfung über den Puck-Baum (Feature 2).
  *
  * Reine Funktion (kein DOM/DB) → läuft im Editor (Warnungen) und in Tests. Prüft:
- * - fehlende Alt-Texte (Image-Block + <img> in RichText)
- * - Heading-Reihenfolge (übersprungene Ebenen, z. B. h2 → h4)
+ * - fehlende Alt-Texte (Image-Block, Galerie-Bilder, <img> in RichText)
+ * - fehlende Embed-Titel (iframe-Beschriftung)
+ * - Heading-Reihenfolge (übersprungene Ebenen, z. B. h2 → h4; inkl. Heading-Block)
  *
  * Bewusst über denselben Slot-Abstieg wie der Renderer (rekursiv über content + Slot-Props).
  */
@@ -77,6 +78,35 @@ function walk(nodes: PuckNode[], issues: A11yIssue[], headings: number[]): void 
       const src = typeof props.src === "string" ? props.src.trim() : "";
       if (src && !alt) {
         issues.push({ level: "warning", message: "Bild ohne Alt-Text", nodeId: id });
+      }
+    }
+
+    // Heading-Block fließt in die Reihenfolge-Prüfung ein.
+    if (type === "Heading") {
+      const lvl = Number(props.level);
+      if (lvl >= 1 && lvl <= 6) headings.push(lvl);
+    }
+
+    // Galerie: Bilder ohne Alt-Text zählen.
+    if (type === "Gallery" && Array.isArray(props.items)) {
+      const missing = (props.items as { src?: string; alt?: string }[]).filter(
+        (it) => it?.src && !(it.alt && it.alt.trim())
+      ).length;
+      if (missing > 0) {
+        issues.push({
+          level: "warning",
+          message: `${missing} Galerie-Bild(er) ohne Alt-Text`,
+          nodeId: id,
+        });
+      }
+    }
+
+    // Embed ohne Titel (Screenreader-Beschriftung des iframes).
+    if (type === "Embed") {
+      const url = typeof props.url === "string" ? props.url.trim() : "";
+      const title = typeof props.title === "string" ? props.title.trim() : "";
+      if (url && !title) {
+        issues.push({ level: "warning", message: "Embed ohne Titel", nodeId: id });
       }
     }
 

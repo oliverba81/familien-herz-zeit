@@ -56,4 +56,33 @@ describe("analyzePuckA11y", () => {
     );
     expect(issues.some((i) => i.nodeId === "i")).toBe(true);
   });
+
+  it("bezieht den Heading-Block in die Reihenfolge-Prüfung ein", () => {
+    const issues = analyzePuckA11y(
+      puck([
+        { type: "Heading", props: { id: "h1", text: "A", level: 2 } },
+        { type: "Heading", props: { id: "h2", text: "B", level: 4 } },
+      ])
+    );
+    expect(issues.some((i) => /übersprungen/.test(i.message))).toBe(true);
+  });
+
+  it("meldet Galerie-Bilder ohne Alt-Text", () => {
+    const issues = analyzePuckA11y(
+      puck([
+        {
+          type: "Gallery",
+          props: { id: "g", columns: 2, items: [{ src: "a.jpg", alt: "" }, { src: "b.jpg", alt: "ok" }] },
+        },
+      ])
+    );
+    expect(issues.some((i) => i.nodeId === "g" && /Galerie/.test(i.message))).toBe(true);
+  });
+
+  it("meldet Embed ohne Titel", () => {
+    const issues = analyzePuckA11y(
+      puck([{ type: "Embed", props: { id: "e", url: "https://youtu.be/abc" } }])
+    );
+    expect(issues.some((i) => i.nodeId === "e" && /Titel/.test(i.message))).toBe(true);
+  });
 });

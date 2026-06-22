@@ -140,4 +140,38 @@ export const PUCK_TEMPLATES: PuckTemplate[] = [
       { type: "ContactForm", props: { id: "tpl" } },
     ],
   },
+  {
+    id: "faq",
+    label: "FAQ / Häufige Fragen",
+    description: "Überschrift + aufklappbare Fragen",
+    thumbnail: thumb(
+      "<rect x='8' y='8' width='28' height='6' rx='2' fill='#374151'/><rect x='8' y='20' width='44' height='6' rx='2' fill='#f3f4f6' stroke='#e5e7eb'/><rect x='8' y='30' width='44' height='6' rx='2' fill='#f3f4f6' stroke='#e5e7eb'/>"
+    ),
+    nodes: [
+      { type: "Heading", props: { id: "tpl", text: "Häufige Fragen", level: 2, align: "left" } },
+      {
+        type: "Accordion",
+        props: {
+          id: "tpl",
+          items: [
+            { question: "Wie melde ich mich an?", answer: "Über das Kontaktformular oder telefonisch." },
+            { question: "Was kostet ein Kurs?", answer: "Die Preise findest du beim jeweiligen Angebot." },
+            { question: "Ab welchem Alter?", answer: "Schon ab den ersten Lebensmonaten." },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "gallery",
+    label: "Bildergalerie",
+    description: "Überschrift + Bildraster",
+    thumbnail: thumb(
+      "<rect x='8' y='8' width='26' height='6' rx='2' fill='#374151'/><rect x='8' y='20' width='13' height='14' rx='2' fill='#e5e7eb'/><rect x='24' y='20' width='13' height='14' rx='2' fill='#e5e7eb'/><rect x='40' y='20' width='13' height='14' rx='2' fill='#e5e7eb'/>"
+    ),
+    nodes: [
+      { type: "Heading", props: { id: "tpl", text: "Eindrücke", level: 2, align: "left" } },
+      { type: "Gallery", props: { id: "tpl", columns: 3, items: [] } },
+    ],
+  },
 ];

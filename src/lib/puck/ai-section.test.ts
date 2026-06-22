@@ -54,4 +54,29 @@ describe("validateGeneratedNodes (KI-Ausgabe absichern)", () => {
     expect(validateGeneratedNodes("kaputt")).toEqual([]);
     expect(validateGeneratedNodes({ foo: 1 })).toEqual([]);
   });
+
+  it("akzeptiert die neuen Blocktypen (Heading, Accordion, Gallery)", () => {
+    const out = validateGeneratedNodes([
+      { type: "Heading", props: { text: "Titel", level: 2 } },
+      { type: "Accordion", props: { items: [{ question: "Q", answer: "A" }] } },
+      { type: "Gallery", props: { columns: 3, items: [] } },
+    ]);
+    expect(out.map((n) => n.type)).toEqual(["Heading", "Accordion", "Gallery"]);
+  });
+
+  it("validiert Columns-Slots (col1/col2) rekursiv", () => {
+    const out = validateGeneratedNodes([
+      {
+        type: "Columns",
+        props: {
+          count: 2,
+          col1: [{ type: "RichText", props: { html: "<p>links</p>" } }],
+          col2: [{ type: "Boese", props: {} }],
+        },
+      },
+    ]);
+    expect(out).toHaveLength(1);
+    expect(out[0].props.col1 as PuckNode[]).toHaveLength(1);
+    expect(out[0].props.col2 as PuckNode[]).toHaveLength(0);
+  });
 });
