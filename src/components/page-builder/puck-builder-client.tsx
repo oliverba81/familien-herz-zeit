@@ -63,13 +63,15 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
   }, [pageId, initialData]);
 
   const save = useCallback(
-    async (publish: boolean): Promise<void> => {
+    async (publish: boolean, createRevision: boolean): Promise<void> => {
       setSaving(true);
       try {
         const body = {
           ...pageFields,
           published: publish ? true : pageFields.published,
           draftContentJson: latest.current,
+          // Snapshot nur bei manuellem Speichern; bei Publish übernimmt die Publish-Route.
+          createRevision: createRevision && !publish,
         };
         const res = await fetch(`/api/pages/${pageId}`, {
           method: "PUT",
@@ -102,9 +104,11 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
     [pageId, pageFields]
   );
 
-  const saveDraft = useCallback(() => save(false), [save]);
+  // Autosave: ohne Snapshot. Manuelles Speichern (Button): mit Snapshot.
+  const autosaveDraft = useCallback(() => save(false, false), [save]);
+  const saveDraftManual = useCallback(() => save(false, true), [save]);
 
-  useAutosave({ enabled: dirty, isDirty: dirty, isSaving: saving, saveDraft });
+  useAutosave({ enabled: dirty, isDirty: dirty, isSaving: saving, saveDraft: autosaveDraft });
 
   const handleChange = useCallback(
     (d: PageContentPuck) => {
@@ -122,8 +126,47 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
   );
 
   const handlePublish = useCallback(() => {
-    void save(true);
+    void save(true, false);
   }, [save]);
+
+  // Versionshistorie laden + wiederherstellen.
+  const [revisions, setRevisions] = useState<
+    { id: string; label: string | null; createdAt: string }[]
+  >([]);
+  const loadRevisions = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/pages/${pageId}/revisions`);
+      if (res.ok) {
+        const data = await res.json();
+        setRevisions(data.revisions ?? []);
+      }
+    } catch {
+      // ignorieren
+    }
+  }, [pageId]);
+
+  const restoreRevision = useCallback(
+    async (revisionId: string) => {
+      try {
+        const res = await fetch(`/api/pages/${pageId}/revisions/${revisionId}/restore`, {
+          method: "POST",
+        });
+        if (!res.ok) throw new Error("Wiederherstellen fehlgeschlagen");
+        const data = await res.json();
+        const restored = contentToPuck(data.content);
+        setEditorData(restored);
+        setEditorKey((k) => k + 1);
+        latest.current = restored;
+        setDirty(true);
+        setA11y(analyzePuckA11y(restored));
+        setStatus("✓ Version wiederhergestellt (als Entwurf)");
+        window.setTimeout(() => setStatus(null), 3000);
+      } catch (e) {
+        setStatus(`Fehler: ${(e as Error).message}`);
+      }
+    },
+    [pageId]
+  );
 
   const restoreDraft = useCallback(() => {
     if (!recovery) return;
@@ -190,11 +233,44 @@ export default function PuckBuilderClient({ pageId, initialContent, pageFields }
         ) : (
           <span className="text-xs text-green-700">♿ keine A11y-Hinweise</span>
         )}
+        <details
+          className="relative text-xs ml-auto"
+          onToggle={(e) => {
+            if ((e.target as HTMLDetailsElement).open) void loadRevisions();
+          }}
+        >
+          <summary className="cursor-pointer list-none px-2 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
+            🕔 Versionen
+          </summary>
+          <div className="absolute right-0 z-10 mt-1 w-80 max-h-72 overflow-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg">
+            {revisions.length === 0 ? (
+              <p className="px-1 py-2 text-gray-500">Noch keine Versionen.</p>
+            ) : (
+              <ul className="space-y-1">
+                {revisions.map((rev) => (
+                  <li key={rev.id} className="flex items-center justify-between gap-2 px-1 py-1">
+                    <span className="text-gray-700">
+                      {new Date(rev.createdAt).toLocaleString("de-DE")}
+                      {rev.label ? ` · ${rev.label}` : ""}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void restoreRevision(rev.id)}
+                      className="px-2 py-0.5 rounded bg-rose-100 text-rose-700 hover:bg-rose-200"
+                    >
+                      Wiederherstellen
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </details>
         <button
           type="button"
-          onClick={saveDraft}
+          onClick={saveDraftManual}
           disabled={saving || !dirty}
-          className="ml-auto px-3 py-1.5 text-sm rounded-lg bg-gray-600 text-white disabled:opacity-50"
+          className="px-3 py-1.5 text-sm rounded-lg bg-gray-600 text-white disabled:opacity-50"
         >
           {saving ? "Speichert …" : "Entwurf speichern"}
         </button>

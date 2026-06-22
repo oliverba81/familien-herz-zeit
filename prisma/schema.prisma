@@ -48,6 +48,20 @@ model Page {
   ogImageUrl           String? // Relativer Pfad oder URL für OG/Social (z. B. 1200×630 px)
   updatedAt            DateTime  @updatedAt
   createdAt            DateTime  @default(now())
+  revisions            PageRevision[]
+}
+
+/// Versionshistorie einer Seite (Snapshots bei manuellem Speichern + Publish).
+model PageRevision {
+  id          String   @id @default(cuid())
+  pageId      String
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  contentJson Json // Snapshot (Puck v3 / V1 / V2)
+  label       String? // optionaler Hinweis, z. B. "Veröffentlicht"
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  @@index([pageId, createdAt])
 }
 
 model ReusableBlock {

@@ -8,6 +8,7 @@ import { AuditAction } from "@prisma/client";
 import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
 import { parsePageContent, pageContentSchemaV1, isPageContentV2, pageContentSchemaV2, resolveContentKind } from "@/lib/page-builder/schema";
+import { createPageRevision } from "@/lib/pages/revisions";
 
 // GET /api/pages/:id - Einzelne Seite abrufen
 export async function GET(
@@ -291,6 +292,18 @@ export async function PUT(
       where: { id },
       data: updateData,
     });
+
+    // Versionshistorie: Snapshot nur bei manuellem Speichern (nicht bei Autosave).
+    if (body.createRevision === true) {
+      try {
+        const actor = await getActorFromSession();
+        await createPageRevision(id, draftContentJson, {
+          createdById: actor?.userId ?? null,
+        });
+      } catch (e) {
+        console.error("[pages] Snapshot fehlgeschlagen:", e);
+      }
+    }
 
     await logger.success("ADMIN", "PAGE_UPDATED", `Page updated: ${page.title}`, {
       pageId: page.id,
