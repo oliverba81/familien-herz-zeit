@@ -22,9 +22,13 @@ const prisma = new PrismaClient({ adapter });
  * Liest eine HTML-Vorlage aus dem docs-Verzeichnis und entfernt den
  * führenden HTML-Kommentarblock (Anleitung). Das Ergebnis ist das reine
  * HTML-Fragment, das der V2-Renderer ({ version: 2, html }) erwartet.
+ *
+ * Nutzt process.cwd() (Projekt-Root, von wo `prisma db seed` läuft) statt
+ * __dirname, damit es sowohl in CommonJS als auch in ESM funktioniert
+ * (ts-node parst diese Datei je nach Umgebung als ES-Modul).
  */
 function readLegalTemplate(fileName: string): string {
-  const filePath = join(__dirname, "..", "docs", fileName);
+  const filePath = join(process.cwd(), "docs", fileName);
   const raw = readFileSync(filePath, "utf-8");
   // Entferne HTML-Kommentare (<!-- ... -->) und trimme.
   return raw.replace(/<!--[\s\S]*?-->/g, "").trim();
