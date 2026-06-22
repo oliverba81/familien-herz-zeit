@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.6.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.5.0...v0.6.0) (2026-06-22)
+
+
+### Features
+
+* **page-builder:** P0-Fundament für Puck-Visual-Builder (Content-Form-Guard) ([fbaeab0](https://github.com/oliverba81/familien-herz-zeit/commit/fbaeab00d447117d691c63ca933fd892408c6813))
+* **puck:** A11y-Hinweise live im Builder anzeigen (Feature 2 end-to-end) ([425563e](https://github.com/oliverba81/familien-herz-zeit/commit/425563e16809600905578f0b88041deae696afe9))
+* **puck:** A11y-Prüfung über den Puck-Baum (Feature 2) ([025c4ef](https://github.com/oliverba81/familien-herz-zeit/commit/025c4ef2182743be6b9ea6ea38989254733caa7c))
+* **puck:** Admin-Test-Route /admin/puck-test für visuelle Verifikation ([cef8aef](https://github.com/oliverba81/familien-herz-zeit/commit/cef8aefd68833bb89f035d0c9183f3734ab91f93))
+* **puck:** Autosave-Recovery-Banner (localStorage) im Builder (Feature 1 komplett) ([50d3b63](https://github.com/oliverba81/familien-herz-zeit/commit/50d3b63767589cfcbcf32c1168549b3b57dcefd5))
+* **puck:** Block-Kategorien, Bild-/Button-Optionen, Anker-IDs + neue Blöcke ([8c49421](https://github.com/oliverba81/familien-herz-zeit/commit/8c49421b0282c1a708918fbf86b153f2e1464eda))
+* **puck:** Block-Kategorien, Bild-/Button-Optionen, Anker-IDs + neue Blöcke ([82393b5](https://github.com/oliverba81/familien-herz-zeit/commit/82393b53957343e9fa4f7cbdf6aa48ef06fbed66))
+* **puck:** Columns/Grid + weitere Blöcke, volle Embed-Felder, Vorlagen-Vorschau ([476d7da](https://github.com/oliverba81/familien-herz-zeit/commit/476d7daf47fb93cd8c226ed8f308a77e225e17a7))
+* **puck:** Columns/Grid, weitere Blöcke, volle Embed-Felder, Vorlagen-Vorschau ([e31a843](https://github.com/oliverba81/familien-herz-zeit/commit/e31a843907e88c3386bcafaa913ede99b87f3f56))
+* **puck:** contentToPuck — bestehende Inhalte (V1/V2) für den Editor konvertieren ([1276b29](https://github.com/oliverba81/familien-herz-zeit/commit/1276b29245d938f0d985acc99daf3eb8c318dd3f))
+* **puck:** echte Builder-Route /admin/pages/[id]/puck + Speichern/Autosave ([f22efcd](https://github.com/oliverba81/familien-herz-zeit/commit/f22efcd81292e52a37f1237deb16323eae06ca4d))
+* **puck:** Editor-Hülle, Config + RichText-Custom-Feld + iframe-Style-Sync ([4ca57b2](https://github.com/oliverba81/familien-herz-zeit/commit/4ca57b2ad3b0f1ac46f2fd3f36ac7c55b60aa190))
+* **puck:** Einfüge-UIs — Vorlagen, Inline-KI, Reusable (Features 4 & 7) ([e6689b8](https://github.com/oliverba81/familien-herz-zeit/commit/e6689b88e85dc09290f44339cc5195ee50a6dc5d))
+* **puck:** Einfüge-UIs im Editor — Vorlagen, Inline-KI, Reusable (Features 4 & 7) ([563d803](https://github.com/oliverba81/familien-herz-zeit/commit/563d803b6ef7d9fb5ab09dd8420f76b5d96ebdae))
+* **puck:** Embed-Feldabdeckung erweitert + Config-Test ([616ba1a](https://github.com/oliverba81/familien-herz-zeit/commit/616ba1aa289ba69df4637f33efedbf85f2ddaa15))
+* **puck:** Features/Testimonials/Heading/Trenner-Blöcke + Section-Gestaltung + Courses-Bild ([5ce5226](https://github.com/oliverba81/familien-herz-zeit/commit/5ce5226f46513f0a8df7a191b869f0a4ffc1d2e2))
+* **puck:** Inline-KI-Sektionen — Backend + Ausgabe-Validierung (Feature 7) ([ea43833](https://github.com/oliverba81/familien-herz-zeit/commit/ea43833c4874c8e39ca7076a2be9422fef37edb2))
+* **puck:** MediaPicker fürs Bild-Feld (statt URL-Eingabe) ([12a4ed7](https://github.com/oliverba81/familien-herz-zeit/commit/12a4ed7ff2392978758b03b9ee7040f670e5a422))
+* **puck:** Read-Pfad verdrahten — RenderPageContent via resolveContentKind (P0-f) ([e535c79](https://github.com/oliverba81/familien-herz-zeit/commit/e535c79dcf1a6094d4226a168a65ce0a91710d1f))
+* **puck:** renderPuckTree-Server-Walker (RichText, Section-Slots, 4 Embeds) ([afcea20](https://github.com/oliverba81/familien-herz-zeit/commit/afcea208433d1316e5117f16719516d51815ed6d))
+* **puck:** Responsive-Overrides — Sichtbarkeit pro Breakpoint (Feature 8) ([38d54bd](https://github.com/oliverba81/familien-herz-zeit/commit/38d54bdd5d49883c7073beee94f736857a42199e))
+* **puck:** Reusable/globale Blöcke mit Zyklusschutz (Feature 5) ([b91394f](https://github.com/oliverba81/familien-herz-zeit/commit/b91394f960546c1258abce7022f0ef7eb4c918d8))
+* **puck:** v2HtmlToPuck-Migrationsadapter + geteilte HTML-Segmentierung ([c9cdc29](https://github.com/oliverba81/familien-herz-zeit/commit/c9cdc293bbf98f31d555aac32b4d2ba53d482608))
+* **puck:** Versionshistorie mit Restore + Retention (Feature 6) ([ae4b740](https://github.com/oliverba81/familien-herz-zeit/commit/ae4b7404440b12075aff8057ce0d06a5e9a81a64))
+* **puck:** Versionshistorie mit Restore + Retention (Feature 6) ([77d7012](https://github.com/oliverba81/familien-herz-zeit/commit/77d701208b80c8d94127aad432ad016904407ee7))
+* **puck:** Visual-Builder – Features (Responsive, Vorlagen, SEO, A11y, Inline-KI, Reusable, Autosave/Recovery, MediaPicker) ([744438c](https://github.com/oliverba81/familien-herz-zeit/commit/744438c78c21d17f42e430ab261c2e2cdff79646))
+* **puck:** Vorlagen-Bibliothek-Kern — instantiateTemplate mit ID-Neuvergabe (Feature 4) ([d2194b5](https://github.com/oliverba81/familien-herz-zeit/commit/d2194b58c598d7111bf7c37814813e010bcb3855))
+* **puck:** Vorlagen-Thumbnails (SVG) + Reusable-Block-Verwaltung ([86ad9ed](https://github.com/oliverba81/familien-herz-zeit/commit/86ad9edfe5f5a0fce866b3e5c0ebdbb62d177f2a))
+* **seo:** SEO-/OG-Live-Vorschau in der Seiten-Form (Feature 3) ([ea10708](https://github.com/oliverba81/familien-herz-zeit/commit/ea10708340863da13a46857ce7c6ddd3cc0104e4))
+
+
+### Bug Fixes
+
+* **builder:** Vorschau ohne Token für Admins + Custom CSS in Editor-Vorschau ([a7765e2](https://github.com/oliverba81/familien-herz-zeit/commit/a7765e223d580a1bb56234424d5c634101be4e30))
+* **builder:** Vorschau ohne Token für Admins + Custom CSS in Editor-Vorschau ([3a35c4d](https://github.com/oliverba81/familien-herz-zeit/commit/3a35c4d9eed16a94b4d0c0fb31be603fa00c8caf))
+* **puck:** Editor in Test-Route ohne SSR laden (next/dynamic ssr:false) ([324d9b1](https://github.com/oliverba81/familien-herz-zeit/commit/324d9b1f197b1f49c7dc176969b6bb83008958da))
+* **puck:** Editorhöhe an Viewport binden + Zurück-Button + scrollbare Blockliste ([9d6c036](https://github.com/oliverba81/familien-herz-zeit/commit/9d6c0368f835a51d5a2f803be14ff10efcfd5a8a))
+* **puck:** Editorhöhe an Viewport binden + Zurück-Button + scrollbare Blockliste ([f2db04c](https://github.com/oliverba81/familien-herz-zeit/commit/f2db04c99bc8f890887dd4386644eb2316e3eac6))
+* **puck:** Zurück-Button in die Kopfzeile neben Publish verschieben ([9e1bf49](https://github.com/oliverba81/familien-herz-zeit/commit/9e1bf49a9dbef3f38f27cd2b27dd3fb822de747d))
+
 ## [0.5.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.4.3...v0.5.0) (2026-06-21)
 
 
