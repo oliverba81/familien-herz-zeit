@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.6.0...v0.7.0) (2026-06-22)
+
+
+### Features
+
+* **puck:** Responsive pro Breakpoint für Spalten & Galerie ([0f47f8d](https://github.com/oliverba81/familien-herz-zeit/commit/0f47f8d939b963327fa9a3a29544b17405aaf5e5))
+* **puck:** Responsive pro Breakpoint für Spalten & Galerie ([6f6c60a](https://github.com/oliverba81/familien-herz-zeit/commit/6f6c60a2a85a7805611afcf912409cae2a45e7b9))
+
+
+### Bug Fixes
+
+* **puck:** Canvas & Panels als scrollbare Bereiche klar kennzeichnen ([7bb077d](https://github.com/oliverba81/familien-herz-zeit/commit/7bb077d680ca1e11e1d2a77085f9328a1ad9d282))
+* **puck:** Canvas/Panels als scrollbare Bereiche klar kennzeichnen ([4ecb6f4](https://github.com/oliverba81/familien-herz-zeit/commit/4ecb6f438feb2768d25d0efe746fcb15855c27c0))
+
 ## [0.6.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.5.0...v0.6.0) (2026-06-22)
 
 
