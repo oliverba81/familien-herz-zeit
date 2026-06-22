@@ -21,3 +21,36 @@
 .fhz-puck-host [class*="PuckLayout_"] {
   height: 100%;
 }
+
+/* Scrollbare Bereiche klar als solche kennzeichnen.
+ *
+ * Canvas (Vorschau) und die Seiten-Panels scrollen intern (overflow:auto), aber
+ * der Scrollbalken ist auf vielen Systemen nur beim Scrollen sichtbar — dadurch
+ * wirkt es, als wäre der Inhalt am unteren Rand abgeschnitten und nicht
+ * erreichbar. Wir reservieren dauerhaft Platz für einen sichtbaren Scrollbalken
+ * (`scrollbar-gutter: stable`) und stylen ihn deutlich, damit klar ist, dass der
+ * Bereich gescrollt werden kann und nichts verborgen bleibt.
+ *
+ * `[class*="PuckCanvas_"]` = Scroll-Container des Editor-Bereichs,
+ * `[class*="Sidebar_"]` = linke Blockliste + rechter Inspektor. */
+.fhz-puck-host [class*="PuckCanvas_"],
+.fhz-puck-host [class*="Sidebar_"] {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.fhz-puck-host [class*="PuckCanvas_"]::-webkit-scrollbar,
+.fhz-puck-host [class*="Sidebar_"]::-webkit-scrollbar {
+  width: 12px;
+}
+.fhz-puck-host [class*="PuckCanvas_"]::-webkit-scrollbar-thumb,
+.fhz-puck-host [class*="Sidebar_"]::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.fhz-puck-host [class*="PuckCanvas_"]::-webkit-scrollbar-thumb:hover,
+.fhz-puck-host [class*="Sidebar_"]::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
