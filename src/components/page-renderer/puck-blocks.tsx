@@ -5,6 +5,8 @@ import {
   columnsTemplate,
   COLUMNS_GAP,
   toEmbedUrl,
+  colsTemplateValue,
+  colsNumberValue,
 } from "@/lib/puck/blocks";
 
 /**
@@ -134,11 +136,16 @@ export function GalleryView({
   items,
   columns,
   layout,
+  tabletColumns,
+  mobileColumns,
 }: {
   items?: GalleryImage[];
   columns?: number;
   /** "grid" (Raster, responsiv gestapelt) oder "slider" (horizontale Scroll-Snap-Reihe). */
   layout?: string;
+  /** Per-Breakpoint-Spaltenzahl ("auto"/"1".."4"); "auto" erbt den Default. */
+  tabletColumns?: string;
+  mobileColumns?: string;
 }): ReactNode {
   const list = (items ?? []).filter((it) => it.src);
   const cols = [2, 3, 4].includes(Number(columns)) ? Number(columns) : 3;
@@ -147,11 +154,11 @@ export function GalleryView({
       <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">Keine Bilder</div>
     );
   }
-  // Responsives Verhalten (Raster stapelt auf Mobil, Slider scrollt) liegt in
-  // public/page-builder-v2-presets.css; nur die Spaltenzahl kommt als Custom-Property.
+  // Responsives Verhalten (Raster stapelt je Breakpoint, Slider scrollt) liegt in
+  // public/page-builder-v2-presets.css; die Spaltenzahlen kommen als Custom-Properties.
   const className = layout === "slider" ? "fhz-gallery fhz-gallery--slider" : "fhz-gallery";
   return (
-    <div className={className} style={{ ["--gallery-cols" as string]: String(cols) }}>
+    <div className={className} style={galleryContainerStyle(cols, tabletColumns, mobileColumns)}>
       {list.map((item, i) => (
          
         <img key={i} src={item.src} alt={item.alt || ""} className="fhz-gallery__img" />
@@ -160,12 +167,44 @@ export function GalleryView({
   );
 }
 
-/** Inline-Style für den Spalten-Container (Verhältnis + Abstand, mobil gestapelt via CSS). */
-export function columnsContainerStyle(count: number, ratio?: string, gap?: string): CSSProperties {
-  return {
-    ["--cols-template" as string]: columnsTemplate(count, ratio),
-    ["--cols-gap" as string]: COLUMNS_GAP[gap ?? "md"] ?? COLUMNS_GAP.md,
+/**
+ * Inline-Style für den Spalten-Container (Verhältnis + Abstand + per-Breakpoint-Spalten).
+ * Tablet/Mobil werden nur gesetzt, wenn ausgewählt; sonst greifen die CSS-Defaults
+ * (Tablet erbt Desktop-Template, Mobil stapelt auf 1) aus den Presets.
+ */
+export function columnsContainerStyle(
+  count: number,
+  ratio?: string,
+  gap?: string,
+  tabletCols?: string,
+  mobileCols?: string
+): CSSProperties {
+  const style: Record<string, string> = {
+    "--cols-template": columnsTemplate(count, ratio),
+    "--cols-gap": COLUMNS_GAP[gap ?? "md"] ?? COLUMNS_GAP.md,
   };
+  const t = colsTemplateValue(tabletCols);
+  if (t) style["--cols-tablet"] = t;
+  const m = colsTemplateValue(mobileCols);
+  if (m) style["--cols-mobile"] = m;
+  return style as CSSProperties;
+}
+
+/**
+ * Inline-Style für den Galerie-Container (Spaltenzahl je Breakpoint als number-var).
+ * Tablet/Mobil nur gesetzt, wenn ausgewählt; sonst CSS-Defaults (Tablet 2, Mobil 1).
+ */
+export function galleryContainerStyle(
+  cols: number,
+  tabletCols?: string,
+  mobileCols?: string
+): CSSProperties {
+  const style: Record<string, string> = { "--gallery-cols": String(cols) };
+  const t = colsNumberValue(tabletCols);
+  if (t) style["--gallery-cols-tablet"] = t;
+  const m = colsNumberValue(mobileCols);
+  if (m) style["--gallery-cols-mobile"] = m;
+  return style as CSSProperties;
 }
 
 export interface FeatureItem {

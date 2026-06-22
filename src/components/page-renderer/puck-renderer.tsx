@@ -150,7 +150,13 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
       return (
         <div
           className="fhz-columns"
-          style={columnsContainerStyle(count, props.ratio as string, props.gap as string)}
+          style={columnsContainerStyle(
+            count,
+            props.ratio as string,
+            props.gap as string,
+            props.tabletCols as string,
+            props.mobileCols as string
+          )}
         >
           <div>{(resolved.col1 as ReactNode) ?? null}</div>
           <div>{(resolved.col2 as ReactNode) ?? null}</div>
@@ -183,6 +189,8 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
           items={props.items as { src?: string; alt?: string }[]}
           columns={props.columns as number}
           layout={props.layout as string}
+          tabletColumns={props.tabletColumns as string}
+          mobileColumns={props.mobileColumns as string}
         />
       );
 
