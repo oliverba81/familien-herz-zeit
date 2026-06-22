@@ -73,6 +73,17 @@ describe("PuckRenderer (V3 Tree-Walker)", () => {
     expect(screen.getByText("Tief verschachtelt")).toBeInTheDocument();
   });
 
+  it("umhüllt Blöcke mit Responsive-Sichtbarkeitsklassen", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          { type: "RichText", props: { id: "r", html: "<p>x</p>", hideMobile: true } },
+        ])}
+      />
+    );
+    expect(container.querySelector(".fhz-hide-mobile")).not.toBeNull();
+  });
+
   it("zeigt den Unknown-Fallback für unbekannte Typen", () => {
     render(<PuckRenderer data={puck([{ type: "GibtsNicht", props: { id: "x" } }])} />);
     expect(screen.getByText(/Unbekannter Block-Typ/)).toBeInTheDocument();

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cleanAndConvertHtml } from "@/lib/utils/html-links";
+import { getResponsiveClasses } from "@/lib/puck/responsive";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
 import CoursesBlock from "@/components/courses/courses-block";
 import CurrentAppointmentsBlock from "@/components/courses/current-appointments-block";
@@ -43,9 +44,21 @@ function isSlotArray(value: unknown): value is PuckNode[] {
 }
 
 function renderContent(nodes: PuckNode[], keyPrefix: string): ReactNode {
-  return nodes.map((node, i) => (
-    <RenderNode key={`${keyPrefix}-${node.props?.id ?? i}`} node={node} index={i} />
-  ));
+  return nodes.map((node, i) => {
+    const key = `${keyPrefix}-${node.props?.id ?? i}`;
+    const cls = getResponsiveClasses(node.props ?? {});
+    const el = <RenderNode node={node} index={i} />;
+    // Responsive-Sichtbarkeit: nur umhüllen, wenn Flags gesetzt sind.
+    return cls ? (
+      <div key={key} className={cls}>
+        {el}
+      </div>
+    ) : (
+      <span key={key} style={{ display: "contents" }}>
+        {el}
+      </span>
+    );
+  });
 }
 
 function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNode {

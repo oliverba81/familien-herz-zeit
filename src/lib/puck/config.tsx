@@ -5,6 +5,7 @@ import { cleanAndConvertHtml } from "@/lib/utils/html-links";
 import { RichTextField } from "./rich-text-field";
 import { EmbedLivePreview } from "@/components/page-builder/embed-live/embed-live-preview";
 import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
+import { responsiveFields, responsiveDefaults } from "./responsive";
 
 /** Puck-Komponentenname → V2-Embed-Blocktyp (für Edit-Preview + spätere Serialisierung). */
 export const PUCK_TO_V2_EMBED: Record<string, string> = {
@@ -148,3 +149,9 @@ export const puckConfig: Config<any> = {
     },
   },
 };
+
+// Responsive-Sichtbarkeits-Felder (Feature 8) in jede Komponente spreizen (DRY).
+for (const comp of Object.values(puckConfig.components)) {
+  comp.fields = { ...comp.fields, ...responsiveFields };
+  comp.defaultProps = { ...comp.defaultProps, ...responsiveDefaults };
+}
