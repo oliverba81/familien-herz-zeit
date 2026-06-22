@@ -7,6 +7,7 @@ import { EmbedLivePreview } from "@/components/page-builder/embed-live/embed-liv
 import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
 import { responsiveFields, responsiveDefaults } from "./responsive";
 import { MediaUrlField } from "./image-field";
+import { SPACER_SIZES } from "./blocks";
 
 /** Puck-Komponentenname → V2-Embed-Blocktyp (für Edit-Preview + spätere Serialisierung). */
 export const PUCK_TO_V2_EMBED: Record<string, string> = {
@@ -140,6 +141,13 @@ export const puckConfig: Config<any> = {
         showTopics: boolField("Themen zeigen"),
         maxItems: { type: "number" },
         showEmptyMessage: boolField("Leer-Hinweis"),
+        width: {
+          type: "select",
+          options: [
+            { label: "Voll", value: "full" },
+            { label: "Schmal", value: "narrow" },
+          ],
+        },
         footerHtml: { type: "textarea" },
       },
       defaultProps: appointmentsDefaults,
@@ -159,6 +167,19 @@ export const puckConfig: Config<any> = {
           ],
         },
         backgroundColor: { type: "text" },
+        stories: {
+          type: "array",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          getItemSummary: (item: any) => item?.title || "Geschichte",
+          arrayFields: {
+            title: { type: "text" },
+            teaser: { type: "textarea" },
+            readingTime: { type: "text" },
+            audioUrl: { type: "text" },
+            imageUrl: { type: "text" },
+            fullText: { type: "textarea" },
+          },
+        },
       },
       defaultProps: storyDefaults,
       render: embedEditRender("HerzZeitStory"),
@@ -171,15 +192,148 @@ export const puckConfig: Config<any> = {
         role: { type: "text" },
         address: { type: "textarea" },
         phone: { type: "text" },
+        phoneLink: { type: "text" },
         email: { type: "text" },
+        emailLink: { type: "text" },
         showOfficeHours: boolField("Sprechzeiten zeigen"),
         officeHoursTitle: { type: "text" },
         officeHoursText: { type: "textarea" },
+        showFirstName: boolField("Vorname-Feld"),
+        firstNameLabel: { type: "text" },
+        firstNameRequired: boolField("Vorname Pflicht"),
+        showLastName: boolField("Nachname-Feld"),
+        lastNameLabel: { type: "text" },
+        lastNameRequired: boolField("Nachname Pflicht"),
+        emailLabel: { type: "text" },
+        emailRequired: boolField("E-Mail Pflicht"),
+        messageLabel: { type: "text" },
+        messageRequired: boolField("Nachricht Pflicht"),
         submitButtonText: { type: "text" },
         enableRecaptcha: boolField("reCAPTCHA"),
+        recaptchaSiteKey: { type: "text" },
+        layout: {
+          type: "select",
+          options: [
+            { label: "Standard", value: "default" },
+            { label: "Gestapelt", value: "stacked" },
+          ],
+        },
       },
       defaultProps: contactDefaults,
       render: embedEditRender("ContactForm"),
+    },
+
+    Columns: {
+      label: "Spalten",
+      fields: {
+        count: {
+          type: "radio",
+          options: [
+            { label: "2 Spalten", value: 2 },
+            { label: "3 Spalten", value: 3 },
+          ],
+        },
+        col1: { type: "slot" },
+        col2: { type: "slot" },
+        col3: { type: "slot" },
+      },
+      defaultProps: { count: 2 },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ count, col1: C1, col2: C2, col3: C3 }: any) => (
+        <div
+          className="fhz-columns"
+          style={{ ["--cols" as string]: String(count ?? 2) }}
+        >
+          <div>{C1 ? <C1 /> : null}</div>
+          <div>{C2 ? <C2 /> : null}</div>
+          {Number(count) >= 3 ? <div>{C3 ? <C3 /> : null}</div> : null}
+        </div>
+      ),
+    },
+
+    Spacer: {
+      label: "Abstand",
+      fields: {
+        size: {
+          type: "select",
+          options: [
+            { label: "Klein", value: "sm" },
+            { label: "Mittel", value: "md" },
+            { label: "Groß", value: "lg" },
+            { label: "Sehr groß", value: "xl" },
+          ],
+        },
+      },
+      defaultProps: { size: "md" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ size }: any) => (
+        <div style={{ height: SPACER_SIZES[size as string] ?? SPACER_SIZES.md }} />
+      ),
+    },
+
+    Button: {
+      label: "Button",
+      fields: {
+        text: { type: "text" },
+        href: { type: "text" },
+        variant: {
+          type: "radio",
+          options: [
+            { label: "Primär", value: "primary" },
+            { label: "Sekundär", value: "secondary" },
+          ],
+        },
+        align: {
+          type: "radio",
+          options: [
+            { label: "Links", value: "left" },
+            { label: "Mitte", value: "center" },
+            { label: "Rechts", value: "right" },
+          ],
+        },
+      },
+      defaultProps: { text: "Mehr erfahren", href: "/", variant: "primary", align: "left" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ text, href, variant, align }: any) => (
+        <div style={{ textAlign: align || "left" }}>
+          <a
+            href={href || "#"}
+            className={
+              variant === "secondary"
+                ? "inline-block px-5 py-2.5 rounded-lg border border-rose-500 text-rose-600 font-semibold"
+                : "inline-block px-5 py-2.5 rounded-lg bg-rose-500 text-white font-semibold"
+            }
+          >
+            {text || "Button"}
+          </a>
+        </div>
+      ),
+    },
+
+    Video: {
+      label: "Video",
+      fields: {
+        src: {
+          type: "custom",
+          render: ({ value, onChange }) => (
+            <MediaUrlField value={value as string} onChange={onChange} mediaType="video" />
+          ),
+        },
+        title: { type: "text" },
+      },
+      defaultProps: { src: "", title: "" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ src, title }: any) =>
+        src ? (
+          <figure>
+            <video src={src} controls style={{ width: "100%", height: "auto" }} />
+            {title ? <figcaption>{title}</figcaption> : null}
+          </figure>
+        ) : (
+          <div className="p-6 bg-gray-100 text-center text-gray-500 rounded">
+            Kein Video gewählt
+          </div>
+        ),
     },
 
     Reusable: {
