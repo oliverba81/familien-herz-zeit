@@ -7,6 +7,7 @@ import { AuditAction } from "@prisma/client";
 import { revalidateTag } from "@/lib/cache/revalidate";
 import { tagPage, tagPages } from "@/lib/seo/tags";
 import { parsePageContent, resolveContentKind } from "@/lib/page-builder/schema";
+import { createPageRevision } from "@/lib/pages/revisions";
 
 // POST /api/pages/:id/publish - Seite veröffentlichen
 export async function POST(
@@ -74,6 +75,17 @@ export async function POST(
 
     // Audit Log
     const actor = await getActorFromSession();
+
+    // Versionshistorie: Snapshot des veröffentlichten Stands.
+    try {
+      await createPageRevision(id, draftContent, {
+        label: "Veröffentlicht",
+        createdById: actor?.userId ?? null,
+      });
+    } catch (e) {
+      console.error("[publish] Snapshot fehlgeschlagen:", e);
+    }
+
     await logAudit({
       actor,
       entity: {
