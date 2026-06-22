@@ -12,11 +12,29 @@ export const KNOWN_PUCK_TYPES = new Set<string>([
   "RichText",
   "Section",
   "Image",
+  "Heading",
+  "Button",
+  "Spacer",
+  "Divider",
+  "Columns",
+  "Video",
+  "Embed",
+  "Accordion",
+  "Tabs",
+  "Gallery",
+  "Features",
+  "Testimonials",
   "Courses",
   "CurrentAppointments",
   "HerzZeitStory",
   "ContactForm",
 ]);
+
+/** Slot-Props je Komponententyp (Kinder, die rekursiv validiert werden müssen). */
+const SLOT_KEYS: Record<string, string[]> = {
+  Section: ["children"],
+  Columns: ["col1", "col2", "col3"],
+};
 
 export interface PuckNode {
   type: string;
@@ -41,10 +59,10 @@ function coerceNode(raw: unknown, depth: number): PuckNode | null {
     if (typeof props.html !== "string" || props.html.trim() === "") return null;
   }
 
-  // Section: children rekursiv validieren (Slot).
-  if (type === "Section") {
-    const children = Array.isArray(inProps.children) ? inProps.children : [];
-    props.children = children
+  // Slot-Kinder (Section.children, Columns.col1..col3) rekursiv validieren.
+  for (const key of SLOT_KEYS[type] ?? []) {
+    const children = Array.isArray(inProps[key]) ? (inProps[key] as unknown[]) : [];
+    props[key] = children
       .map((c) => coerceNode(c, depth + 1))
       .filter((c): c is PuckNode => c !== null);
   }
@@ -73,12 +91,22 @@ export function validateGeneratedNodes(raw: unknown): PuckNode[] {
 
 export const SECTION_SYSTEM_PROMPT = `Du bist ein Assistent, der Inhaltssektionen für einen visuellen Seiten-Editor erzeugt.
 Du darfst AUSSCHLIESSLICH diese Komponenten verwenden:
+- "Heading" mit props.text und props.level (1-6) und props.align ("left"/"center"/"right")
 - "RichText" mit props.html (HTML-String: <h2>, <h3>, <p>, <ul>/<li>, <strong>, <em>, <a>)
-- "Section" mit props.children (Array weiterer Komponenten)
 - "Image" mit props.src, props.alt, props.caption
+- "Button" mit props.text, props.href, props.variant ("primary"/"secondary")
+- "Section" mit props.children (Array weiterer Komponenten)
+- "Columns" mit props.count (2 oder 3) und props.col1/col2/col3 (jeweils Array weiterer Komponenten)
+- "Spacer" mit props.size ("sm"/"md"/"lg"/"xl"), "Divider" (ohne Props)
+- "Embed" mit props.url (YouTube/Vimeo) und props.title
+- "Accordion" mit props.items (Array aus {question, answer})
+- "Tabs" mit props.items (Array aus {label, content})
+- "Gallery" mit props.columns (2-4) und props.items (Array aus {src, alt})
+- "Features" mit props.title und props.items (Array aus {title, text})
+- "Testimonials" mit props.title und props.items (Array aus {name, text})
 - "Courses", "CurrentAppointments", "HerzZeitStory", "ContactForm" (ohne weitere Pflicht-Props)
 Antworte NUR mit JSON dieser Form, ohne Markdown/Erklärung:
-{"nodes": [ { "type": "RichText", "props": { "html": "<h2>…</h2><p>…</p>" } } ] }
+{"nodes": [ { "type": "Heading", "props": { "text": "…", "level": 2 } }, { "type": "RichText", "props": { "html": "<p>…</p>" } } ] }
 Schreibe auf Deutsch, prägnant und passend zum Wunsch des Nutzers.`;
 
 export function buildSectionUserPrompt(userPrompt: string): string {
