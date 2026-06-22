@@ -78,15 +78,27 @@ export function PuckInsertToolbar() {
       {/* Vorlagen */}
       <details className="relative">
         <summary className={summaryCls}>➕ Vorlage</summary>
-        <ul className={panelCls}>
+        <ul className={`${panelCls} w-80`}>
           {PUCK_TEMPLATES.map((tpl) => (
             <li key={tpl.id}>
               <button
                 type="button"
                 onClick={() => insertNodes(instantiateTemplate(tpl.nodes))}
-                className="w-full text-left px-2 py-1.5 rounded hover:bg-gray-100 text-sm"
+                className="w-full flex items-center gap-3 text-left px-2 py-2 rounded hover:bg-gray-100"
               >
-                {tpl.label}
+                {tpl.preview && (
+                  <span
+                    className="shrink-0 w-16 h-12 overflow-hidden rounded border border-gray-200 bg-white p-1 text-[8px] leading-tight"
+                    aria-hidden
+                    dangerouslySetInnerHTML={{ __html: tpl.preview }}
+                  />
+                )}
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-gray-800">{tpl.label}</span>
+                  {tpl.description && (
+                    <span className="block text-xs text-gray-500 truncate">{tpl.description}</span>
+                  )}
+                </span>
               </button>
             </li>
           ))}

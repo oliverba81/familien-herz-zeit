@@ -10,6 +10,10 @@ const EXPECTED = [
   "CurrentAppointments",
   "HerzZeitStory",
   "ContactForm",
+  "Columns",
+  "Spacer",
+  "Button",
+  "Video",
   "Reusable",
 ];
 

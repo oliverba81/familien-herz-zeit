@@ -84,6 +84,43 @@ describe("PuckRenderer (V3 Tree-Walker)", () => {
     expect(container.querySelector(".fhz-hide-mobile")).not.toBeNull();
   });
 
+  it("rendert Columns mit Slot-Inhalten (2 Spalten)", () => {
+    const { container } = render(
+      <PuckRenderer
+        data={puck([
+          {
+            type: "Columns",
+            props: {
+              id: "cols",
+              count: 2,
+              col1: [{ type: "RichText", props: { id: "a", html: "<p>Links</p>" } }],
+              col2: [{ type: "RichText", props: { id: "b", html: "<p>Rechts</p>" } }],
+            },
+          },
+        ])}
+      />
+    );
+    expect(container.querySelector(".fhz-columns")).not.toBeNull();
+    expect(screen.getByText("Links")).toBeInTheDocument();
+    expect(screen.getByText("Rechts")).toBeInTheDocument();
+  });
+
+  it("rendert Spacer, Button und Video", () => {
+    render(
+      <PuckRenderer
+        data={puck([
+          { type: "Spacer", props: { id: "s", size: "lg" } },
+          { type: "Button", props: { id: "btn", text: "Los", href: "/x", variant: "primary" } },
+          { type: "Video", props: { id: "v", src: "/film.mp4", title: "Clip" } },
+        ])}
+      />
+    );
+    const link = screen.getByText("Los");
+    expect(link).toBeInTheDocument();
+    expect(link.getAttribute("href")).toBe("/x");
+    expect(screen.getByText("Clip")).toBeInTheDocument();
+  });
+
   it("zeigt den Unknown-Fallback für unbekannte Typen", () => {
     render(<PuckRenderer data={puck([{ type: "GibtsNicht", props: { id: "x" } }])} />);
     expect(screen.getByText(/Unbekannter Block-Typ/)).toBeInTheDocument();

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cleanAndConvertHtml } from "@/lib/utils/html-links";
 import { getResponsiveClasses } from "@/lib/puck/responsive";
+import { SPACER_SIZES } from "@/lib/puck/blocks";
 import type { PageContentPuck } from "@/lib/page-builder/schema";
 import CoursesBlock from "@/components/courses/courses-block";
 import CurrentAppointmentsBlock from "@/components/courses/current-appointments-block";
@@ -92,6 +93,47 @@ function RenderNode({ node, index }: { node: PuckNode; index: number }): ReactNo
         </section>
       );
     }
+
+    case "Columns": {
+      const count = Number(props.count) >= 3 ? 3 : 2;
+      return (
+        <div className="fhz-columns" style={{ ["--cols" as string]: String(count) }}>
+          <div>{(resolved.col1 as ReactNode) ?? null}</div>
+          <div>{(resolved.col2 as ReactNode) ?? null}</div>
+          {count >= 3 ? <div>{(resolved.col3 as ReactNode) ?? null}</div> : null}
+        </div>
+      );
+    }
+
+    case "Spacer":
+      return <div style={{ height: SPACER_SIZES[String(props.size)] ?? SPACER_SIZES.md }} />;
+
+    case "Button": {
+      const variant = props.variant === "secondary" ? "secondary" : "primary";
+      return (
+        <div style={{ textAlign: (props.align as "left" | "center" | "right") || "left" }}>
+          <a
+            href={String(props.href || "#")}
+            className={
+              variant === "secondary"
+                ? "inline-block px-5 py-2.5 rounded-lg border border-rose-500 text-rose-600 font-semibold"
+                : "inline-block px-5 py-2.5 rounded-lg bg-rose-500 text-white font-semibold"
+            }
+          >
+            {String(props.text || "Button")}
+          </a>
+        </div>
+      );
+    }
+
+    case "Video":
+      return props.src ? (
+        <figure>
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video src={String(props.src)} controls style={{ width: "100%", height: "auto" }} />
+          {props.title ? <figcaption>{String(props.title)}</figcaption> : null}
+        </figure>
+      ) : null;
 
     case "Courses":
       return <CoursesBlock data={props as unknown as CoursesBlockData} />;
