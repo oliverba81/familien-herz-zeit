@@ -14,6 +14,7 @@ import { PageContentV1, PageContentV2, isPageContentV2, createEmptyContent } fro
 import { normalizeContent, createDefaultContent } from "@/lib/page-builder/templates";
 import { convertV1ToV2Html } from "@/lib/page-builder/v1-to-v2-html";
 import { extractTextFromContentForAI } from "@/lib/seo/meta";
+import SeoPreview from "@/components/seo/seo-preview";
 
 type BuilderContent = PageContentV1 | PageContentV2;
 
@@ -380,6 +381,14 @@ export default function PageForm({ initialData, mode }: PageFormProps) {
               id="ogImageUrl"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
               placeholder="Bild-URL für Vorschau (optional). Ideal: 1200×630 px, unter 150 KB"
+            />
+          </div>
+          <div className="pt-2 border-t border-gray-200">
+            <SeoPreview
+              title={watch("title") || ""}
+              description={watch("metaDescription") || ""}
+              slug={slug || ""}
+              ogImageUrl={watch("ogImageUrl") || null}
             />
           </div>
         </div>

@@ -5,6 +5,8 @@ import { cleanAndConvertHtml } from "@/lib/utils/html-links";
 import { RichTextField } from "./rich-text-field";
 import { EmbedLivePreview } from "@/components/page-builder/embed-live/embed-live-preview";
 import { getV2EmbedDefaultData } from "@/lib/page-builder/v2-embed-defaults";
+import { responsiveFields, responsiveDefaults } from "./responsive";
+import { MediaUrlField } from "./image-field";
 
 /** Puck-Komponentenname → V2-Embed-Blocktyp (für Edit-Preview + spätere Serialisierung). */
 export const PUCK_TO_V2_EMBED: Record<string, string> = {
@@ -32,6 +34,18 @@ const coursesDefaults = getV2EmbedDefaultData("courses");
 const appointmentsDefaults = getV2EmbedDefaultData("current-appointments");
 const storyDefaults = getV2EmbedDefaultData("herzzeit-story");
 const contactDefaults = getV2EmbedDefaultData("contactForm");
+
+/** Boolean-Feld als Radio (Puck hat kein natives Checkbox-Feld). */
+function boolField(label: string) {
+  return {
+    type: "radio" as const,
+    label,
+    options: [
+      { label: "An", value: true },
+      { label: "Aus", value: false },
+    ],
+  };
+}
 
 /**
  * Puck-Konfiguration (Must-have-Set v1: RichText, Section, Image + 4 Embeds).
@@ -77,7 +91,12 @@ export const puckConfig: Config<any> = {
     Image: {
       label: "Bild",
       fields: {
-        src: { type: "text" },
+        src: {
+          type: "custom",
+          render: ({ value, onChange }) => (
+            <MediaUrlField value={value as string} onChange={onChange} />
+          ),
+        },
         alt: { type: "text" },
         caption: { type: "text" },
       },
@@ -104,6 +123,10 @@ export const puckConfig: Config<any> = {
         subtitle: { type: "textarea" },
         maxCourses: { type: "number" },
         maxTopics: { type: "number" },
+        showEmptyMessage: boolField("Leer-Hinweis"),
+        contactLinkUrl: { type: "text" },
+        contactLinkLabel: { type: "text" },
+        backgroundImageOpacity: { type: "number" },
       },
       defaultProps: coursesDefaults,
       render: embedEditRender("Courses"),
@@ -113,7 +136,11 @@ export const puckConfig: Config<any> = {
       label: "Aktuelle Termine",
       fields: {
         title: { type: "text" },
+        showCourses: boolField("Kurse zeigen"),
+        showTopics: boolField("Themen zeigen"),
         maxItems: { type: "number" },
+        showEmptyMessage: boolField("Leer-Hinweis"),
+        footerHtml: { type: "textarea" },
       },
       defaultProps: appointmentsDefaults,
       render: embedEditRender("CurrentAppointments"),
@@ -131,6 +158,7 @@ export const puckConfig: Config<any> = {
             { label: "Minimal", value: "minimal" },
           ],
         },
+        backgroundColor: { type: "text" },
       },
       defaultProps: storyDefaults,
       render: embedEditRender("HerzZeitStory"),
@@ -140,11 +168,43 @@ export const puckConfig: Config<any> = {
       label: "Kontaktformular",
       fields: {
         name: { type: "text" },
+        role: { type: "text" },
+        address: { type: "textarea" },
+        phone: { type: "text" },
         email: { type: "text" },
+        showOfficeHours: boolField("Sprechzeiten zeigen"),
+        officeHoursTitle: { type: "text" },
+        officeHoursText: { type: "textarea" },
         submitButtonText: { type: "text" },
+        enableRecaptcha: boolField("reCAPTCHA"),
       },
       defaultProps: contactDefaults,
       render: embedEditRender("ContactForm"),
     },
+
+    Reusable: {
+      label: "Wiederverwendbarer Block",
+      fields: {
+        reusableId: { type: "text" },
+      },
+      defaultProps: { reusableId: "" },
+       
+      render: ({ reusableId }: any) => (
+        <div className="p-4 rounded-lg border-2 border-dashed border-violet-300 bg-violet-50 text-center text-sm text-violet-800">
+          🔄 Wiederverwendbarer Block
+          {reusableId ? (
+            <span className="block text-xs text-violet-500 mt-1">ID: {reusableId}</span>
+          ) : (
+            <span className="block text-xs text-violet-500 mt-1">Keine Referenz gewählt</span>
+          )}
+        </div>
+      ),
+    },
   },
 };
+
+// Responsive-Sichtbarkeits-Felder (Feature 8) in jede Komponente spreizen (DRY).
+for (const comp of Object.values(puckConfig.components)) {
+  comp.fields = { ...comp.fields, ...responsiveFields };
+  comp.defaultProps = { ...comp.defaultProps, ...responsiveDefaults };
+}

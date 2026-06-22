@@ -86,3 +86,21 @@
 .fhz-table-compact th {
   padding: 0.25rem 0.5rem;
 }
+
+/* Responsive-Sichtbarkeit (Puck Responsive-Overrides, SSR-sicher, kein JS).
+   Breakpoints passend zu den Editor-Viewports (Mobil < 768, Tablet 768–1023, Desktop ≥ 1024). */
+@media (max-width: 767px) {
+  .fhz-hide-mobile {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .fhz-hide-tablet {
+    display: none !important;
+  }
+}
+@media (min-width: 1024px) {
+  .fhz-hide-desktop {
+    display: none !important;
+  }
+}
