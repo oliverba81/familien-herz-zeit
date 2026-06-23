@@ -24,11 +24,32 @@ import type { PageContentPuck } from "@/lib/page-builder/schema";
  * Visuelle Verifikation (iframe-Treue, RichText-Fokus, Responsive) erfolgt im Browser.
  */
 
+// Eigenes Icon für die „Voll"-Breite (Puck bringt nur Smartphone/Tablet/Monitor mit).
+const MaximizeIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+    <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+    <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+    <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+  </svg>
+);
+
 const VIEWPORTS: Viewports = [
-  { width: 360, height: "auto", label: "Mobil" },
-  { width: 768, height: "auto", label: "Tablet" },
-  { width: 1280, height: "auto", label: "Desktop" },
-  { width: "100%", height: "auto", label: "Voll" },
+  { width: 360, height: "auto", label: "Mobil", icon: "Smartphone" },
+  { width: 768, height: "auto", label: "Tablet", icon: "Tablet" },
+  { width: 1280, height: "auto", label: "Desktop", icon: "Monitor" },
+  { width: "100%", height: "auto", label: "Voll", icon: MaximizeIcon },
 ];
 
 const CustomCssContext = createContext<string | null | undefined>(undefined);
