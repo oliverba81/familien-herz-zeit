@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.1](https://github.com/oliverba81/familien-herz-zeit/compare/v0.7.0...v0.7.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* **puck:** Einfüge-Dropdowns (Vorlage/KI/Block) via Portal sichtbar machen ([e3f7434](https://github.com/oliverba81/familien-herz-zeit/commit/e3f74343c89dd1359b717164271b3e583f81a927))
+* **puck:** Einfüge-Dropdowns (Vorlage/KI/Block) via Portal sichtbar machen ([f2fbbf8](https://github.com/oliverba81/familien-herz-zeit/commit/f2fbbf817a0033a72f7e94be04ebc6313f0708e8))
+
 ## [0.7.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.6.0...v0.7.0) (2026-06-22)
 
 
