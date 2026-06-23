@@ -7,6 +7,8 @@
 
 * **puck:** Einfüge-Dropdowns (Vorlage/KI/Block) via Portal sichtbar machen ([e3f7434](https://github.com/oliverba81/familien-herz-zeit/commit/e3f74343c89dd1359b717164271b3e583f81a927))
 * **puck:** Einfüge-Dropdowns (Vorlage/KI/Block) via Portal sichtbar machen ([f2fbbf8](https://github.com/oliverba81/familien-herz-zeit/commit/f2fbbf817a0033a72f7e94be04ebc6313f0708e8))
+* **puck:** Viewport-Umschalter mit unterscheidbaren Icons ([401e99a](https://github.com/oliverba81/familien-herz-zeit/commit/401e99a40ab00b57c9f94f30412f7125ffbcd8e0))
+* **puck:** Viewport-Umschalter mit unterscheidbaren Icons ([225d461](https://github.com/oliverba81/familien-herz-zeit/commit/225d4610023bac0306dcef53e67c999c75c8bf1f))
 
 ## [0.7.0](https://github.com/oliverba81/familien-herz-zeit/compare/v0.6.0...v0.7.0) (2026-06-22)
 
