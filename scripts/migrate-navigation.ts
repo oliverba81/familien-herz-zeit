@@ -87,6 +87,8 @@ const footerNavItems: NavItem[] = [
   { href: "/kontakt", label: "Kontakt" },
   { href: "/impressum", label: "Impressum" },
   { href: "/datenschutzerklaerung", label: "Datenschutzerklärung" },
+  { href: "/agb", label: "AGB" },
+  { href: "/widerrufsbelehrung", label: "Widerrufsbelehrung" },
 ];
 
 async function createNavItem(
