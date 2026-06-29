@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "nav:add-legal-footer-links": "npx tsx scripts/add-legal-footer-links.ts",
     "backup:db": "bash scripts/backup-database.sh",
     "backup:full": "bash scripts/full-backup.sh",
     "restore:db": "bash scripts/restore-database.sh"
