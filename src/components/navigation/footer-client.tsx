@@ -24,14 +24,6 @@ export default function FooterClient({ items }: FooterClientProps) {
 
   const footerItems = items || [];
 
-  // Gruppiere Footer Items in Spalten (max 4 Spalten)
-  const columns: NavigationItem[][] = [];
-  const itemsPerColumn = Math.ceil(footerItems.length / 4);
-  
-  for (let i = 0; i < footerItems.length; i += itemsPerColumn) {
-    columns.push(footerItems.slice(i, i + itemsPerColumn));
-  }
-
   const renderFooterItem = (item: NavigationItem, level: number = 0): React.ReactNode => {
     const paddingLeft = level * 16;
     
@@ -93,14 +85,14 @@ export default function FooterClient({ items }: FooterClientProps) {
               </li>
             </ul>
           </div>
-          {columns.map((column, colIndex) => (
-            <div key={colIndex}>
-              <h3 className="text-lg font-semibold mb-4">Navigation</h3>
+          {footerItems.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Rechtliches</h3>
               <ul className="space-y-2 text-sm">
-                {column.map((item) => renderFooterItem(item, 0))}
+                {footerItems.map((item) => renderFooterItem(item, 0))}
               </ul>
             </div>
-          ))}
+          )}
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
           <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Familien Herz Zeit. Alle Rechte vorbehalten.</p>
